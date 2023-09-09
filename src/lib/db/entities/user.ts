@@ -1,6 +1,7 @@
 import { Collection, Entity, ManyToMany, PrimaryKey, Property, wrap } from '@mikro-orm/core';
 import crypto from 'crypto';
 import { Course } from './course';
+import { Role } from '../role';
 
 @Entity()
 export class User {
@@ -17,7 +18,13 @@ export class User {
     @Property({ hidden: true })
     public password: string;
 
-    @ManyToMany({ hidden: true, entity: () => Course })
+    @Property({ hidden: true })
+    public sessionToken?: string;
+
+    @Property()
+    public role = Role.USER;
+
+    @ManyToMany({ hidden: true, entity: () => Course, eager: true })
     public courses = new Collection<Course>(this);
 
     constructor(username: string, email: string, password: string) {
@@ -28,5 +35,10 @@ export class User {
 
     public toJSON() {
         return wrap<User>(this).toObject();
+    }
+
+    public isPasswordCorrect(password: string) {
+        const hash = crypto.createHmac('sha256', password).digest('hex');
+        return hash === this.password;
     }
 }
