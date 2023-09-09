@@ -65,25 +65,4 @@
 			max-height: 40dvh;
 		}
 	}
-
-	button#register {
-		display: block;
-		margin: 15px auto 30px;
-		padding: 1em 3em;
-		background: var(--cAccent);
-		color: white;
-		border: 0;
-		border-radius: 80px;
-		font-weight: bold;
-		cursor: pointer;
-		box-shadow: 1px 1px 8px #0000002e;
-	}
-
-	button.disabled {
-		border: 2px solid var(--c40);
-		background-color: var(--c100);
-		color: var(--c80);
-		cursor: no-drop;
-		box-shadow: unset;
-	}
 </style>
