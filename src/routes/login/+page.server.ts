@@ -5,7 +5,7 @@ import type { PageServerLoad } from "../$types";
 
 export const load: PageServerLoad = async ({ locals }) => {
     if (locals.user) {
-        throw redirect(307, '/courses');
+        throw redirect(303, '/courses');
     }
 };
 
@@ -35,6 +35,6 @@ export const actions = {
         cookies.set('user', user.sessionToken, { path: "/" });
 
         await locals.em.persistAndFlush(user);
-        throw redirect(307, '/courses'); // 307 is a temporary redirect, 301 is permanent
+        throw redirect(303, '/courses'); // 307 is a temporary redirect, 301 is permanent
     },
 } satisfies Actions;

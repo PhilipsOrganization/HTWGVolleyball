@@ -23,7 +23,7 @@ export const actions = {
 
         const isFirstUser = (await locals.em.count(User)) === 0;
         if (isFirstUser) {
-            newUser.role = Role.ADMIN;
+            newUser.role = Role.SUPER_ADMIN;
         }
 
         const sessionToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -31,6 +31,6 @@ export const actions = {
         cookies.set('user', newUser.sessionToken, { path: "/" });
 
         await locals.em.persistAndFlush(newUser);
-        throw redirect(307, '/courses'); // 307 is a temporary redirect, 301 is permanent
+        throw redirect(303, '/courses'); // 307 is a temporary redirect, 301 is permanent
     },
 } satisfies Actions;

@@ -3,7 +3,7 @@ import type { Options } from '@mikro-orm/core';
 
 export const config: Options = {
     type: 'sqlite',
-    dbName: 'test.db',
+    dbName: 'prod.db',
     entities,
     debug: true,
     forceUtcTimezone: true,

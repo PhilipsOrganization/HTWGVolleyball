@@ -1,5 +1,3 @@
-<!-- login page -->
-
 <div>
 	<h1>Register</h1>
 	<a href="/login">Login</a>
@@ -13,3 +11,20 @@
 		<button>Login</button>
 	</form>
 </div>
+
+<style>
+	form {
+		display: flex;
+		flex-direction: column;
+	}
+
+	div {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	button {
+		margin-top: 10px;
+	}
+</style>

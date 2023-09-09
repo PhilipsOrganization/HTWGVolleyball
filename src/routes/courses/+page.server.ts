@@ -4,7 +4,7 @@ import { Course } from "$lib/db/entities/course";
 
 export const load: PageServerLoad = async ({ locals }) => {
     if (!locals.user) {
-        throw redirect(307, '/login');
+        throw redirect(303, '/login');
     }
 
     const courses = locals.user.courses.getItems();
@@ -13,14 +13,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 
     return {
         courses: courses.map((c) => c.toJSON()),
-        allCourses: allCourses.map((c) => c.toJSON()),
+        allCourses: allCourses.map((c) => c.toJSON(locals.user)),
+        user: locals.user.toJSON(),
     };
 };
 
 export const actions = {
     enlist: async ({ locals, request }) => {
         if (!locals.user) {
-            throw redirect(307, '/login');
+            throw redirect(303, '/login');
         }
 
         const form = await request.formData()
@@ -44,7 +45,7 @@ export const actions = {
     },
     drop: async ({ locals, request }) => {
         if (!locals.user) {
-            throw redirect(307, '/login');
+            throw redirect(303, '/login');
         }
 
         const form = await request.formData()

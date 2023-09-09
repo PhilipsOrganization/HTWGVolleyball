@@ -1,25 +1,24 @@
 import { Course } from "$lib/db/entities/course";
-import { error } from "@sveltejs/kit";
-import type { PageServerLoad, Actions } from "./$types";
+import { redirect } from "@sveltejs/kit";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals }) => {
-    const courses = await locals.em.find(Course, {});
-    return {
-        posts: courses.map((c) => c.toJSON()),
-    };
+    if(locals.user) {
+        throw redirect(303, '/courses');
+    }
+
+    const courses = await locals.em.find(Course, { publishOn: { $lt: new Date() } }, { orderBy: { date: "ASC" } });
+
+    const dates: { [date: string]: Course[] } = {};
+
+    for (const course of courses) {
+        const date = course.date.toISOString().substr(0, 10);
+        if (!dates[date]) {
+            dates[date] = [];
+        }
+        dates[date].push(course);
+    }
+
+    return { dates: Object.entries(dates).map(([date, courses]) => ({ date, courses: courses.map((c) => c.toJSON()) })) };
 };
 
-export const actions = {
-    default: async ({ locals, request }) => {
-        const form = await request.formData()
-        const title = form.get('title');
-        if (!title) {
-            throw error(400, 'No title provided');
-        }
-
-        const course = new Course();
-        course.title = title as string;
-
-        await locals.em.persistAndFlush(course);
-    },
-} satisfies Actions;

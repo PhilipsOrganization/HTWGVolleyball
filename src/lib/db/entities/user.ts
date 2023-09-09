@@ -24,6 +24,9 @@ export class User {
     @Property()
     public role = Role.USER;
 
+    @Property()
+    public strikes: number;
+
     @ManyToMany({ hidden: true, entity: () => Course, eager: true })
     public courses = new Collection<Course>(this);
 
@@ -31,6 +34,7 @@ export class User {
         this.username = username;
         this.email = email;
         this.password = crypto.createHmac('sha256', password).digest('hex');
+        this.strikes = 0;
     }
 
     public toJSON() {

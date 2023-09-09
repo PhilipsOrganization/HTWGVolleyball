@@ -1,5 +1,6 @@
 import { Collection, Entity, ManyToMany, PrimaryKey, Property, wrap } from '@mikro-orm/core';
 import { User } from './user';
+import { DateType } from '../date-type';
 
 @Entity()
 export class Course {
@@ -7,20 +8,44 @@ export class Course {
     public id!: number;
 
     @Property()
-    public title!: string;
+    public name!: string;
 
-    @Property({ type: 'date' })
-    public createdAt = new Date();
+    @Property({ type: DateType, length: 3 })
+    public date!: Date;
+
+    @Property({ type: "date" })
+    public publishOn!: Date;
+
+    @Property()
+    public maxParticipants!: number;
+
+    @Property()
+    public location!: string;
+
+    @Property()
+    public time!: string;
 
     @ManyToMany(() => User, user => user.courses, { owner: true, hidden: true, eager: true })
     public users = new Collection<User>(this);
 
+    @Property({ type: 'date' })
+    public createdAt = new Date();
+
     @Property({ type: 'date', onUpdate: () => new Date() })
     public updatedAt = new Date();
 
-    public toJSON() {
+    public toJSON(user?: User) {
         const obj = wrap<Course>(this).toObject();
         const signupCount = this.users.count();
-        return { ...obj, signupCount };
+
+        let isEnrolled = false;
+
+        if (user) {
+            isEnrolled = this.users.contains(user);
+        }
+
+        return { ...obj, signupCount, isEnrolled };
     }
 }
+
+export type CourseDTO = ReturnType<Course['toJSON']>;
