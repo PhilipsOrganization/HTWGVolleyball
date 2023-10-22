@@ -4,7 +4,7 @@
 	<form action="?/login" method="post">
 		<fieldset>
 			<label for="username">Username</label>
-			<input type="text" name="username" id="username" autocomplete="username"/>
+			<input type="text" name="username" id="username" autocomplete="username" />
 		</fieldset>
 		<fieldset>
 			<label for="password">Password</label>

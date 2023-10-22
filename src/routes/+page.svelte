@@ -13,7 +13,7 @@
 		<p>There are currently no courses. ☹</p>
 	{:else}
 		<h2>Avaliable Courses:</h2>
-		<p> <a href="/login">Sign in</a> to register</p>
+		<p><a href="/login">Sign in</a> to register</p>
 	{/if}
 	<div id="list">
 		{#each data.dates ?? [] as block, i}

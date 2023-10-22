@@ -1,4 +1,7 @@
 <script>
+	/**
+	 * @type {boolean}
+	 */
 	export let loading;
 </script>
 

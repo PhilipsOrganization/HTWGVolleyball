@@ -1,15 +1,15 @@
-version: '3.8' 
- 
-services: 
-  volleyball: 
-    build: 
-      context: ./ 
-      dockerfile: Dockerfile 
+version: '3.8'
+
+services:
+  volleyball:
+    build:
+      context: ./
+      dockerfile: Dockerfile
     restart: always
     # sqllite db file
     volumes:
       - ./volleyball.db:/app/prod.db
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.volleyball.rule=Host(`volleyball.homelab`)"
-      - "traefik.http.services.volleyball.loadbalancer.server.port=4173"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.volleyball.rule=Host(`volleyball.homelab`)'
+      - 'traefik.http.services.volleyball.loadbalancer.server.port=4173'

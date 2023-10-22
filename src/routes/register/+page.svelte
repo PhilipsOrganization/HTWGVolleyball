@@ -1,19 +1,18 @@
 <script lang="ts">
-	import { enhance } from "$app/forms";
-
-
+	import { enhance } from '$app/forms';
 </script>
+
 <div>
 	<h1>Register / <a href="/login">Login</a></h1>
 
 	<form action="?/register" method="post" use:enhance>
 		<fieldset>
 			<label for="username">Username</label>
-			<input type="text" name="username" id="username" autocomplete="username"/>
+			<input type="text" name="username" id="username" autocomplete="username" />
 		</fieldset>
 		<fieldset>
 			<label for="email">Email</label>
-			<input type="email" name="email" id="email" autocomplete="email"/>
+			<input type="email" name="email" id="email" autocomplete="email" />
 		</fieldset>
 		<fieldset>
 			<label for="password">Password</label>

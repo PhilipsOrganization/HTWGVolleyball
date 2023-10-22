@@ -6,21 +6,24 @@ import { User } from '$lib/db/entities/user';
 
 const orm = await MikroORM.init(config);
 
-const migrator = orm.getMigrator()
-await migrator.createMigration()
-await migrator.up()
-
+const migrator = orm.getMigrator();
+await migrator.createMigration();
+await migrator.up();
 
 export const handle: Handle = async ({ event, resolve }) => {
-    event.locals.em = orm.em.fork() as SqlEntityManager;
-    const session = event.cookies.get('user');
+	event.locals.em = orm.em.fork() as SqlEntityManager;
+	const session = event.cookies.get('user');
 
-    if (session) {
-        const user = await event.locals.em.findOne(User, { sessionToken: session }, { populate: ['courses'] });
-        if (user) {
-            event.locals.user = user;
-        }
-    }
+	if (session) {
+		const user = await event.locals.em.findOne(
+			User,
+			{ sessionToken: session },
+			{ populate: ['courses'] }
+		);
+		if (user) {
+			event.locals.user = user;
+		}
+	}
 
-    return await resolve(event);
+	return await resolve(event);
 };
