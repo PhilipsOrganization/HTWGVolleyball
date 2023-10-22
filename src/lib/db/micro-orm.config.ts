@@ -3,7 +3,7 @@ import type { Options } from '@mikro-orm/sqlite';
 
 export const config: Options = {
 	type: 'sqlite',
-	dbName: 'prod.db',
+	dbName: './db/prod.db',
 	entities,
 	discovery: {
 		disableDynamicFileAccess: true,

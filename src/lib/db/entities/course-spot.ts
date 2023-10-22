@@ -4,7 +4,7 @@ import { Subscription } from './subscription';
 import crypto from 'crypto';
 
 
-@Entity({ tableName: 'users' })
+@Entity({ tableName: 'users', })
 export class User {
 	@PrimaryKey()
 	public id!: number;
