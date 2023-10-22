@@ -21,5 +21,6 @@ jobs:
         run: |
           echo "VITE_VAPID_PUBLIC=${{ secrets.VITE_VAPID_PUBLIC }}" >> .env.local
           echo "VAPID_PRIVATE=${{ secrets.VAPID_PRIVATE }}" >> .env.local
+          echo "ORIGIN=${{ secrets.ORIGIN }}" >> .env.local
           cat .env.local
           docker-compose up --build -d
