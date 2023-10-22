@@ -8,13 +8,15 @@ services:
     restart: always
     networks:
       - traefik_web
+    environment:
+      - ORIGIN=https://volleyball.oesterlin.dev
     # sqllite db file
     volumes:
-      - ./volleyball.db:/app/prod.db
+      - ./db:/app/db
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.volleyball.rule=Host(`volleyball.homelab`)'
-      - 'traefik.http.services.volleyball.loadbalancer.server.port=4173'
+      - 'traefik.http.services.volleyball.loadbalancer.server.port=3000'
 
 
 networks:

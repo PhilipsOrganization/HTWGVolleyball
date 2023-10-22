@@ -11,4 +11,4 @@ RUN pnpm install -r --offline && pnpm run build
 
 EXPOSE 4173
 
-CMD [ "npm", "run", "preview" ]
+CMD [ "node", "-r", "dotenv/config", "build" ]
