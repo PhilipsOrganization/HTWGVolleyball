@@ -6,6 +6,8 @@ services:
       context: ./
       dockerfile: Dockerfile
     restart: always
+    networks:
+      - traefik_web
     # sqllite db file
     volumes:
       - ./volleyball.db:/app/prod.db
@@ -13,3 +15,8 @@ services:
       - 'traefik.enable=true'
       - 'traefik.http.routers.volleyball.rule=Host(`volleyball.homelab`)'
       - 'traefik.http.services.volleyball.loadbalancer.server.port=4173'
+
+
+networks:
+  traefik_web:
+    external: true
