@@ -1,6 +1,6 @@
 import { Entity, Property, wrap } from '@mikro-orm/core';
 import type { EntityManager } from '@mikro-orm/sqlite';
-import { Course } from './course';
+import { Course } from './';
 
 @Entity({
 	expression: (em: EntityManager) => {

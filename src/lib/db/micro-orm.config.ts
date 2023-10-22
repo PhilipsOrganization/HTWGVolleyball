@@ -1,10 +1,17 @@
 import { entities } from '$lib/db/entities';
-import type { Options } from '@mikro-orm/core';
+import type { Options } from '@mikro-orm/sqlite';
 
 export const config: Options = {
 	type: 'sqlite',
 	dbName: 'prod.db',
 	entities,
+	discovery: {
+		disableDynamicFileAccess: true,
+		requireEntitiesArray: true,
+	},
+	cache: {
+		enabled: false,
+	},
 	debug: true,
 	forceUtcTimezone: true,
 	validate: true,

@@ -1,4 +1,4 @@
-import { User } from '$lib/db/entities/user';
+import { User } from '$lib/db/entities';
 import { Role } from '$lib/db/role';
 import { error, redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';

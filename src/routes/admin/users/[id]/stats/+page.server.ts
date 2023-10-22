@@ -2,8 +2,7 @@ import { UserStats } from '$lib/db/entities/user-stats';
 import { Role } from '$lib/db/role';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { User } from '$lib/db/entities/user';
-import { Course } from '$lib/db/entities/course';
+import { Course, User } from '$lib/db/entities';
 import { getPath } from '$lib/helpers/stats';
 
 export const load: PageServerLoad = async ({ locals, params }) => {

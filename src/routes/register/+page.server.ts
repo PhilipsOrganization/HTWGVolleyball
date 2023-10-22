@@ -1,4 +1,4 @@
-import { User } from '$lib/db/entities/user';
+import { User } from '$lib/db/entities';
 import { Role } from '$lib/db/role';
 import { error, type Actions, redirect } from '@sveltejs/kit';
 
@@ -14,12 +14,12 @@ export const actions = {
 			throw error(400, 'invalid data');
 		}
 
-		const user = await locals.em.findOne(User, { $or: [{ username }, { email }] });
-		if (user) {
+		const existingUser = await locals.em.findOne(User, { $or: [{ username }, { email }] });
+		if (existingUser) {
 			throw error(400, 'user already exists');
 		}
 
-		const newUser = new User(username, email, password);
+		const newUser = new User( username, email, password);
 
 		const isFirstUser = (await locals.em.count(User)) === 0;
 		if (isFirstUser) {
@@ -31,7 +31,8 @@ export const actions = {
 		newUser.sessionToken = sessionToken;
 		cookies.set('user', newUser.sessionToken, { path: '/' });
 
-		await locals.em.persistAndFlush(newUser);
+		const user = locals.em.create(User, newUser);
+		await locals.em.persistAndFlush(user);
 		throw redirect(303, '/courses'); // 307 is a temporary redirect, 301 is permanent
 	}
 } satisfies Actions;

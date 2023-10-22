@@ -14,7 +14,8 @@ jobs:
       - uses: actions/checkout@master
 
       - name: stop running containers
-        run: sudo docker-compose down --remove-orphans
+        continue-on-error: true
+        run: docker-compose down --remove-orphans
 
       - name: Run all containers
-        run: sudo docker-compose up --build -d
+        run: docker-compose up --build -d

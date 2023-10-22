@@ -2,7 +2,7 @@ import type { Handle } from '@sveltejs/kit';
 import { config } from './lib/db/micro-orm.config';
 import { MikroORM } from '@mikro-orm/core';
 import type { SqlEntityManager } from '@mikro-orm/sqlite';
-import { User } from '$lib/db/entities/user';
+import { User } from '$lib/db/entities';
 
 const orm = await MikroORM.init(config);
 

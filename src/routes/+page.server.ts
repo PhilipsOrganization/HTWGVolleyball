@@ -1,4 +1,4 @@
-import { Course } from '$lib/db/entities/course';
+import { Course } from '$lib/db/entities';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

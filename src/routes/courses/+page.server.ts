@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { Course } from '$lib/db/entities/course';
+import { Course } from '$lib/db/entities';
 import { Role } from '$lib/db/role';
 
 export const load: PageServerLoad = async ({ locals }) => {
