@@ -1,4 +1,4 @@
-FROM node:20-slim AS base
+FROM node:20-slim
 WORKDIR /app
 
 # pnpm fetch does require only lockfile
@@ -11,4 +11,4 @@ RUN pnpm install -r --offline && pnpm run build
 
 EXPOSE 3000
 
-CMD [ "node", "-r", "dotenv/config", "build" ]
+CMD ["node", "build/index.js"]
