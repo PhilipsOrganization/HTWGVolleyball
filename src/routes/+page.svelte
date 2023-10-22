@@ -9,6 +9,12 @@
 </script>
 
 <main>
+	{#if data.dates?.length === 0}
+		<p>There are currently no courses. ☹</p>
+	{:else}
+		<h2>Avaliable Courses:</h2>
+		<p> <a href="/login">Sign in</a> to register</p>
+	{/if}
 	<div id="list">
 		{#each data.dates ?? [] as block, i}
 			<span>{humanReadableDate(block.date)}</span>
@@ -23,7 +29,6 @@
 				<div class="line" />
 			{/if}
 		{/each}
-		{#if data.dates?.length === 0}There are currently no courses. ☹{/if}
 	</div>
 </main>
 
@@ -52,12 +57,6 @@
 		width: 90vw;
 		max-width: 700px;
 		box-sizing: border-box;
-	}
-
-	#list {
-		max-height: 48dvh;
-		overflow-y: auto;
-		margin-bottom: 4vh;
 	}
 
 	@media screen and (max-height: 600px) {

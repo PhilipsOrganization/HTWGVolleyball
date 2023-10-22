@@ -1,10 +1,15 @@
 <script>
-	import { daysOfWeek, humanReadableDate, monthsOfYear, addDays } from '../helpers/date';
-	// @ts-ignore
-	import Datepicker from 'svelte-calendar';
-	import { createEventDispatcher } from 'svelte';
-	import { nextMonday, nextSaturday, nextThursday, nextTuesday, nextWednesday } from 'date-fns';
-	const dispatch = createEventDispatcher();
+	import { enhance } from '$app/forms';
+	import { page } from '$app/stores';
+	import {
+		addDays,
+		nextMonday,
+		nextSaturday,
+		nextThursday,
+		nextWednesday,
+		setHours,
+		setMinutes
+	} from 'date-fns';
 
 	const difficulties = [
 		'Beginner',
@@ -16,27 +21,23 @@
 		'Christmas Special🎄'
 	];
 
-	let course = {
-		name: 'Volleyball - ',
-		location: 'Ellenrieder Sporthalle',
-		spots: 18,
-		time: '20:30',
-		duration: 1.5,
-		date: addDays(new Date(), 7),
-		publishOn: new Date()
-	};
+	$: form = $page.form;
 
-	let defaults = [
+	/** @type {HTMLDialogElement} */
+	let dialog;
+	let name = 'Beginner';
+
+	let courses = [
 		{
 			name: difficulties[0],
 			settings: {
 				name: difficulties[0],
 				location: 'Ellenrieder Sporthalle',
-				spots: 18,
+				maxParticipants: 18,
 				time: '17:30',
 				duration: 1.5,
 				date: nextMonday(new Date()),
-				publishOn: nextThursday(new Date())
+				publishOn: setTo12(nextThursday(new Date()))
 			}
 		},
 		{
@@ -44,11 +45,11 @@
 			settings: {
 				name: difficulties[1],
 				location: 'Ellenrieder Sporthalle',
-				spots: 18,
+				maxParticipants: 18,
 				time: '19:00',
 				duration: 1.5,
 				date: nextMonday(new Date()),
-				publishOn: nextThursday(new Date())
+				publishOn: setTo12(nextThursday(new Date()))
 			}
 		},
 		{
@@ -56,11 +57,11 @@
 			settings: {
 				name: difficulties[2],
 				location: 'Ellenrieder Sporthalle',
-				spots: 18,
+				maxParticipants: 18,
 				time: '20:30',
 				duration: 1.5,
 				date: nextMonday(new Date()),
-				publishOn: nextThursday(new Date())
+				publishOn: setTo12(nextThursday(new Date()))
 			}
 		},
 		{
@@ -68,11 +69,11 @@
 			settings: {
 				name: difficulties[4],
 				location: 'Ellenrieder Sporthalle',
-				spots: 18,
+				maxParticipants: 18,
 				time: '20:30',
 				duration: 1.5,
 				date: nextWednesday(new Date()),
-				publishOn: nextThursday(new Date())
+				publishOn: setTo12(nextThursday(new Date()))
 			}
 		},
 		{
@@ -80,164 +81,183 @@
 			settings: {
 				name: difficulties[5],
 				location: 'Petershausener Sporthalle',
-				spots: 36,
+				maxParticipants: 36,
 				time: '12:00',
 				duration: 1.5,
 				date: nextSaturday(addDays(new Date(), 7)),
-				publishOn: nextThursday(new Date())
+				publishOn: setTo12(nextThursday(new Date()))
 			}
 		}
 	];
 
-	function applyDefault(settings) {
-		Object.keys(settings).forEach((key) => {
-			course[key] = settings[key];
-		});
+	$: defaults = courses.find((c) => c.name === name)?.settings;
+
+	/**
+	 * @param {number} number
+	 */
+	function padNumberToTwoDigits(number) {
+		return number.toString().padStart(2, '0');
+	}
+
+	/**
+	 * @param {Date | undefined} date
+	 */
+	function dateTimeToDateString(date) {
+		if (!date) return '';
+
+		const components = [
+			date.getFullYear(),
+			padNumberToTwoDigits(date.getMonth() + 1),
+			padNumberToTwoDigits(date.getDate())
+		];
+
+		return components.join('-');
+	}
+
+	/**
+	 * @param {Date | undefined} date
+	 */
+	function dateTimeToString(date) {
+		if (!date) return '';
+
+		const components = [
+			dateTimeToDateString(date),
+			'T',
+			padNumberToTwoDigits(date.getHours()),
+			':',
+			padNumberToTwoDigits(date.getMinutes())
+		];
+
+		return components.join('');
+	}
+
+	/**
+	 * @param {Date} date
+	 */
+	function setTo12(date) {
+		return setMinutes(setHours(date, 12), 0);
 	}
 </script>
 
-<div id="overlay" on:click|self={() => dispatch('close')}>
-	<div id="inner">
-		<button id="close" on:click={() => dispatch('close')}>X</button>
-		<h3>Create a Course:</h3>
-		<div id="defaults">
-			{#each defaults as setting}
-				<button on:click={() => applyDefault(setting.settings)}>{setting.name}</button>
-			{/each}
-		</div>
-		<p>
-			<label for="titel">Titel</label>
-			<!-- <input type="text" bind:value={course.name} placeholder="Titel" id="titel" /> -->
-			<select bind:value={course.name} id="titel">
+<button class="highlight" id="open" on:click={() => dialog.showModal()}>Create Course</button>
+<dialog bind:this={dialog}>
+	<h1>New Course</h1>
+	<form method="POST" action="?/create-course" use:enhance>
+		<button id="close" value="cancel" formmethod="dialog">x</button>
+		<field>
+			<label for="name">Name</label>
+			<!-- <input bind:value={name} type="text" name="name" placeholder="Name" /> -->
+			<select bind:value={name} name="name">
 				{#each difficulties as difficulty}
-					<option value={difficulty}>
-						{difficulty}
-					</option>
+					<option value={difficulty}>{difficulty}</option>
 				{/each}
 			</select>
-		</p>
-		<p>
+			<small class="error">{form?.name ?? ''}</small>
+		</field>
+
+		<field>
 			<label for="location">Location</label>
-			<input type="text" bind:value={course.location} placeholder="Location" id="location" />
-		</p>
-		<p>
-			<label for="spots">Spots</label>
-			<input type="number" bind:value={course.spots} placeholder="Spots" id="spots" />
-		</p>
-		<p>
-			<label for="duration">Duration</label>
+			<input value={defaults?.location ?? ''} type="text" name="location" placeholder="Location" />
+			<small class="error">{form?.location ?? ''}</small>
+		</field>
+
+		<field>
+			<label for="date">Date</label>
 			<input
-				type="number"
-				bind:value={course.duration}
-				step="0.25"
-				placeholder="Duration"
-				id="duration"
+				value={dateTimeToDateString(defaults?.date)}
+				type="date"
+				name="date"
+				placeholder="Date"
 			/>
-		</p>
-		<p>
+			<small class="error">{form?.date ?? ''}</small>
+		</field>
+
+		<field>
 			<label for="time">Time</label>
-			<input type="text" bind:value={course.time} placeholder="Time" id="time" />
-		</p>
-		<p>
-			<label for="">Date:</label>
-			<Datepicker
-				{daysOfWeek}
-				{monthsOfYear}
-				start={new Date()}
-				startOfWeekIndex={2}
-				bind:selected={course.date}
-				format={humanReadableDate}
+			<input value={defaults?.time ?? ''} type="time" name="time" placeholder="Time" />
+			<small class="error">{form?.time ?? ''}</small>
+		</field>
+
+		<field>
+			<label for="maxParticipants">Max Participants</label>
+			<input
+				value={defaults?.maxParticipants ?? ''}
+				type="number"
+				name="maxParticipants"
+				placeholder="Max Participants"
 			/>
-		</p>
-		<p>
-			<label for="">Publish on:</label>
-			<Datepicker
-				{daysOfWeek}
-				{monthsOfYear}
-				start={addDays(new Date(), -7)}
-				startOfWeekIndex={2}
-				bind:selected={course.publishOn}
-				format={humanReadableDate}
+			<small class="error">{form?.maxParticipants ?? ''}</small>
+		</field>
+
+		<field>
+			<label for="publishOn">Publish On</label>
+			<input
+				value={dateTimeToString(defaults?.publishOn)}
+				type="datetime-local"
+				name="publishOn"
+				placeholder="Publish On"
 			/>
-		</p>
-		<button on:click={() => dispatch('submit', course)}>Create</button>
-	</div>
-</div>
+			<small class="error">{form?.publishOn ?? ''}</small>
+		</field>
+
+		<button id="submit" class="highlight">Submit</button>
+	</form>
+</dialog>
 
 <style>
-	div#overlay {
-		position: fixed;
-		inset: 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		background: rgba(0, 0, 0, 0.267);
-	}
-
-	div#inner {
+	dialog {
 		position: relative;
-		background: white;
-		padding: 20px;
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		width: 400px;
+		padding: 12px 3em;
+		width: min(90vw, 400px);
+		max-width: calc(100vw - 9em);
 	}
 
-	p {
-		flex: 1 1 100%;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	p > *:nth-child(2) {
-		width: 250px;
+	#open {
+		position: fixed;
+		bottom: 1em;
+		right: 1em;
+		z-index: 100;
 	}
 
 	#close {
 		position: absolute;
-		top: -52px;
-		right: 0px;
-		background: cadetblue;
-		border: 30px solid white;
-		box-sizing: content-box;
+		inset: 10px 10px auto auto;
+		padding: 0.5em 0.75em;
+		background: rgb(230, 230, 230);
+		border: none;
 		border-radius: 50%;
-		line-height: 0.9em;
-		color: white;
-		font-weight: bold;
-		font-size: 40px;
+		font-size: 1.5em;
+		line-height: 1;
 		cursor: pointer;
 	}
 
-	button:not(#close) {
-		display: block;
-		margin: 15px auto;
-		width: 100%;
-		height: 60px;
-		background: cadetblue;
-		color: white;
-		border: 0;
-		border-radius: 15px;
-		font-weight: bold;
-		cursor: pointer;
+	#submit {
+		min-width: 60%;
 	}
 
-	#defaults {
+	form {
 		display: flex;
-		gap: 7px;
-		background: #e4dfdf;
-		padding: 6px;
-		margin: 0 -20px 7px;
-		opacity: 0.9;
+		flex-direction: column;
 	}
-	h3 {
-		background: cadetblue;
-		width: calc(100% + 40px);
-		margin: -20px;
-		margin-bottom: 0;
-		color: white;
-		text-align: center;
-		padding: 20px;
+
+	form field {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 1rem;
+	}
+
+	form field label {
+		margin-bottom: 0.5rem;
+	}
+
+	form field input {
+		padding: 0.5rem;
+		border: 1px solid #ccc;
+		border-radius: 0.25rem;
+	}
+
+	form field input:focus {
+		outline: none;
+		border-color: #000;
 	}
 </style>

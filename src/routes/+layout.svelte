@@ -1,30 +1,33 @@
 <script>
 	import { page } from '$app/stores';
+	import { Role } from '$lib/db/role';
 </script>
 
 <header>
-	<a href="/">
-		<h1>Register for Volleyball</h1>
-		{#if $page.data.user}
-			<span>{$page.data.user.username}</span>
-			<a href="/logout">Logout</a>
-		{:else}
-			<a href="/login">Login</a>
+	<h1>Register for Volleyball</h1>
+	{#if $page.data.user}
+		<span>{$page.data.user.username}</span>
+		<a class="accent margin" href="/logout">Logout</a>
+		<a class="accent margin" href="/profile">Profile</a>
+		{#if $page.data.user.role !== Role.USER}
+			<a class="accent margin" href="/admin">Admin</a>
 		{/if}
-	</a>
+	{:else}
+		<a class="accent" href="/login">Login</a>
+	{/if}
 	<img src="/Volleyball_icon.svg" alt="" />
 </header>
 
 <slot />
 
-<style lang="scss">
+<style>
 	:global(body) {
-		--c0: black;
+		--c0: #282828;
 		--c20: #3b3b37;
 		--c40: #4d4747;
 		--c80: #d0d0d0;
 		--c100: white;
-		--cAccent: #21b5ac;
+		--cAccent: #55b5fa;
 		--breakpoint-sm: 576px;
 		--breakpoint-md: 768px;
 
@@ -52,5 +55,13 @@
 		top: -50%;
 		right: -10px;
 		bottom: -50%;
+	}
+
+	a.margin {
+		margin-left: 10px;
+	}
+
+	a.accent {
+		color: var(--cAccent);
 	}
 </style>

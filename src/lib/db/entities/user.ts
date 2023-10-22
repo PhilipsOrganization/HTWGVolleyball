@@ -1,7 +1,8 @@
-import { Collection, Entity, ManyToMany, PrimaryKey, Property, wrap } from '@mikro-orm/core';
+import { Collection, Embedded, Entity, ManyToMany, PrimaryKey, Property, wrap } from '@mikro-orm/core';
 import crypto from 'crypto';
 import { Course } from './course';
 import { Role } from '../role';
+import { Subscription } from './subscription';
 
 @Entity()
 export class User {
@@ -18,7 +19,7 @@ export class User {
     @Property({ hidden: true })
     public password: string;
 
-    @Property({ hidden: true })
+    @Property({ hidden: true, nullable: true })
     public sessionToken?: string;
 
     @Property()
@@ -26,6 +27,12 @@ export class User {
 
     @Property()
     public strikes: number;
+
+    @Property({ nullable: true })
+    public notes?: string;
+
+    @Embedded(() => Subscription, { nullable: true })
+    public subscription?: Subscription;
 
     @ManyToMany({ hidden: true, entity: () => Course, eager: true })
     public courses = new Collection<Course>(this);
@@ -44,5 +51,10 @@ export class User {
     public isPasswordCorrect(password: string) {
         const hash = crypto.createHmac('sha256', password).digest('hex');
         return hash === this.password;
+    }
+
+    @Property({ persist: false })
+    public get hasNotificationsEnabled() {
+        return this.subscription !== undefined;
     }
 }

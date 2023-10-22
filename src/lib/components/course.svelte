@@ -16,6 +16,7 @@
 	export let selected = false;
 	export let fullDate = false;
 	export let showPublishDate = false;
+	export let spot = 0;
 
 	$: registered = course?.signupCount;
 
@@ -49,7 +50,20 @@
 			{/if}
 		</span>
 	</div>
-	<Scale avaliable={course.maxParticipants} booked={registered} dark={selected} />
+	{#if course.isEnrolled}
+		<div class="center">
+			{#if spot > 0}
+				{@const waitlistSpot = spot - course.maxParticipants}
+				{#if waitlistSpot > 0}
+					<span>Waitlist: #{waitlistSpot}</span>
+				{:else}
+					<span>#{spot}</span>
+				{/if}
+			{/if}
+		</div>
+	{:else}
+		<Scale avaliable={course.maxParticipants} booked={registered} dark={selected} />
+	{/if}
 	<span>{course.location}</span>
 	{#if showPublishDate}
 		<br />
@@ -104,12 +118,17 @@
 	}
 
 	button {
-		padding: 0 25px;
+		padding: 5px 25px 0;
 	}
 
 	.flex {
 		display: flex;
 		justify-content: space-between;
-		flex-wrap: wrap;
+	}
+
+	.center {
+		text-align: center;
+		font-size: large;
+		color: var(--cAccent);
 	}
 </style>

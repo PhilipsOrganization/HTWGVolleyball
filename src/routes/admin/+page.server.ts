@@ -5,15 +5,14 @@ import { Role } from "$lib/db/role";
 import { assign } from "@mikro-orm/core";
 import { User } from "$lib/db/entities/user";
 import { z } from "zod";
-import { sub } from "date-fns";
 
-export const load: PageServerLoad = async ({ locals }) => {
-    if (locals.user?.role !== Role.ADMIN) {
-        throw redirect(303, '/login');
+export const load: PageServerLoad = async ({ locals, url }) => {
+    if (!locals.user || locals.user.role === Role.USER) {
+        throw redirect(303, '/courses');
     }
 
     // find all courses that take place in the future
-    const courses = await locals.em.find(Course, { date: { $gte: sub(new Date(), { days: 1 }) } });
+    const courses = await locals.em.find(Course, {});
 
     const dates: { [date: string]: Course[] } = {};
 
@@ -25,13 +24,19 @@ export const load: PageServerLoad = async ({ locals }) => {
         dates[date].push(course);
     }
 
-
     const users = await locals.em.find(User, {});
+    let course: Course | null = null;
+
+    if (url.searchParams.has("course")) {
+        const courseId = parseInt(url.searchParams.get("course") ?? '');
+        course = await locals.em.findOne(Course, { id: courseId });
+    }
 
     return {
         users: users.map((u) => u.toJSON()),
         dates: Object.entries(dates).map(([date, courses]) => ({ date, courses: courses.map((c) => c.toJSON()) })),
         user: locals.user.toJSON(),
+        course: course?.toJSON(locals.user),
     };
 };
 
@@ -47,7 +52,7 @@ const courseValidation = z.object({
 
 export const actions = {
     "create-course": async ({ locals, request }) => {
-        if (locals.user?.role !== Role.ADMIN) {
+        if (!locals.user || locals.user.role === Role.USER) {
             throw redirect(303, '/login');
         }
 
@@ -79,7 +84,7 @@ export const actions = {
         await locals.em.persistAndFlush(course);
     },
     "delete-course": async ({ locals, request }) => {
-        if (locals.user?.role !== Role.ADMIN) {
+        if (!locals.user || locals.user.role === Role.USER) {
             throw redirect(303, '/login');
         }
 
@@ -100,7 +105,7 @@ export const actions = {
         await locals.em.flush();
     },
     "update-course": async ({ locals, request }) => {
-        if (locals.user?.role !== Role.ADMIN) {
+        if (!locals.user || locals.user.role === Role.USER) {
             throw redirect(303, '/login');
         }
 
@@ -121,7 +126,7 @@ export const actions = {
         await locals.em.persistAndFlush(course);
     },
     demote: async ({ locals, request }) => {
-        if (locals.user?.role !== Role.ADMIN && locals.user?.role !== Role.SUPER_ADMIN) {
+        if (!locals.user || locals.user.role === Role.USER) {
             throw redirect(303, '/login');
         }
 
@@ -171,4 +176,28 @@ export const actions = {
         await locals.em.persistAndFlush(user);
     },
 
+    cancel: async ({ locals, request }) => {
+        if (!locals.user || locals.user.role === Role.USER) {
+            throw redirect(303, '/login');
+        }
+
+        const form = await request.formData();
+        const courseIdString = form.get('courseId') as string | undefined;
+        if (!courseIdString) {
+            throw error(400, 'No courseId provided');
+        }
+        const courseId = parseInt(courseIdString);
+        const course = await locals.em.findOneOrFail(Course, { id: courseId });
+        
+        const userIdString = form.get('userId') as string | undefined;
+        if (!userIdString) {
+            throw error(400, 'No userId provided');
+        }
+
+        const userId = parseInt(userIdString);
+        const user = await locals.em.findOneOrFail(User, { id: userId });
+        course.users.remove(user);
+
+        await locals.em.persistAndFlush(course);
+    }
 } satisfies Actions;

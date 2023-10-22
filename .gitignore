@@ -11,3 +11,6 @@ vite.config.ts.timestamp-*
 
 /src/migrations/*
 !src/migrations/package.json
+prod.db
+
+test.db

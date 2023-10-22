@@ -16,7 +16,7 @@ export const actions = {
 
         const user = await locals.em.findOne(User, { $or: [{ username }, { email }] });
         if (user) {
-            throw error(400, 'invalid data');
+            throw error(400, 'user already exists');
         }
 
         const newUser = new User(username, email, password);

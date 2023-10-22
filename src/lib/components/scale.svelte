@@ -1,5 +1,7 @@
 <script>
+	/** @type{number} */
 	export let avaliable;
+	/** @type{number} */
 	export let booked;
 	export let dark = false;
 </script>
