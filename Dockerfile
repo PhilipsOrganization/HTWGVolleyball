@@ -9,6 +9,6 @@ RUN npm i -g pnpm && pnpm fetch
 ADD . ./
 RUN pnpm install -r --offline && pnpm run build
 
-EXPOSE 4173
+EXPOSE 3000
 
 CMD [ "node", "-r", "dotenv/config", "build" ]
