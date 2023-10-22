@@ -8,9 +8,6 @@ services:
     restart: always
     networks:
       - traefik_web
-    environment:
-      - ORIGIN=https://volleyball.oesterlin.dev
-    # sqllite db file
     volumes:
       - ./db:/app/db
     labels:
