@@ -13,10 +13,12 @@ jobs:
     steps:
       - name: stop running containers
         continue-on-error: true
-        run: docker-compose down --remove-orphans
+        run: |
+          docker-compose down --remove-orphans
+          sudo chmod -R g+w /db
 
       - uses: actions/checkout@master
-        with: 
+        with:
           clean: false
 
       - name: Run all containers
