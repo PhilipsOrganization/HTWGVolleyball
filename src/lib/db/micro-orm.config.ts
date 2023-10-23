@@ -1,6 +1,7 @@
-import { env } from '$env/dynamic/private';
 import { entities } from '$lib/db/entities';
 import type { Options } from '@mikro-orm/postgresql';
+
+const env = process.env;
 
 export const config: Options = {
 	type: 'postgresql',
