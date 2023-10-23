@@ -2,6 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { Course } from '$lib/db/entities';
 import { Role } from '$lib/db/role';
+import { startOfYesterday } from 'date-fns';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
@@ -9,8 +10,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	const isAdmin = locals.user.role !== Role.USER;
-
-	const courses = await locals.em.find(Course, isAdmin ? {} : { publishOn: { $lt: new Date() } }, {
+	const baseQuery = { date: { $gte: startOfYesterday() } };
+	const courses = await locals.em.find(Course, isAdmin ? baseQuery : { publishOn: { $lt: new Date() }, ...baseQuery }, {
 		orderBy: { date: 'ASC' }
 	});
 

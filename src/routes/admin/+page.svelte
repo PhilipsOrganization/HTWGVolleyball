@@ -9,19 +9,28 @@
 
 	/** @type {number} */
 	$: courseID = parseInt($page.url.searchParams.get('course') ?? '0');
+
+	/** @param {boolean} show  */
+	function toggleShowArchived(show) {
+		show ? $page.url.searchParams.set('archived', 'true') : $page.url.searchParams.delete('archived');
+		goto($page.url.toString(), { replaceState: true, invalidateAll: true });
+	}
 </script>
 
 <CreateCourse />
 
 <h1>Courses <a href="/admin/users">Manage Users</a></h1>
 <div id="list">
+	<div>
+		<label for="archived">Show archived</label>
+		<input type="checkbox" id="archived" on:change={(e) => toggleShowArchived(e.target.checked)} />
+	</div>
 	{#each data.dates ?? [] as block, i}
 		<span>{humanReadableDate(block.date)}</span>
 		{#each block.courses as course}
 			<Course
 				{course}
-				on:select={(c) =>
-					goto(`/admin?course=${c.detail.course}`, { invalidateAll: true, replaceState: true })}
+				on:select={(c) => goto(`/admin?course=${c.detail.course}`, { invalidateAll: true, replaceState: true })}
 				selected={course.id === courseID}
 				action="?/delete-course"
 				actionName="delete"

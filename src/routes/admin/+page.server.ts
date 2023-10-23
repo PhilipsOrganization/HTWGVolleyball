@@ -5,6 +5,7 @@ import { Role } from '$lib/db/role';
 import { assign } from '@mikro-orm/core';
 import { User } from '$lib/db/entities';
 import { z } from 'zod';
+import { startOfYesterday } from 'date-fns';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -12,7 +13,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	}
 
 	// find all courses that take place in the future
-	const courses = await locals.em.find(Course, {});
+	const showArchived = url.searchParams.has('archived');
+	const courses = await locals.em.find(Course, showArchived ? {} : { date: { $gte: startOfYesterday() } });
 
 	const dates: { [date: string]: Course[] } = {};
 
