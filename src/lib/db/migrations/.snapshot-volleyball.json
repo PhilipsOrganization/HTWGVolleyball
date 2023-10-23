@@ -96,6 +96,16 @@
       "schema": "public",
       "indexes": [
         {
+          "keyName": "courses_name_date_index",
+          "columnNames": [
+            "name",
+            "date"
+          ],
+          "composite": true,
+          "primary": false,
+          "unique": false
+        },
+        {
           "keyName": "courses_pkey",
           "columnNames": [
             "id"
@@ -219,11 +229,38 @@
           "mappedType": "string"
         }
       },
-      "name": "users",
+      "name": "accounts",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "users_pkey",
+          "keyName": "accounts_session_token_index",
+          "columnNames": [
+            "session_token"
+          ],
+          "composite": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "accounts_email_index",
+          "columnNames": [
+            "email"
+          ],
+          "composite": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "accounts_username_index",
+          "columnNames": [
+            "username"
+          ],
+          "composite": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "accounts_pkey",
           "columnNames": [
             "id"
           ],
@@ -304,7 +341,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.users",
+          "referencedTableName": "public.accounts",
           "updateRule": "cascade"
         }
       }
@@ -330,11 +367,11 @@
           "mappedType": "integer"
         }
       },
-      "name": "users_courses",
+      "name": "accounts_courses",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "users_courses_pkey",
+          "keyName": "accounts_courses_pkey",
           "columnNames": [
             "user_id",
             "course_id"
@@ -346,25 +383,25 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "users_courses_user_id_foreign": {
-          "constraintName": "users_courses_user_id_foreign",
+        "accounts_courses_user_id_foreign": {
+          "constraintName": "accounts_courses_user_id_foreign",
           "columnNames": [
             "user_id"
           ],
-          "localTableName": "public.users_courses",
+          "localTableName": "public.accounts_courses",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.users",
+          "referencedTableName": "public.accounts",
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
-        "users_courses_course_id_foreign": {
-          "constraintName": "users_courses_course_id_foreign",
+        "accounts_courses_course_id_foreign": {
+          "constraintName": "accounts_courses_course_id_foreign",
           "columnNames": [
             "course_id"
           ],
-          "localTableName": "public.users_courses",
+          "localTableName": "public.accounts_courses",
           "referencedColumnNames": [
             "id"
           ],

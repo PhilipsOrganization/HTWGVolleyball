@@ -1,9 +1,12 @@
-import { Collection, Embedded, Entity, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
+import { Collection, Embedded, Entity, Index, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
 import crypto from 'crypto';
 import { Role } from '../role';
 import { Subscription } from './subscription';
 
-@Entity({ tableName: 'users' })
+@Entity({ tableName: 'accounts' })
+@Index({ properties: ['username'], options: { unique: true } })
+@Index({ properties: ['email'], options: { unique: true } })
+@Index({ properties: ['sessionToken'], options: { unique: true } })
 export class User {
 	@PrimaryKey()
 	public id!: number;
@@ -58,6 +61,7 @@ export class User {
 }
 
 @Entity({ tableName: 'courses' })
+@Index({ properties: ['name', 'date'], options: { unique: true } })
 export class Course {
 	@PrimaryKey()
 	public id!: number;
