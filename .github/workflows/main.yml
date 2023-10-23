@@ -13,17 +13,19 @@ jobs:
     steps:
       - name: stop running containers
         continue-on-error: true
-        run: |
-          docker-compose down --remove-orphans -f docker-compose.prod.yml
-          sudo chmod -R g+w /db
+        run: docker compose down --remove-orphans
 
       - uses: actions/checkout@master
-        with:
-          clean: false
 
       - name: Run all containers
         run: |
           echo "VITE_VAPID_PUBLIC=${{ secrets.VITE_VAPID_PUBLIC }}" >> .env.local
           echo "VAPID_PRIVATE=${{ secrets.VAPID_PRIVATE }}" >> .env.local
+          echo "MIKRO_ORM_DB_NAME=volleyball" >> .env.local
+          echo "MIKRO_ORM_HOST=postgres" >> .env.local
+          echo "MIKRO_ORM_PASSWORD=password" >> .env.local
+          echo "MIKRO_ORM_PORT=5432" >> .env.local
+          echo "MIKRO_ORM_USER=postgres" >> .env.local
           cat .env.local
-          docker-compose up --build -d -f docker-compose.prod.yml
+
+          docker compose -f docker-compose.prod.yaml up --build -d 
