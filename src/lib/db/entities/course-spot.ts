@@ -1,7 +1,7 @@
-import { Collection, DateType, Embedded, Entity, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
+import { Collection, Embedded, Entity, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
+import crypto from 'crypto';
 import { Role } from '../role';
 import { Subscription } from './subscription';
-import crypto from 'crypto';
 
 @Entity({ tableName: 'users' })
 export class User {
@@ -65,10 +65,10 @@ export class Course {
 	@Property()
 	public name!: string;
 
-	@Property({ type: DateType, length: 3 })
+	@Property({ type: 'date', length: 3 })
 	public date!: Date;
 
-	@Property({ type: DateType, length: 3 })
+	@Property({ type: 'datetime', length: 3 })
 	public publishOn!: Date;
 
 	@Property()
@@ -88,10 +88,10 @@ export class Course {
 	})
 	public users = new Collection<User>(this);
 
-	@Property({ type: 'date' })
+	@Property({ type: 'datetime' })
 	public createdAt = new Date();
 
-	@Property({ type: 'date', onUpdate: () => new Date() })
+	@Property({ type: 'datetime', onUpdate: () => new Date() })
 	public updatedAt = new Date();
 
 	public toJSON(user?: User) {
@@ -132,6 +132,6 @@ export class CourseSpot {
 	@ManyToOne(() => Course, { primary: true })
 	public course!: Course;
 
-	@Property({ type: 'date', defaultRaw: 'CURRENT_TIMESTAMP' })
+	@Property({ type: 'datetime', defaultRaw: 'NOW()' })
 	createdAt = new Date();
 }

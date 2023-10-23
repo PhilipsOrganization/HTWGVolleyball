@@ -1,10 +1,10 @@
 import { Entity, Property, wrap } from '@mikro-orm/core';
-import type { EntityManager } from '@mikro-orm/sqlite';
+import type { EntityManager } from '@mikro-orm/postgresql';
 import { CourseSpot } from '.';
 
 @Entity({
 	expression: (em: EntityManager) => {
-		const timeDiff = "abs(strftime('%s', spot.created_at) - strftime('%s', c.publish_on))";
+		const timeDiff = "extract(epoch from spot.created_at) - extract(epoch from c.publish_on)";
 		return (
 			em
 				.createQueryBuilder(CourseSpot, 'spot')
@@ -12,7 +12,7 @@ import { CourseSpot } from '.';
 				.select([`avg(${timeDiff}) as average_time`, `min(${timeDiff}) as min_time`, 'u.id as user_id'])
 				.join('spot.user', 'u')
 				.leftJoin('spot.course', 'c')
-				.groupBy(['u.id'])
+				.groupBy('u.id')
 		);
 	}
 })

@@ -1,7 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
 
 import type { User } from '$lib/db/entities';
-import type { SqlEntityManager } from '@mikro-orm/sqlite';
+import type { SqlEntityManager } from '@mikro-orm/postgresql';
 
 // for information about these interfaces
 declare global {

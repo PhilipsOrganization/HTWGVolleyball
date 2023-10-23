@@ -1,11 +1,14 @@
 {
-  "namespaces": [],
+  "namespaces": [
+    "public"
+  ],
+  "name": "public",
   "tables": [
     {
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "serial",
           "unsigned": true,
           "autoincrement": true,
           "primary": true,
@@ -14,36 +17,36 @@
         },
         "name": {
           "name": "name",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "date": {
           "name": "date",
-          "type": "date(3)",
+          "type": "timestamptz(3)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "length": 3,
-          "mappedType": "date"
+          "mappedType": "datetime"
         },
         "publish_on": {
           "name": "publish_on",
-          "type": "date(3)",
+          "type": "timestamptz(3)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "length": 3,
-          "mappedType": "date"
+          "mappedType": "datetime"
         },
         "max_participants": {
           "name": "max_participants",
-          "type": "integer",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -52,25 +55,25 @@
         },
         "location": {
           "name": "location",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "time": {
           "name": "time",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "created_at": {
           "name": "created_at",
-          "type": "datetime",
+          "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -80,7 +83,7 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "datetime",
+          "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -90,9 +93,10 @@
         }
       },
       "name": "courses",
+      "schema": "public",
       "indexes": [
         {
-          "keyName": "primary",
+          "keyName": "courses_pkey",
           "columnNames": [
             "id"
           ],
@@ -108,7 +112,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "serial",
           "unsigned": true,
           "autoincrement": true,
           "primary": true,
@@ -117,52 +121,52 @@
         },
         "username": {
           "name": "username",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "email": {
           "name": "email",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "password": {
           "name": "password",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "session_token": {
           "name": "session_token",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "role": {
           "name": "role",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "strikes": {
           "name": "strikes",
-          "type": "integer",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -171,54 +175,55 @@
         },
         "notes": {
           "name": "notes",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "subscription_endpoint": {
           "name": "subscription_endpoint",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "subscription_expiration_time": {
           "name": "subscription_expiration_time",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "subscription_p256dh": {
           "name": "subscription_p256dh",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "mappedType": "text"
+          "mappedType": "string"
         },
         "subscription_auth": {
           "name": "subscription_auth",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "mappedType": "text"
+          "mappedType": "string"
         }
       },
       "name": "users",
+      "schema": "public",
       "indexes": [
         {
-          "keyName": "primary",
+          "keyName": "users_pkey",
           "columnNames": [
             "id"
           ],
@@ -234,7 +239,7 @@
       "columns": {
         "course_id": {
           "name": "course_id",
-          "type": "integer",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -243,7 +248,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "integer",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -252,38 +257,21 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "datetime",
+          "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "length": 0,
-          "default": "CURRENT_TIMESTAMP",
+          "default": "now()",
           "mappedType": "datetime"
         }
       },
       "name": "course_spots",
+      "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "course_id"
-          ],
-          "composite": false,
-          "keyName": "course_spots_course_id_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "user_id"
-          ],
-          "composite": false,
-          "keyName": "course_spots_user_id_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "primary",
+          "keyName": "course_spots_pkey",
           "columnNames": [
             "course_id",
             "user_id"
@@ -300,11 +288,11 @@
           "columnNames": [
             "course_id"
           ],
-          "localTableName": "course_spots",
+          "localTableName": "public.course_spots",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "courses",
+          "referencedTableName": "public.courses",
           "updateRule": "cascade"
         },
         "course_spots_user_id_foreign": {
@@ -312,11 +300,11 @@
           "columnNames": [
             "user_id"
           ],
-          "localTableName": "course_spots",
+          "localTableName": "public.course_spots",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "users",
+          "referencedTableName": "public.users",
           "updateRule": "cascade"
         }
       }
@@ -325,7 +313,7 @@
       "columns": {
         "user_id": {
           "name": "user_id",
-          "type": "integer",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -334,7 +322,7 @@
         },
         "course_id": {
           "name": "course_id",
-          "type": "integer",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -343,27 +331,10 @@
         }
       },
       "name": "users_courses",
+      "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "user_id"
-          ],
-          "composite": false,
-          "keyName": "users_courses_user_id_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "course_id"
-          ],
-          "composite": false,
-          "keyName": "users_courses_course_id_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "primary",
+          "keyName": "users_courses_pkey",
           "columnNames": [
             "user_id",
             "course_id"
@@ -380,11 +351,11 @@
           "columnNames": [
             "user_id"
           ],
-          "localTableName": "users_courses",
+          "localTableName": "public.users_courses",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "users",
+          "referencedTableName": "public.users",
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
@@ -393,11 +364,11 @@
           "columnNames": [
             "course_id"
           ],
-          "localTableName": "users_courses",
+          "localTableName": "public.users_courses",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "courses",
+          "referencedTableName": "public.courses",
           "deleteRule": "cascade",
           "updateRule": "cascade"
         }

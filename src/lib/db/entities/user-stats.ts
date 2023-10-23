@@ -1,5 +1,5 @@
 import { Entity, Property, wrap } from '@mikro-orm/core';
-import type { EntityManager } from '@mikro-orm/sqlite';
+import type { EntityManager } from '@mikro-orm/postgresql';
 import { Course } from './';
 
 @Entity({
@@ -8,7 +8,7 @@ import { Course } from './';
 			.createQueryBuilder(Course, 'b')
 			.select(['b.name as course_name', 'count(*) as count', 'u.id as user_id'])
 			.join('b.users', 'u')
-			.groupBy('b.name');
+			.groupBy(['b.name', 'u.id']);
 	}
 })
 export class UserStats {

@@ -1,23 +1,28 @@
 version: '3.8'
 
 services:
-  volleyball:
-    build:
-      context: ./
-      dockerfile: Dockerfile
+  # volleyball:
+  #   build:
+  #     context: ./
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #     - 3000:3000
+  #   environment:
+  #     - MIKRO_ORM_DB_NAME=volleyball
+  #     - MIKRO_ORM_HOST=postgres
+  #     - MIKRO_ORM_PASSWORD=password
+  #     - MIKRO_ORM_PORT=5433
+  #     - MIKRO_ORM_USER=postgres
+
+  postgres:
+    image: postgres:latest
     restart: always
-    # ports:
-    #   - 3000:3000
-    networks:
-      - traefik_web
     volumes:
-      - ./db:/app/db:z
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.volleyball.rule=Host(`volleyball.homelab`)'
-      - 'traefik.http.services.volleyball.loadbalancer.server.port=3000'
-
-
-networks:
-  traefik_web:
-    external: true
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: volleyball

@@ -14,7 +14,7 @@ jobs:
       - name: stop running containers
         continue-on-error: true
         run: |
-          docker-compose down --remove-orphans
+          docker-compose down --remove-orphans -f docker-compose.prod.yml
           sudo chmod -R g+w /db
 
       - uses: actions/checkout@master
@@ -26,4 +26,4 @@ jobs:
           echo "VITE_VAPID_PUBLIC=${{ secrets.VITE_VAPID_PUBLIC }}" >> .env.local
           echo "VAPID_PRIVATE=${{ secrets.VAPID_PRIVATE }}" >> .env.local
           cat .env.local
-          docker-compose up --build -d
+          docker-compose up --build -d -f docker-compose.prod.yml
