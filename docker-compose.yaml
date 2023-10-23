@@ -6,10 +6,12 @@ services:
       context: ./
       dockerfile: Dockerfile
     restart: always
+    # ports:
+    #   - 3000:3000
     networks:
       - traefik_web
     volumes:
-      - ./db:/app/db
+      - ./db:/app/db:z
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.volleyball.rule=Host(`volleyball.homelab`)'
