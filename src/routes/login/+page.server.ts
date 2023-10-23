@@ -28,12 +28,12 @@ export const actions = {
 			throw error(400, 'Incorrect password');
 		}
 
-		const sessionToken =
-			Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+		const sessionToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 		user.sessionToken = sessionToken;
-		cookies.set('user', user.sessionToken, { path: '/' });
-
 		await locals.em.persistAndFlush(user);
-		throw redirect(303, '/courses'); // 307 is a temporary redirect, 301 is permanent
+		
+		cookies.set('user', sessionToken, { path: '/' });
+
+		throw redirect(303, '/courses');
 	}
 } satisfies Actions;
