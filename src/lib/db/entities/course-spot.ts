@@ -3,8 +3,7 @@ import { Role } from '../role';
 import { Subscription } from './subscription';
 import crypto from 'crypto';
 
-
-@Entity({ tableName: 'users', })
+@Entity({ tableName: 'users' })
 export class User {
 	@PrimaryKey()
 	public id!: number;
@@ -58,7 +57,6 @@ export class User {
 	}
 }
 
-
 @Entity({ tableName: 'courses' })
 export class Course {
 	@PrimaryKey()
@@ -70,7 +68,7 @@ export class Course {
 	@Property({ type: DateType, length: 3 })
 	public date!: Date;
 
-	@Property({ type: 'date' })
+	@Property({ type: DateType, length: 3 })
 	public publishOn!: Date;
 
 	@Property()
@@ -134,6 +132,6 @@ export class CourseSpot {
 	@ManyToOne(() => Course, { primary: true })
 	public course!: Course;
 
-	@Property({ type: "date", defaultRaw: 'CURRENT_TIMESTAMP' })
+	@Property({ type: 'date', defaultRaw: 'CURRENT_TIMESTAMP' })
 	createdAt = new Date();
 }

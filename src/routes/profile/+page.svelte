@@ -50,6 +50,34 @@
 
 		goto('/profile', { replaceState: true, invalidateAll: true });
 	}
+
+	/**
+	 * 
+	 * @param {number} time
+	 */
+	function approximatelyFormatTime(time) {
+		const days = Math.floor(time / 60 / 60 / 24);
+		const hours = Math.floor(time / 60 / 60) - days * 24;
+		const minutes = Math.floor(time / 60) - hours * 60 - days * 24 * 60;
+		const seconds = Math.floor(time) - minutes * 60 - hours * 60 * 60 - days * 24 * 60 * 60;
+
+		let result = '';
+		if (days > 0) {
+			result += `${days} days `;
+		}
+
+		if (hours > 0) {
+			result += `${hours} hours `;
+		}
+
+		if (minutes > 0) {
+			result += `${minutes} minutes `;
+		}
+
+		result += `${seconds} seconds`;
+
+		return result;
+	}
 </script>
 
 <section>
@@ -57,8 +85,8 @@
 
 	<h3>Notifications</h3>
 	<p>
-		Notifications make it easier to keep up to date. You'll get a notification when something
-		happens that you might want to know about. You can turn them off any time from your profile.
+		Notifications make it easier to keep up to date. You'll get a notification when something happens that you might want to know about. You
+		can turn them off any time from your profile.
 	</p>
 	{#if data.user.hasNotificationsEnabled}
 		<button on:click={disableNotification}>Disable notifications</button>
@@ -73,6 +101,10 @@
 	{:else}
 		<p>No courses registered</p>
 	{/each}
+	{#if data.registrationStats}
+		<p>Average Registration time: {approximatelyFormatTime(data.registrationStats.averageTime)}</p>
+		<p>Fastest Registration time: {approximatelyFormatTime(data.registrationStats.minTime)}</p>
+	{/if}
 
 	<div id="stats">
 		<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
