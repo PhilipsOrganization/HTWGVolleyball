@@ -12,7 +12,17 @@ services:
       - 'traefik.enable=true'
       - 'traefik.http.routers.volleyball.rule=Host(`volleyball.homelab`)'
       - 'traefik.http.services.volleyball.loadbalancer.server.port=3000'
-     
+
+  database:
+    image: postgres:latest
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    networks:
+      - traefik_web
 
 networks:
   traefik_web:

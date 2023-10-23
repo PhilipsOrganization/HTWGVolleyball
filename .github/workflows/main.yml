@@ -22,7 +22,7 @@ jobs:
           echo "VITE_VAPID_PUBLIC=${{ secrets.VITE_VAPID_PUBLIC }}" >> .env.local
           echo "VAPID_PRIVATE=${{ secrets.VAPID_PRIVATE }}" >> .env.local
           echo "MIKRO_ORM_DB_NAME=volleyball" >> .env.local
-          echo "MIKRO_ORM_HOST=postgres" >> .env.local
+          echo "MIKRO_ORM_HOST=database" >> .env.local
           echo "MIKRO_ORM_PASSWORD=password" >> .env.local
           echo "MIKRO_ORM_PORT=5432" >> .env.local
           echo "MIKRO_ORM_USER=postgres" >> .env.local
