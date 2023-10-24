@@ -6,9 +6,10 @@
 
 	const spot = course.spot + 1;
 	const waitlistSpot = spot - course.maxParticipants;
+	const href = `courses/${course.id}${admin ? '?admin' : ''}`;
 </script>
 
-<a href="courses/{course.id}">
+<a {href}>
 	<div
 		aria-roledescription="course"
 		class:enlisted={course.isEnrolled}
@@ -28,7 +29,7 @@
 			<span>{course.signupCount}/{course.maxParticipants}</span>
 		{/if}
 
-		<a class="underline right" href="courses/{course.id}">
+		<a class="underline right" {href}>
 			{#if admin}
 				details
 			{:else}

@@ -7,11 +7,9 @@
 
 	export let data;
 
-	/** @type {number} */
-	$: courseID = parseInt($page.url.searchParams.get('course') ?? '0');
-
-	/** @param {boolean} show  */
-	function toggleShowArchived(show) {
+	/** @param {Event & {currentTarget: EventTarget & HTMLInputElement}} event  */
+	function toggleShowArchived(event) {
+		const show = event.currentTarget.checked;
 		show ? $page.url.searchParams.set('archived', 'true') : $page.url.searchParams.delete('archived');
 		goto($page.url.toString(), { replaceState: true, invalidateAll: true });
 	}
@@ -19,16 +17,15 @@
 
 <CreateCourse />
 <main>
-	<h1>Courses <a href="/admin/users">Manage Users</a></h1>
-	<div id="list">
-		<div>
-			<label for="archived">Show archived</label>
-			<input type="checkbox" id="archived" on:change={(e) => toggleShowArchived(e.target.checked)} />
-		</div>
+	<div>
+		<label for="archived">Show archived</label>
+		<input type="checkbox" id="archived" on:change={(e) => toggleShowArchived(e)} />
+	</div>
 
+	<div id="list">
 		{#each data.dates ?? [] as block, i}
 			<div id="block">
-				<span>{humanReadableDate(block.date)}</span>
+				<h2>{humanReadableDate(block.date)}</h2>
 				{#each block.courses as course}
 					<Course {course} admin />
 				{/each}
@@ -39,20 +36,17 @@
 </main>
 
 <style>
-	h1 {
-		text-align: center;
-	}
-
 	main {
 		display: flex;
 		flex-direction: column;
-		margin: 5dvh auto 15dvh;
+		margin: 0 auto 15dvh;
 		width: 90vw;
 		max-width: 700px;
 		box-sizing: border-box;
 	}
 
 	#list {
+		margin-top: 2rem;
 		flex: 1;
 		display: flex;
 		flex-direction: column;
@@ -65,7 +59,9 @@
 		margin-bottom: 6rem;
 	}
 
-	a {
-		text-decoration: none;
+	h2 {
+		text-align: center;
+		margin: 0 0 2rem;
+		text-transform: capitalize;
 	}
 </style>

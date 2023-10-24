@@ -1,6 +1,7 @@
 import { error, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
-import { Course } from "$lib/db/entities";
+import { Course, User } from "$lib/db/entities";
+import { Role } from "$lib/db/role";
 
 export const load: PageServerLoad = async ({ locals, params }) => {
     if (!locals.user) {
@@ -24,7 +25,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 
 export const actions = {
-    enlist: async ({ locals, params }) => {
+    enlist: async ({ locals, params, url }) => {
         if (!locals.user) {
             throw redirect(303, '/login');
         }
@@ -48,9 +49,14 @@ export const actions = {
         course.users.add(locals.user);
 
         await locals.em.persistAndFlush([locals.user, course]);
+
+        if (url.searchParams.has("admin")) {
+            throw redirect(303, `/admin`);
+        }
+
         throw redirect(303, `/courses`);
     },
-    drop: async ({ locals, params }) => {
+    drop: async ({ locals, params, url }) => {
         if (!locals.user) {
             throw redirect(303, '/login');
         }
@@ -73,6 +79,54 @@ export const actions = {
         locals.user.courses.remove(course);
         course.users.remove(locals.user);
         await locals.em.persistAndFlush([locals.user, course]);
+
+        if (url.searchParams.has("admin")) {
+            throw redirect(303, `/admin`);
+        }
+
         throw redirect(303, `/courses`);
+    },
+    'delete-course': async ({ locals, request }) => {
+        if (!locals.user || locals.user.role === Role.USER) {
+            throw redirect(303, '/login');
+        }
+
+        const form = await request.formData();
+        const courseIdString = form.get('courseId') as string | undefined;
+        if (!courseIdString) {
+            throw error(400, 'No courseId provided');
+        }
+
+        const courseId = parseInt(courseIdString);
+        const course = await locals.em.findOne(Course, { id: courseId });
+
+        if (!course) {
+            throw error(400, 'Course not found');
+        }
+
+        locals.em.remove(course);
+        await locals.em.flush();
+
+        throw redirect(303, `/admin`);
+    },
+    cancel: async ({ locals, request, params }) => {
+        if (!locals.user || locals.user.role === Role.USER) {
+            throw redirect(303, '/login');
+        }
+
+        const form = await request.formData();
+        const courseId = parseInt(params.id as string);
+        const course = await locals.em.findOneOrFail(Course, { id: courseId });
+
+        const userIdString = form.get('userId') as string | undefined;
+        if (!userIdString) {
+            throw error(400, 'No userId provided');
+        }
+
+        const userId = parseInt(userIdString);
+        const user = await locals.em.findOneOrFail(User, { id: userId });
+        course.users.remove(user);
+
+        await locals.em.persistAndFlush(course);
     }
 };

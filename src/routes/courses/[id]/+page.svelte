@@ -1,6 +1,6 @@
 <script>
+	import { page } from '$app/stores';
 	import { Role } from '$lib/db/role';
-	import { humanReadableDate } from '$lib/helpers/date.js';
 
 	export let data;
 
@@ -11,14 +11,14 @@
 		day: 'numeric'
 	});
 
-	const admin = data.user.role !== Role.USER;
+	const admin = $page.url.searchParams.has('admin');
 
 	const course = data.course;
 	const waitList = course.signupCount > course.maxParticipants;
 </script>
 
 <main>
-	<div>
+	<section>
 		<h2>{course.name}</h2>
 		<p>{course.time}</p>
 		<p>{intl.format(course.date)}</p>
@@ -31,19 +31,25 @@
 		<p class:waitList>
 			{course.signupCount}/{course.maxParticipants} Registrations
 		</p>
+	</section>
+
+	<div class:waitList class="actions" style:--course-transition={`course-${course.id}`}>
+		<a href={admin ? '/admin' : '/courses'}>back</a>
+		{#if admin}
+			<form action="?/delete-course" method="post">
+				<button type="submit">delete</button>
+			</form>
+		{/if}
+		<form action={`?/${course.isEnrolled ? 'drop' : 'enlist'}${admin ? '&admin' : ''}`} method="post">
+			<button type="submit">
+				{#if course.isEnrolled}
+					drop
+				{:else}
+					enlist
+				{/if}
+			</button>
+		</form>
 	</div>
-
-	<form class:waitList action={course.isEnrolled ? '?/drop' : '?/enlist'} method="post" style:--course-transition={`course-${course.id}`}>
-		<a href="/courses">back</a>
-		<button type="submit">
-			{#if course.isEnrolled}
-				drop
-			{:else}
-				enlist
-			{/if}
-		</button>
-	</form>
-
 	{#if admin}
 		<div id="users">
 			{#each data.course.participants ?? [] as participant}
@@ -52,7 +58,7 @@
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
 					<form action="?/cancel" method="post">
 						<input type="hidden" name="userId" value={participant.id} />
-						<button>cancel</button>
+						<button class="underline">cancel</button>
 					</form>
 				</div>
 			{:else}
@@ -64,13 +70,13 @@
 
 <style>
 	main,
-	div {
+	section {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 	}
 
-	div {
+	section {
 		justify-content: center;
 		max-height: 400px;
 	}
@@ -92,7 +98,7 @@
 		color: #eb714f;
 	}
 
-	form {
+	div.actions {
 		view-transition-name: var(--course-transition);
 		display: flex;
 		flex-direction: row;
@@ -106,5 +112,24 @@
 
 	form.waitList {
 		background: #eb714f;
+	}
+
+	#users {
+		display: flex;
+		flex-direction: column;
+		margin: 0 auto;
+		width: min(80%, 450px);
+	}
+
+	.user {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.5rem;
+	}
+
+	.underline {
+		text-decoration: underline;
 	}
 </style>

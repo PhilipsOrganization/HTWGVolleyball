@@ -1,9 +1,24 @@
 <script>
+	import { Role } from '$lib/db/role.js';
+
 	export let data;
+
+	const user = data.user;
 </script>
 
 <section>
-	<h1>Stats for {data.user.username}</h1>
+	<h1>Stats for {user.username}</h1>
+	{#if user.role === Role.ADMIN}
+		<form action="?/demote" method="post">
+			<input type="hidden" name="userId" value={user.id} />
+			<button>demote to user</button>
+		</form>
+	{:else if user.role === Role.USER}
+		<form action="?/promote" method="post">
+			<input type="hidden" name="userId" value={user.id} />
+			<button>promote to admin</button>
+		</form>
+	{/if}
 
 	<p>Registered for {data.totalRegistrations} courses</p>
 	{#each data.stats as course}

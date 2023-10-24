@@ -16,7 +16,13 @@
 		{/if}
 	</nav>
 	<a href="/courses">
-		<h1>Volleyball HTWG</h1>
+		<h1>
+			Volleyball HTWG
+
+			{#if $page.route.id === '/admin'}
+				- Admin
+			{/if}
+		</h1>
 	</a>
 
 	<img src="/Volleyball_icon.svg" alt="Volleyball" />

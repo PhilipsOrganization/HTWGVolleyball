@@ -38,7 +38,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		users: users.map((u) => u.toJSON()),
 		dates: Object.entries(dates).map(([date, courses]) => ({
 			date,
-			courses: courses.map((c) => c.toJSON())
+			courses: courses.map((c) => c.toJSON(locals.user))
 		})),
 		user: locals.user.toJSON(),
 		course: course?.toJSON(locals.user)
@@ -90,27 +90,7 @@ export const actions = {
 
 		await locals.em.persistAndFlush(course);
 	},
-	'delete-course': async ({ locals, request }) => {
-		if (!locals.user || locals.user.role === Role.USER) {
-			throw redirect(303, '/login');
-		}
-
-		const form = await request.formData();
-		const courseIdString = form.get('courseId') as string | undefined;
-		if (!courseIdString) {
-			throw error(400, 'No courseId provided');
-		}
-
-		const courseId = parseInt(courseIdString);
-		const course = await locals.em.findOne(Course, { id: courseId });
-
-		if (!course) {
-			throw error(400, 'Course not found');
-		}
-
-		locals.em.remove(course);
-		await locals.em.flush();
-	},
+	
 	'update-course': async ({ locals, request }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
 			throw redirect(303, '/login');
@@ -183,24 +163,5 @@ export const actions = {
 		await locals.em.persistAndFlush(user);
 	},
 
-	cancel: async ({ locals, request, params }) => {
-		if (!locals.user || locals.user.role === Role.USER) {
-			throw redirect(303, '/login');
-		}
-
-		const form = await request.formData();
-		const courseId = parseInt(params.id as string);
-		const course = await locals.em.findOneOrFail(Course, { id: courseId });
-
-		const userIdString = form.get('userId') as string | undefined;
-		if (!userIdString) {
-			throw error(400, 'No userId provided');
-		}
-
-		const userId = parseInt(userIdString);
-		const user = await locals.em.findOneOrFail(User, { id: userId });
-		course.users.remove(user);
-
-		await locals.em.persistAndFlush(course);
-	}
+	
 } satisfies Actions;
