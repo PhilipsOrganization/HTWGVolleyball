@@ -1,4 +1,5 @@
 <script>
+	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { Role } from '$lib/db/role';
 
@@ -42,7 +43,7 @@
 				<button type="submit">delete</button>
 			</form>
 		{/if}
-		<form action={`?/${course.isEnrolled ? 'drop' : 'enlist'}${admin ? '&admin' : ''}`} method="post" data-sveltekit-replacestate>
+		<form action={`?/${course.isEnrolled ? 'drop' : 'enlist'}${admin ? '&admin' : ''}`} method="post" data-sveltekit-replacestate use:enhance>
 			<button type="submit">
 				{#if course.isEnrolled}
 					drop

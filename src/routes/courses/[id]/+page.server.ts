@@ -92,7 +92,11 @@ export const actions = {
             throw error(400, 'Course not found');
         }
 
-        await locals.em.removeAndFlush(course);
+        await locals.em.transactional(async em => {
+            course.users.removeAll();
+            await em.persistAndFlush(course);
+            await em.removeAndFlush(course);
+        })
 
         throw redirect(303, `/admin`);
     },

@@ -89,6 +89,8 @@ export const actions = {
 		assign(course, data);
 
 		await locals.em.persistAndFlush(course);
+
+		return 
 	},
 	
 	'update-course': async ({ locals, request }) => {

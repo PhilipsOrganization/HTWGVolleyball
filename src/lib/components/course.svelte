@@ -30,11 +30,13 @@
 		{/if}
 
 		<a class="underline right" {href}>
-			{#if admin}
-				details
-			{:else}
-				{course.isEnrolled ? 'drop' : 'enlist'}
-			{/if}
+			<p>
+				{#if admin}
+					details
+				{:else}
+					{course.isEnrolled ? 'drop ' : 'enlist'}
+				{/if}
+			</p>
 		</a>
 	</div>
 </a>
@@ -62,7 +64,13 @@
 	}
 
 	a.right {
-		text-align: right;
+		display: flex;
+		justify-content: flex-end;
+	}
+	p {
+		all: unset;
+		min-width: 8ch;
+		text-align: center;
 	}
 
 	.underline {

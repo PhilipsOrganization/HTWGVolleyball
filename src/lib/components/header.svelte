@@ -20,7 +20,7 @@
 		<h1>
 			Volleyball HTWG
 
-			{#if $page.route.id?.includes('/admin')}
+			{#if $page.route.id?.includes('/admin') || $page.url.searchParams.has('admin')}
 				- Admin
 			{/if}
 		</h1>

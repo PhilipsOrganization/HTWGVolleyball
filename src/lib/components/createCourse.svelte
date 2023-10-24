@@ -7,9 +7,8 @@
 
 	$: form = $page.form;
 
-	/** @type {HTMLDialogElement} */
-	let dialog;
 	let name = 'Beginner';
+	let open = false;
 
 	/**
 	 * @type {any[]}
@@ -126,18 +125,22 @@
 	}
 </script>
 
-<button class="highlight" id="open" on:click={() => dialog.showModal()}>Create Course</button>
-<dialog bind:this={dialog}>
+<button class="highlight" id="open" on:click={() => (open = true)}>Create Course</button>
+<dialog {open}>
 	<h1>New Course</h1>
 	<form
 		method="POST"
 		action="?/create-course"
 		use:enhance
-		on:submit={() => {
-			dialog.close();
-			reset();
-		}}
 		data-sveltekit-reload
+		use:enhance={() => {
+			return () => {
+				console.log('enhance');
+				courses = [];
+				reset();
+				name = name;
+			};
+		}}
 	>
 		<button id="close" value="cancel" formmethod="dialog">x</button>
 		<field>
@@ -180,7 +183,7 @@
 			<small class="error">{form?.publishOn ?? ''}</small>
 		</field>
 
-		<button id="submit" class="highlight">Submit</button>
+		<button id="submit">Submit</button>
 	</form>
 </dialog>
 
@@ -258,7 +261,7 @@
 		border-color: #000;
 	}
 
-	.highlight {
+	#submit {
 		background: #9cc1cf;
 		color: #000;
 		padding: 1rem 2rem;
