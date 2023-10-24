@@ -1,5 +1,5 @@
 <script>
-	import { Role } from '$lib/db/role.js';
+	import { Role } from '$lib/db/role';
 
 	export let data;
 
