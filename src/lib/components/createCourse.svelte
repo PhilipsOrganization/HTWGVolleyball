@@ -137,6 +137,7 @@
 			dialog.close();
 			reset();
 		}}
+		data-sveltekit-reload
 	>
 		<button id="close" value="cancel" formmethod="dialog">x</button>
 		<field>

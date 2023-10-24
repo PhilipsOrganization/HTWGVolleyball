@@ -42,7 +42,7 @@
 				<button type="submit">delete</button>
 			</form>
 		{/if}
-		<form action={`?/${course.isEnrolled ? 'drop' : 'enlist'}${admin ? '&admin' : ''}`} method="post">
+		<form action={`?/${course.isEnrolled ? 'drop' : 'enlist'}${admin ? '&admin' : ''}`} method="post" data-sveltekit-replacestate>
 			<button type="submit">
 				{#if course.isEnrolled}
 					drop

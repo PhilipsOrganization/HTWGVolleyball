@@ -1,5 +1,5 @@
 import { User } from '$lib/db/entities';
-import { error, type Actions, redirect } from '@sveltejs/kit';
+import { error, type Actions, redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from '../$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -16,22 +16,22 @@ export const actions = {
 		const password = form.get('password') as string | undefined;
 
 		if (!username || !password) {
-			throw error(400, 'No username or password provided');
+			return fail(400, { missingCredentials: true });
 		}
 
 		const user = await locals.em.findOne(User, { username });
 		if (!user) {
-			throw error(400, 'User not found');
+			return fail(400, { username, userNotFound: true });
 		}
 
 		if (!user.isPasswordCorrect(password)) {
-			throw error(400, 'Incorrect password');
+			return fail(400, { username, wrongPassword: true });
 		}
 
 		const sessionToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 		user.sessionToken = sessionToken;
 		await locals.em.persistAndFlush(user);
-		
+
 		cookies.set('user', sessionToken, { path: '/' });
 
 		throw redirect(303, '/courses');

@@ -1,6 +1,6 @@
 import { User } from '$lib/db/entities';
 import { Role } from '$lib/db/role';
-import { error, type Actions, redirect } from '@sveltejs/kit';
+import { fail, redirect, type Actions } from '@sveltejs/kit';
 
 export const actions = {
 	register: async ({ locals, request, cookies }) => {
@@ -11,15 +11,20 @@ export const actions = {
 		const email = form.get('email') as string | undefined;
 
 		if (!username || !password || !email) {
-			throw error(400, 'invalid data');
+			return fail(400, { username, email, missingCredentials: true });
+		}
+
+		const weakPassword = password.length < 8;
+		if (weakPassword) {
+			return fail(400, { username, email, weakPassword: true });
 		}
 
 		const existingUser = await locals.em.findOne(User, { $or: [{ username }, { email }] });
 		if (existingUser) {
-			throw error(400, 'user already exists');
+			return fail(400, { username, email, userAlreadyExists: true });
 		}
 
-		const newUser = new User( username, email, password);
+		const newUser = new User(username, email, password);
 
 		const isFirstUser = (await locals.em.count(User)) === 0;
 		if (isFirstUser) {
