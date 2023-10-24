@@ -4,6 +4,16 @@
 	import { Role } from '$lib/db/role';
 
 	export let data;
+	let course = data.course;
+
+	/**
+	 * @returns {(data: {result: any}) => void}
+	 */
+	function updateCourse() {
+		return ({ result }) => {
+			course = result?.data?.course;
+		};
+	}
 
 	const intl = new Intl.DateTimeFormat('de-DE', {
 		weekday: 'long',
@@ -13,8 +23,6 @@
 	});
 
 	const admin = $page.url.searchParams.has('admin');
-
-	const course = data.course;
 	const waitList = course.signupCount > course.maxParticipants;
 </script>
 
@@ -43,7 +51,7 @@
 				<button type="submit">delete</button>
 			</form>
 		{/if}
-		<form action={`?/${course.isEnrolled ? 'drop' : 'enlist'}${admin ? '&admin' : ''}`} method="post" data-sveltekit-replacestate use:enhance>
+		<form action={`?/${course.isEnrolled ? 'drop' : 'enlist'}${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
 			<button type="submit">
 				{#if course.isEnrolled}
 					drop
@@ -55,11 +63,11 @@
 	</div>
 	{#if admin}
 		<div id="users">
-			{#each data.course.participants ?? [] as participant}
+			{#each course.participants ?? [] as participant}
 				<div class="user">
 					<span>{participant.username}</span>
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
-					<form action="?/cancel" method="post">
+					<form action="?/cancel" method="post" use:enhance={updateCourse}>
 						<input type="hidden" name="userId" value={participant.id} />
 						<button class="underline">cancel</button>
 					</form>

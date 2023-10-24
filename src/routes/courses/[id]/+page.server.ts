@@ -49,6 +49,9 @@ export const actions = {
         course.users.add(locals.user);
 
         await locals.em.persistAndFlush([locals.user, course]);
+        return {
+            course: course.toJSON(locals.user),
+        };
     },
     drop: async ({ locals, params, url }) => {
         if (!locals.user) {
@@ -73,6 +76,10 @@ export const actions = {
         locals.user.courses.remove(course);
         course.users.remove(locals.user);
         await locals.em.persistAndFlush([locals.user, course]);
+
+        return {
+            course: course.toJSON(locals.user),
+        };
     },
     'delete-course': async ({ locals, params }) => {
         if (!locals.user || locals.user.role === Role.USER) {
@@ -119,5 +126,9 @@ export const actions = {
         course.users.remove(user);
 
         await locals.em.persistAndFlush(course);
+
+        return {
+            course: course.toJSON(locals.user),
+        };
     }
 };

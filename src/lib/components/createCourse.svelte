@@ -1,5 +1,4 @@
 <script>
-	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { addDays, nextMonday, nextSaturday, nextThursday, nextWednesday, setHours, setMinutes } from 'date-fns';
 
@@ -128,20 +127,7 @@
 <button class="highlight" id="open" on:click={() => (open = true)}>Create Course</button>
 <dialog {open}>
 	<h1>New Course</h1>
-	<form
-		method="POST"
-		action="?/create-course"
-		use:enhance
-		data-sveltekit-reload
-		use:enhance={() => {
-			return () => {
-				console.log('enhance');
-				courses = [];
-				reset();
-				name = name;
-			};
-		}}
-	>
+	<form method="POST" action="?/create-course">
 		<button id="close" value="cancel" formmethod="dialog">x</button>
 		<field>
 			<label for="name">Name</label>
