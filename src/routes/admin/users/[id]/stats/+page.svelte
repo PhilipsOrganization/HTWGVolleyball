@@ -1,5 +1,6 @@
 <script>
 	import { Role } from '$lib/db/role';
+	import { draw } from 'svelte/transition';
 
 	export let data;
 
@@ -10,12 +11,10 @@
 	<h1>Stats for {user.username}</h1>
 	{#if user.role === Role.ADMIN}
 		<form action="?/demote" method="post">
-			<input type="hidden" name="userId" value={user.id} />
 			<button>demote to user</button>
 		</form>
 	{:else if user.role === Role.USER}
 		<form action="?/promote" method="post">
-			<input type="hidden" name="userId" value={user.id} />
 			<button>promote to admin</button>
 		</form>
 	{/if}
@@ -30,7 +29,7 @@
 
 <div>
 	<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-		{@html data.svg}
+		<path in:draw={{ duration: 1000 }} fill="none" stroke="grey" d={data.svg} />
 	</svg>
 </div>
 
@@ -51,7 +50,7 @@
 		justify-content: center;
 		align-items: center;
 		margin: 1rem;
-		width: 100%;
+		width: 80%;
 		height: 200px;
 	}
 

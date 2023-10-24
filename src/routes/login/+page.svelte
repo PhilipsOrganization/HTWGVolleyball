@@ -1,19 +1,22 @@
-<div>
-	<h1>login / <a href="/register">register</a></h1>
+<script lang="ts">
+	import { enhance } from '$app/forms';
+</script>
 
-	<form action="?/login" method="post">
-		<fieldset>
+<div>
+	<h1><span>login /</span> <a href="/register">register</a></h1>
+
+	<form action="?/login" method="post" use:enhance>
+		<field>
 			<label for="username">username</label>
 			<input type="text" name="username" id="username" autocomplete="username" />
-		</fieldset>
-		<fieldset>
+		</field>
+		<field>
 			<label for="password">password</label>
 			<input type="password" name="password" id="password" autocomplete="current-password" />
-		</fieldset>
+		</field>
 
 		<div id="actions">
-			<a href="/">back</a>
-			<button class="highlight">login</button>
+			<button>login</button>
 		</div>
 	</form>
 </div>
@@ -31,13 +34,22 @@
 		padding-bottom: 10px;
 	}
 
+	
+	span {
+		view-transition-name: login-header;
+	}
+	
+	a{
+		view-transition-name: register-header;
+	}
+
 	input {
 		border: 1px solid var(--cAccent);
 		padding: 1em;
 		border-radius: 8px;
 		border: 1px solid #9cc1cf;
 		background: black;
-		color: white;
+		color: #e0e0e0;
 	}
 
 	label {
@@ -54,7 +66,7 @@
 		font-size: 18px;
 	}
 
-	form fieldset {
+	form field {
 		display: flex;
 		flex-direction: column;
 		border: none;
@@ -70,7 +82,7 @@
 	#actions {
 		display: flex;
 		flex-direction: row;
-		justify-content: space-between;
+		justify-content: flex-end;
 		width: 80vw;
 		background: #ecfbc7;
 		color: black;
@@ -86,5 +98,6 @@
 		border: none;
 		font-size: 20px;
 		padding: 0;
+		view-transition-name: action-button;
 	}
 </style>

@@ -11,9 +11,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const stats = await locals.em.find(UserStats, { userId: locals.user.id });
 	const registrationStats = await locals.em.findOne(RegistrationStats, { userId: locals.user.id });
-	const testStats = await locals.em.find(RegistrationStats, {});
-	console.log({ testStats });
-
 	const totalRegistrations = await locals.em.find(
 		Course,
 		{ users: locals.user },

@@ -1,25 +1,9 @@
 <script>
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import {
-		addDays,
-		nextMonday,
-		nextSaturday,
-		nextThursday,
-		nextWednesday,
-		setHours,
-		setMinutes
-	} from 'date-fns';
+	import { addDays, nextMonday, nextSaturday, nextThursday, nextWednesday, setHours, setMinutes } from 'date-fns';
 
-	const difficulties = [
-		'Beginner',
-		'Advanced',
-		'Actives',
-		'Beach Course',
-		'Actives - 5:1 System',
-		'Free Game',
-		'Christmas Special🎄'
-	];
+	const difficulties = ['Beginner', 'Advanced', 'Actives', 'Beach Course', 'Actives - 5:1 System', 'Free Game', 'Christmas Special🎄'];
 
 	$: form = $page.form;
 
@@ -27,69 +11,76 @@
 	let dialog;
 	let name = 'Beginner';
 
-	let courses = [
-		{
-			name: difficulties[0],
-			settings: {
-				name: difficulties[0],
-				location: 'Ellenrieder Sporthalle',
-				maxParticipants: 18,
-				time: '17:30',
-				duration: 1.5,
-				date: nextMonday(new Date()),
-				publishOn: setTo12(nextThursday(new Date()))
-			}
-		},
-		{
-			name: difficulties[1],
-			settings: {
-				name: difficulties[1],
-				location: 'Ellenrieder Sporthalle',
-				maxParticipants: 18,
-				time: '19:00',
-				duration: 1.5,
-				date: nextMonday(new Date()),
-				publishOn: setTo12(nextThursday(new Date()))
-			}
-		},
-		{
-			name: difficulties[2],
-			settings: {
-				name: difficulties[2],
-				location: 'Ellenrieder Sporthalle',
-				maxParticipants: 18,
-				time: '20:30',
-				duration: 1.5,
-				date: nextMonday(new Date()),
-				publishOn: setTo12(nextThursday(new Date()))
-			}
-		},
-		{
-			name: difficulties[4],
-			settings: {
-				name: difficulties[4],
-				location: 'Ellenrieder Sporthalle',
-				maxParticipants: 18,
-				time: '20:30',
-				duration: 1.5,
-				date: nextWednesday(new Date()),
-				publishOn: setTo12(nextThursday(new Date()))
-			}
-		},
-		{
-			name: difficulties[5],
-			settings: {
-				name: difficulties[5],
-				location: 'Petershausener Sporthalle',
-				maxParticipants: 36,
-				time: '12:00',
-				duration: 1.5,
-				date: nextSaturday(addDays(new Date(), 7)),
-				publishOn: setTo12(nextThursday(new Date()))
-			}
-		}
-	];
+	/**
+	 * @type {any[]}
+	 */
+	let courses = [];
+	reset();
 
+	function reset() {
+		courses = [
+			{
+				name: difficulties[0],
+				settings: {
+					name: difficulties[0],
+					location: 'Ellenrieder Sporthalle',
+					maxParticipants: 18,
+					time: '17:30',
+					duration: 1.5,
+					date: nextMonday(new Date()),
+					publishOn: setTo12(nextThursday(new Date()))
+				}
+			},
+			{
+				name: difficulties[1],
+				settings: {
+					name: difficulties[1],
+					location: 'Ellenrieder Sporthalle',
+					maxParticipants: 18,
+					time: '19:00',
+					duration: 1.5,
+					date: nextMonday(new Date()),
+					publishOn: setTo12(nextThursday(new Date()))
+				}
+			},
+			{
+				name: difficulties[2],
+				settings: {
+					name: difficulties[2],
+					location: 'Ellenrieder Sporthalle',
+					maxParticipants: 18,
+					time: '20:30',
+					duration: 1.5,
+					date: nextMonday(new Date()),
+					publishOn: setTo12(nextThursday(new Date()))
+				}
+			},
+			{
+				name: difficulties[4],
+				settings: {
+					name: difficulties[4],
+					location: 'Ellenrieder Sporthalle',
+					maxParticipants: 18,
+					time: '20:30',
+					duration: 1.5,
+					date: nextWednesday(new Date()),
+					publishOn: setTo12(nextThursday(new Date()))
+				}
+			},
+			{
+				name: difficulties[5],
+				settings: {
+					name: difficulties[5],
+					location: 'Petershausener Sporthalle',
+					maxParticipants: 36,
+					time: '12:00',
+					duration: 1.5,
+					date: nextSaturday(addDays(new Date(), 7)),
+					publishOn: setTo12(nextThursday(new Date()))
+				}
+			}
+		];
+	}
 	$: defaults = courses.find((c) => c.name === name)?.settings;
 
 	/**
@@ -105,11 +96,7 @@
 	function dateTimeToDateString(date) {
 		if (!date) return '';
 
-		const components = [
-			date.getFullYear(),
-			padNumberToTwoDigits(date.getMonth() + 1),
-			padNumberToTwoDigits(date.getDate())
-		];
+		const components = [date.getFullYear(), padNumberToTwoDigits(date.getMonth() + 1), padNumberToTwoDigits(date.getDate())];
 
 		return components.join('-');
 	}
@@ -142,11 +129,18 @@
 <button class="highlight" id="open" on:click={() => dialog.showModal()}>Create Course</button>
 <dialog bind:this={dialog}>
 	<h1>New Course</h1>
-	<form method="POST" action="?/create-course" use:enhance>
+	<form
+		method="POST"
+		action="?/create-course"
+		use:enhance
+		on:submit={() => {
+			dialog.close();
+			reset();
+		}}
+	>
 		<button id="close" value="cancel" formmethod="dialog">x</button>
 		<field>
 			<label for="name">Name</label>
-			<!-- <input bind:value={name} type="text" name="name" placeholder="Name" /> -->
 			<select bind:value={name} name="name">
 				{#each difficulties as difficulty}
 					<option value={difficulty}>{difficulty}</option>
@@ -163,12 +157,7 @@
 
 		<field>
 			<label for="date">Date</label>
-			<input
-				value={dateTimeToDateString(defaults?.date)}
-				type="date"
-				name="date"
-				placeholder="Date"
-			/>
+			<input value={dateTimeToDateString(defaults?.date)} type="date" name="date" placeholder="Date" />
 			<small class="error">{form?.date ?? ''}</small>
 		</field>
 
@@ -180,23 +169,13 @@
 
 		<field>
 			<label for="maxParticipants">Max Participants</label>
-			<input
-				value={defaults?.maxParticipants ?? ''}
-				type="number"
-				name="maxParticipants"
-				placeholder="Max Participants"
-			/>
+			<input value={defaults?.maxParticipants ?? ''} type="number" name="maxParticipants" placeholder="Max Participants" />
 			<small class="error">{form?.maxParticipants ?? ''}</small>
 		</field>
 
 		<field>
 			<label for="publishOn">Publish On</label>
-			<input
-				value={dateTimeToString(defaults?.publishOn)}
-				type="datetime-local"
-				name="publishOn"
-				placeholder="Publish On"
-			/>
+			<input value={dateTimeToString(defaults?.publishOn)} type="datetime-local" name="publishOn" placeholder="Publish On" />
 			<small class="error">{form?.publishOn ?? ''}</small>
 		</field>
 
@@ -207,9 +186,16 @@
 <style>
 	dialog {
 		position: relative;
-		padding: 12px 3em;
+		padding: 12px 3em 30px;
 		width: min(90vw, 400px);
 		max-width: calc(100vw - 9em);
+		background: #383838;
+		color: rgb(182, 182, 182);
+		border-radius: 8px;
+	}
+
+	h1 {
+		color: #e0e0e0;
 	}
 
 	#open {
@@ -223,7 +209,7 @@
 		position: absolute;
 		inset: 10px 10px auto auto;
 		padding: 0.5em 0.75em;
-		background: rgb(230, 230, 230);
+		background: rgb(19, 19, 19);
 		border: none;
 		border-radius: 50%;
 		font-size: 1.5em;
@@ -250,14 +236,31 @@
 		margin-bottom: 0.5rem;
 	}
 
-	form field input {
+	form field input,
+	form field select {
 		padding: 0.5rem;
 		border: 1px solid #ccc;
 		border-radius: 0.25rem;
+		color: #e0e0e0;
+	}
+
+	input,
+	select,
+	option {
+		background: #1f1f1f;
+		color: #fff;
+		font-size: 16px;
 	}
 
 	form field input:focus {
 		outline: none;
 		border-color: #000;
+	}
+
+	.highlight {
+		background: #9cc1cf;
+		color: #000;
+		padding: 1rem 2rem;
+		text-align: center;
 	}
 </style>

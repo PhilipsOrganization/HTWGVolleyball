@@ -30,7 +30,7 @@
 		margin: 0;
 		padding: 0;
 		background: #131313;
-		color: #fff;
+		color: #e0e0e0;
 		font-family: monospace;
 		min-height: 100dvh;
 		font-size: 16px;

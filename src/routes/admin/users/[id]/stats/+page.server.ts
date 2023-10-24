@@ -1,6 +1,6 @@
 import { UserStats } from '$lib/db/entities/user-stats';
 import { Role } from '$lib/db/role';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { Course, User } from '$lib/db/entities';
 import { getPath } from '$lib/helpers/stats';
@@ -25,3 +25,60 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		svg: getPath(totalRegistrations)
 	};
 };
+
+
+
+export const actions = {
+	demote: async ({ locals, request }) => {
+		if (!locals.user || locals.user.role === Role.USER) {
+			throw redirect(303, '/login');
+		}
+
+		const form = await request.formData();
+		const userIdString = form.get('userId') as string | undefined;
+		if (!userIdString) {
+			throw error(400, 'No userId provided');
+		}
+
+		const userId = parseInt(userIdString);
+		const user = await locals.em.findOne(User, { id: userId });
+
+		if (!user) {
+			throw error(400, 'User not found');
+		}
+
+		if (user.role === Role.SUPER_ADMIN) {
+			throw error(400, 'Cannot demote super admin');
+		}
+
+		user.role = Role.USER;
+		user.sessionToken = undefined;
+		await locals.em.persistAndFlush(user);
+	},
+
+	promote: async ({ locals, request }) => {
+		if (locals.user?.role !== Role.ADMIN && locals.user?.role !== Role.SUPER_ADMIN) {
+			throw redirect(303, '/login');
+		}
+
+		const form = await request.formData();
+		const userIdString = form.get('userId') as string | undefined;
+		if (!userIdString) {
+			throw error(400, 'No userId provided');
+		}
+
+		const userId = parseInt(userIdString);
+		const user = await locals.em.findOne(User, { id: userId });
+		if (!user) {
+			throw error(400, 'User not found');
+		}
+
+		if (user.role === Role.SUPER_ADMIN) {
+			throw error(400, 'Cannot promote super admin');
+		}
+
+		user.role = Role.ADMIN;
+		user.sessionToken = undefined;
+		await locals.em.persistAndFlush(user);
+	}
+} satisfies Actions;

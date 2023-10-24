@@ -9,6 +9,7 @@
 			<a href="/profile">Profile</a>
 			{#if $page.data.user.role !== Role.USER}
 				<a href="/admin">Admin</a>
+				<a href="/admin/users">Users</a>
 			{/if}
 			<a href="/logout">Logout</a>
 		{:else}
@@ -19,7 +20,7 @@
 		<h1>
 			Volleyball HTWG
 
-			{#if $page.route.id === '/admin'}
+			{#if $page.route.id?.includes('/admin')}
 				- Admin
 			{/if}
 		</h1>

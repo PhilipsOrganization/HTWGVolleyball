@@ -3,25 +3,24 @@
 </script>
 
 <div>
-	<h1>register / <a href="/login">login</a></h1>
+	<h1><span>register /</span> <a href="/login">login</a></h1>
 
 	<form action="?/register" method="post" use:enhance>
-		<fieldset>
+		<field>
 			<label for="username">username</label>
 			<input type="text" name="username" id="username" autocomplete="username" />
-		</fieldset>
-		<fieldset>
+		</field>
+		<field>
 			<label for="email">email</label>
 			<input type="email" name="email" id="email" autocomplete="email" />
-		</fieldset>
-		<fieldset>
+		</field>
+		<field>
 			<label for="password">password</label>
 			<input type="password" name="password" id="password" autocomplete="new-password" />
-		</fieldset>
+		</field>
 
-		<div>
-			<a href="/">back</a>
-			<button class="highlight">register</button>
+		<div id="actions">
+			<button>register</button>
 		</div>
 	</form>
 </div>
@@ -39,12 +38,21 @@
 		padding-bottom: 10px;
 	}
 
+	span {
+		view-transition-name: register-header;
+	}
+	
+	a{
+		view-transition-name: login-header;
+	}
+
 	input {
 		border: 1px solid var(--cAccent);
 		padding: 1em;
 		border-radius: 8px;
 		border: 1px solid #9cc1cf;
 		background: black;
+		color: #e0e0e0;
 	}
 
 	label {
@@ -61,7 +69,7 @@
 		font-size: 18px;
 	}
 
-	form fieldset {
+	form field {
 		display: flex;
 		flex-direction: column;
 		border: none;
@@ -74,7 +82,25 @@
 		align-items: center;
 	}
 
+	#actions {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+		width: 80vw;
+		background: #ecfbc7;
+		color: black;
+		border: none;
+		padding: 1.5rem 3rem;
+		margin-top: 2rem;
+		font-weight: 100;
+		box-sizing: border-box;
+	}
+
 	button {
-		text-decoration: underline;
+		color: black;
+		border: none;
+		font-size: 20px;
+		padding: 0;
+		view-transition-name: action-button;
 	}
 </style>

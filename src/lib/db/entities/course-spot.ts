@@ -1,4 +1,4 @@
-import { Collection, Embedded, Entity, Index, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
+import { Cascade, Collection, Embedded, Entity, Index, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
 import crypto from 'crypto';
 import { Role } from '../role';
 import { Subscription } from './subscription';
@@ -88,6 +88,7 @@ export class Course {
 		owner: true,
 		hidden: true,
 		eager: true,
+		cascade: [Cascade.REMOVE],
 		pivotEntity: () => CourseSpot
 	})
 	public users = new Collection<User>(this);

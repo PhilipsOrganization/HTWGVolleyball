@@ -20,23 +20,25 @@
 <main>
 	<section>
 		<h2>{course.name}</h2>
-		<p>{course.time}</p>
+		<p class="bold">{course.time}</p>
 		<p>{intl.format(course.date)}</p>
 		<p>{course.location}</p>
 
 		{#if data.user.role !== Role.USER}
 			<p>{intl.format(course.publishOn)}</p>
 		{/if}
-		<p />
-		<p class:waitList>
+		<p class:waitList class:isSignedUp={course.isEnrolled}>
 			{course.signupCount}/{course.maxParticipants} Registrations
 		</p>
+		{#if course.isEnrolled}
+			<p class="isSignedUp">You are in!</p>
+		{/if}
 	</section>
 
 	<div class:waitList class="actions" style:--course-transition={`course-${course.id}`}>
 		<a href={admin ? '/admin' : '/courses'}>back</a>
 		{#if admin}
-			<form action="?/delete-course" method="post">
+			<form class="waitlist" action="?/delete-course" method="post">
 				<button type="submit">delete</button>
 			</form>
 		{/if}
@@ -94,8 +96,17 @@
 		margin-bottom: 0.4rem;
 	}
 
-	p.waitList {
+	.isSignedUp {
+		color: #2aea60;
+	}
+
+	.waitList {
 		color: #eb714f;
+	}
+
+	.bold {
+		font-weight: bold;
+		color: #ecfbc7;
 	}
 
 	div.actions {
@@ -106,11 +117,12 @@
 		background: #ecfbc7;
 		padding: 1rem 2rem;
 		width: min(80%, 450px);
+		max-width: 60vw;
 		margin: 2rem auto 4rem;
 		color: black;
 	}
 
-	form.waitList {
+	div.actions.waitList {
 		background: #eb714f;
 	}
 
