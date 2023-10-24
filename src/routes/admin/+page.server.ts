@@ -183,17 +183,13 @@ export const actions = {
 		await locals.em.persistAndFlush(user);
 	},
 
-	cancel: async ({ locals, request }) => {
+	cancel: async ({ locals, request, params }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
 			throw redirect(303, '/login');
 		}
 
 		const form = await request.formData();
-		const courseIdString = form.get('courseId') as string | undefined;
-		if (!courseIdString) {
-			throw error(400, 'No courseId provided');
-		}
-		const courseId = parseInt(courseIdString);
+		const courseId = parseInt(params.id as string);
 		const course = await locals.em.findOneOrFail(Course, { id: courseId });
 
 		const userIdString = form.get('userId') as string | undefined;

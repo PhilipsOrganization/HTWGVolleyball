@@ -1,67 +1,56 @@
 <script>
-	import { page } from '$app/stores';
-	import { Role } from '$lib/db/role';
+	import { onNavigate } from '$app/navigation';
+	import Header from '$lib/components/header.svelte';
+
+	/**
+	 * @param {() => Promise<void>} callback
+	 */
+	function startViewTransition(callback) {
+		return new Promise((resolve) => {
+			// @ts-ignore
+			const transition = document.startViewTransition(() => {
+				resolve(transition);
+				return callback();
+			});
+		});
+	}
+
+	onNavigate(async (navigation) => {
+		if ('startViewTransition' in document) {
+			await startViewTransition(() => Promise.race([navigation.complete, new Promise((resolve) => setTimeout(resolve, 200))]));
+		}
+	});
 </script>
 
-<header>
-	<h1>Register for Volleyball</h1>
-	{#if $page.data.user}
-		<span>{$page.data.user.username}</span>
-		<a class="accent margin" href="/logout">Logout</a>
-		<a class="accent margin" href="/profile">Profile</a>
-		{#if $page.data.user.role !== Role.USER}
-			<a class="accent margin" href="/admin">Admin</a>
-		{/if}
-	{:else}
-		<a class="accent" href="/login">Login</a>
-	{/if}
-	<img src="/Volleyball_icon.svg" alt="" />
-</header>
-
+<Header />
 <slot />
 
 <style>
 	:global(body) {
-		--c0: #282828;
-		--c20: #3b3b37;
-		--c40: #4d4747;
-		--c80: #d0d0d0;
-		--c100: white;
-		--cAccent: #55b5fa;
-		--breakpoint-sm: 576px;
-		--breakpoint-md: 768px;
-
-		overflow-x: hidden;
-		color: var(--c0);
-	}
-
-	header {
-		background: var(--c20);
-		position: relative;
-		padding: 15px 30px;
-		color: var(--c100);
-	}
-
-	h1 {
-		font-size: 20px;
-		font-weight: bold;
 		margin: 0;
-		text-shadow: 0px 0px 10px var(--c20);
+		padding: 0;
+		background: #131313;
+		color: #fff;
+		font-family: monospace;
+		min-height: 100dvh;
+		font-size: 16px;
+		display: flex;
+		flex-direction: column;
+		text-underline-position: under;
+		text-decoration-thickness: 0px;
 	}
 
-	img {
-		height: 200%;
-		position: absolute;
-		top: -50%;
-		right: -10px;
-		bottom: -50%;
+	:root:view-transition-group(*) {
+		animation-duration: 700ms;
 	}
 
-	a.margin {
-		margin-left: 10px;
+	:global(a) {
+		text-decoration: none;
+		color: unset;
 	}
 
-	a.accent {
-		color: var(--cAccent);
+	:global(button) {
+		all: unset;
+		cursor: pointer;
 	}
 </style>

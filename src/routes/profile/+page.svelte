@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { draw } from 'svelte/transition';
 
 	export let data;
 
@@ -108,7 +109,7 @@
 
 	<div id="stats">
 		<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-			{@html data.svg}
+			<path in:draw={{ duration: 1000 }} fill="none" stroke="grey" d={data.svg} />
 		</svg>
 	</div>
 </section>
@@ -116,7 +117,6 @@
 <style>
 	section {
 		padding: 20px;
-		width: max(240px, 50vw);
 	}
 
 	h3 {

@@ -3,36 +3,33 @@
 	import { humanReadableDate } from '$lib/helpers/date';
 
 	export let data;
-
-	/** @type {number | null} */
-	let courseID;
 </script>
 
 <main>
 	<div id="list">
-		{#each data.dates ?? [] as block, i}
-			<span>{humanReadableDate(block.date)}</span>
-			{#each block.courses as course}
-				<Course
-					{course}
-					on:select={(c) => (courseID = c.detail.course)}
-					selected={course.isEnrolled}
-					action={course.isEnrolled ? '?/drop' : '?/enlist'}
-					actionName={course.isEnrolled ? 'drop' : 'enlist'}
-					spot={course.isEnrolled ? course.spot + 1 : 0}
-				/>
-			{/each}
-			{#if i < data.dates?.length - 1}
-				<div class="line" />
-			{/if}
+		{#each data.dates ?? [] as block}
+			<div id="block">
+				<h2>{humanReadableDate(block.date)}</h2>
+				{#each block.courses as course, i}
+					<Course {course} isFirst={i === 0} />
+				{/each}
+			</div>
 		{/each}
 	</div>
 </main>
 
 <style>
 	#list {
-		margin-bottom: 4vh;
-		padding-right: 5px;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	#block {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 6rem;
 	}
 
 	main {
@@ -42,5 +39,11 @@
 		width: 90vw;
 		max-width: 700px;
 		box-sizing: border-box;
+	}
+
+	h2 {
+		text-align: center;
+		margin: 0 0 2rem;
+		text-transform: capitalize;
 	}
 </style>

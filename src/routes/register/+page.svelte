@@ -3,30 +3,32 @@
 </script>
 
 <div>
-	<h1>Register / <a href="/login">Login</a></h1>
+	<h1>register / <a href="/login">login</a></h1>
 
 	<form action="?/register" method="post" use:enhance>
 		<fieldset>
-			<label for="username">Username</label>
+			<label for="username">username</label>
 			<input type="text" name="username" id="username" autocomplete="username" />
 		</fieldset>
 		<fieldset>
-			<label for="email">Email</label>
+			<label for="email">email</label>
 			<input type="email" name="email" id="email" autocomplete="email" />
 		</fieldset>
 		<fieldset>
-			<label for="password">Password</label>
+			<label for="password">password</label>
 			<input type="password" name="password" id="password" autocomplete="new-password" />
 		</fieldset>
-		<button class="highlight">Register</button>
+
+		<div>
+			<a href="/">back</a>
+			<button class="highlight">register</button>
+		</div>
 	</form>
 </div>
 
 <style>
 	div {
-		padding: 20px;
-		margin: 20svh auto 0;
-		width: 240px;
+		margin: 2rem auto 0;
 	}
 
 	h1 {
@@ -41,11 +43,12 @@
 		border: 1px solid var(--cAccent);
 		padding: 1em;
 		border-radius: 8px;
+		border: 1px solid #9cc1cf;
+		background: black;
 	}
 
 	label {
-		font-size: 18px;
-		margin-left: 8px;
+		color: rgb(182, 182, 182);
 	}
 
 	form {
@@ -72,12 +75,6 @@
 	}
 
 	button {
-		margin-top: 10px;
-		padding: 10px;
-		border-radius: 8px;
-		border: none;
-		background-color: var(--cAccent);
-		color: white;
-		font-size: 16px;
+		text-decoration: underline;
 	}
 </style>

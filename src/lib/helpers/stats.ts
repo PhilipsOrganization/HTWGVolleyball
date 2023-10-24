@@ -1,4 +1,4 @@
-import type { Course } from '$lib/db/entities/course';
+import type { Course } from '$lib/db/entities';
 
 function daysBetween(first: Date, last: Date) {
 	return (last.getTime() - first.getTime()) / (1000 * 60 * 60 * 24);
@@ -70,7 +70,7 @@ const svgPath = (points: [number, number][]) => {
 				  `${acc} ${bezierCommand(point, i, a)}`,
 		''
 	);
-	return `<path d="${d}" fill="none" stroke="grey" />`;
+	return d;
 };
 
 export function getPath(courses: Course[]) {
