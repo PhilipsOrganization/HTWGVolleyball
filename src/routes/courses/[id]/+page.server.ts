@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     const id = parseInt(params.id);
     const course = await locals.em.findOneOrFail(Course, { id });
 
-    if (course.publishOn < new Date()) {
+    if (course.publishOn < new Date() && locals.user.role === Role.USER) {
         throw error(400, 'Course not jet published');
     }
 
