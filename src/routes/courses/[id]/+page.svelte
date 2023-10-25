@@ -1,7 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import { Role } from '$lib/db/role';
 
 	export let data;
 	let course = data.course;
@@ -38,7 +37,7 @@
 		<p>{intl.format(course.date)}</p>
 		<p>{course.location}</p>
 
-		{#if data.user.role !== Role.USER}
+		{#if admin}
 			{@const intlAdmin = new Intl.DateTimeFormat('de-DE', {
 				weekday: 'long',
 				year: 'numeric',

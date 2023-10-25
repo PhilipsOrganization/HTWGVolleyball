@@ -1,8 +1,8 @@
 import { Cascade, Collection, Embedded, Entity, Formula, Index, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
 import crypto from 'crypto';
+import { isPast } from 'date-fns';
 import { Role } from '../role';
 import { Subscription } from './subscription';
-import { isPast } from 'date-fns';
 
 @Entity({ tableName: 'accounts' })
 @Index({ properties: ['username'], options: { unique: true } })
