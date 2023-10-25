@@ -2,6 +2,7 @@ import { error, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
 import { Course, User } from "$lib/db/entities";
 import { Role } from "$lib/db/role";
+import { sendNotification } from "$lib/helpers/notification";
 
 export const load: PageServerLoad = async ({ locals, params }) => {
     if (!locals.user) {
@@ -23,6 +24,21 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     };
 };
 
+
+function notifyNextUser(course: Course) {
+    const spots = course.maxParticipants;
+    const users = course.users.getItems();
+    if (users.length <= spots) {
+        return;
+    }
+
+    const userOnWaitlist = users.at(spots - 1);
+    if (!userOnWaitlist) {
+        return;
+    }
+
+    return sendNotification(userOnWaitlist, `A spot in ${course.name} Course has opened up for you!`);
+}
 
 export const actions = {
     enlist: async ({ locals, params }) => {
@@ -53,7 +69,7 @@ export const actions = {
             course: course.toJSON(locals.user),
         };
     },
-    drop: async ({ locals, params, url }) => {
+    drop: async ({ locals, params }) => {
         if (!locals.user) {
             throw redirect(303, '/login');
         }
@@ -77,6 +93,7 @@ export const actions = {
         course.users.remove(locals.user);
         await locals.em.persistAndFlush([locals.user, course]);
 
+        notifyNextUser(course);
         return {
             course: course.toJSON(locals.user),
         };
@@ -127,6 +144,7 @@ export const actions = {
 
         await locals.em.persistAndFlush(course);
 
+        notifyNextUser(course);
         return {
             course: course.toJSON(locals.user),
         };

@@ -25,6 +25,7 @@
 		});
 
 		if (!request.ok) {
+			console.log(await request.text());
 			return alert('subscription failed');
 		}
 
