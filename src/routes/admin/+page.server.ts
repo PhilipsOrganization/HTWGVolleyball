@@ -5,7 +5,7 @@ import { Role } from '$lib/db/role';
 import { assign } from '@mikro-orm/core';
 import { User } from '$lib/db/entities';
 import { z } from 'zod';
-import { startOfYesterday } from 'date-fns';
+import { startOfYesterday, sub } from 'date-fns';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -78,10 +78,12 @@ export const actions = {
 			return fail(400, obj);
 		}
 
+		const publishOn = new Date(dto.publishOn);
+
 		const data = {
 			...dto,
 			date: new Date(dto.date),
-			publishOn: new Date(dto.publishOn),
+			publishOn: sub(publishOn, { minutes: publishOn.getTimezoneOffset() }),
 			maxParticipants: parseInt(dto.maxParticipants)
 		};
 
