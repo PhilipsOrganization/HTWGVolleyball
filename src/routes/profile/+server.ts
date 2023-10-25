@@ -1,8 +1,8 @@
-import type { RequestHandler } from './$types';
-import { error, redirect } from '@sveltejs/kit';
 import { Subscription } from '$lib/db/entities/subscription';
 import { sendNotification } from '$lib/helpers/notification';
+import { redirect } from '@sveltejs/kit';
 import { z } from 'zod';
+import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) {

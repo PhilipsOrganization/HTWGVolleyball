@@ -1,5 +1,4 @@
 <script>
-	import { goto } from '$app/navigation';
 	import { draw } from 'svelte/transition';
 
 	export let data;
@@ -17,7 +16,7 @@
 			applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC)
 		});
 
-		await fetch('/profile', {
+		const request = await fetch('/profile', {
 			method: 'POST',
 			body: JSON.stringify({ subscription }),
 			headers: {
@@ -25,7 +24,12 @@
 			}
 		});
 
-		goto('/profile', { replaceState: true, invalidateAll: true });
+		if (!request.ok) {
+			return alert('subscription failed');
+		}
+
+		const { user } = await request.json();
+		data.user = user;
 	}
 
 	/**
@@ -45,11 +49,17 @@
 	}
 
 	async function disableNotification() {
-		await fetch('/profile', {
+		const request = await fetch('/profile', {
 			method: 'DELETE'
 		});
 
-		goto('/profile', { replaceState: true, invalidateAll: true });
+
+		if (!request.ok) {
+			return alert('subscription failed');
+		}
+
+		const { user } = await request.json();
+		data.user = user;
 	}
 
 	/**
