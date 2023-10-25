@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	// find all courses that take place in the future
 	const showArchived = url.searchParams.has('archived');
-	const courses = await locals.em.find(Course, showArchived ? {} : { date: { $gte: startOfYesterday() } });
+	const courses = await locals.em.find(Course, showArchived ? {} : { date: { $gte: startOfYesterday() } }, { orderBy: { date: 'ASC' } });
 
 	const dates: { [date: string]: Course[] } = {};
 
@@ -113,53 +113,5 @@ export const actions = {
 
 		assign(course, { name });
 		await locals.em.persistAndFlush(course);
-	},
-	demote: async ({ locals, params }) => {
-		if (!locals.user || locals.user.role === Role.USER) {
-			throw redirect(303, '/login');
-		}
-
-		const userIdString = params.id as string | undefined;
-		if (!userIdString) {
-			throw error(400, 'No userId provided');
-		}
-
-		const userId = parseInt(userIdString);
-		const user = await locals.em.findOne(User, { id: userId });
-
-		if (!user) {
-			throw error(400, 'User not found');
-		}
-
-		if (user.role === Role.SUPER_ADMIN) {
-			throw error(400, 'Cannot demote super admin');
-		}
-
-		user.role = Role.USER;
-		await locals.em.persistAndFlush(user);
-	},
-
-	promote: async ({ locals, params }) => {
-		if (locals.user?.role !== Role.ADMIN && locals.user?.role !== Role.SUPER_ADMIN) {
-			throw redirect(303, '/login');
-		}
-
-		const userIdString = params.id as string | undefined;
-		if (!userIdString) {
-			throw error(400, 'No userId provided');
-		}
-
-		const userId = parseInt(userIdString);
-		const user = await locals.em.findOne(User, { id: userId });
-		if (!user) {
-			throw error(400, 'User not found');
-		}
-
-		if (user.role === Role.SUPER_ADMIN) {
-			throw error(400, 'Cannot promote super admin');
-		}
-
-		user.role = Role.USER;
-		await locals.em.persistAndFlush(user);
 	}
 } satisfies Actions;
