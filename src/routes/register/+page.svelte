@@ -45,7 +45,7 @@
 				{/if}
 
 				{#if form?.weakPassword}
-					<small class="error">user not found</small>
+					<small class="error">weak password</small>
 				{/if}
 			</label>
 			<input type="password" name="password" id="password" autocomplete="new-password" />

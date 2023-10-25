@@ -63,5 +63,6 @@
 		padding: 20px;
 		background: #9cc1cf;
 		margin: 10px;
+		color: black;
 	}
 </style>

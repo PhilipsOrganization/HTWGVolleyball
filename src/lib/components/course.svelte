@@ -56,7 +56,7 @@
 	}
 
 	span {
-		font-weight: bold;
+		font-weight: 200;
 	}
 
 	span:nth-child(2) {
@@ -80,6 +80,10 @@
 	.enlisted {
 		background-color: #9cc1cf;
 		color: #000;
+	}
+
+	.enlisted span {
+		font-weight: bold;
 	}
 
 	.on-waitlist {

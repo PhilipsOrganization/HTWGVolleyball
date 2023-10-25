@@ -63,6 +63,7 @@
 		margin: 0.5rem auto;
 		color: #000;
 		z-index: 1;
+		font-weight: 400;
 	}
 
 	img {

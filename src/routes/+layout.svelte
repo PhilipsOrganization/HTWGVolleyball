@@ -31,7 +31,8 @@
 		padding: 0;
 		background: #131313;
 		color: #e0e0e0;
-		font-family: monospace;
+		font-family: Nono;
+		font-weight: 100;
 		min-height: 100dvh;
 		font-size: 16px;
 		display: flex;
@@ -40,17 +41,34 @@
 		text-decoration-thickness: 0px;
 	}
 
+	/* variable font */
+	@font-face {
+		font-family: Nono;
+		src: local(Nono), url('/fonts/NotoSansMono-VariableFont_wdth,wght.ttf') format('truetype');
+	}
+
 	:root:view-transition-group(*) {
 		animation-duration: 700ms;
+	}
+
+	:global(h1),
+	:global(h2),
+	:global(h3),
+	:global(h4),
+	:global(h5),
+	:global(h6) {
+		font-weight: 400;
 	}
 
 	:global(a) {
 		text-decoration: none;
 		color: unset;
+		font-weight: 400;
 	}
 
 	:global(button) {
 		all: unset;
 		cursor: pointer;
+		font-weight: 400;
 	}
 </style>

@@ -28,7 +28,12 @@
 
 <main>
 	<section>
-		<h2>{course.name}</h2>
+		<h2>
+			{course.name}
+			{#if course.isEnrolled}
+				<small class="isSignedUp"> - registered</small>
+			{/if}
+		</h2>
 		<p class="bold">{course.time}</p>
 		<p>{intl.format(course.date)}</p>
 		<p>{course.location}</p>
@@ -36,12 +41,9 @@
 		{#if data.user.role !== Role.USER}
 			<p>{intl.format(course.publishOn)}</p>
 		{/if}
-		<p class:waitList class:isSignedUp={course.isEnrolled}>
+		<p class:waitList>
 			{course.signupCount}/{course.maxParticipants} Registrations
 		</p>
-		{#if course.isEnrolled}
-			<p class="isSignedUp">You are in!</p>
-		{/if}
 	</section>
 
 	<div class:waitList class="actions" style:--course-transition={`course-${course.id}`}>
@@ -63,6 +65,7 @@
 	</div>
 	{#if admin}
 		<div id="users">
+			<h2>Participants</h2>
 			{#each course.participants ?? [] as participant}
 				<div class="user">
 					<span>{participant.username}</span>
@@ -90,6 +93,7 @@
 	section {
 		justify-content: center;
 		max-height: 400px;
+		padding-top: 2rem;
 	}
 
 	h2,
@@ -106,16 +110,12 @@
 	}
 
 	.isSignedUp {
-		color: #2aea60;
+		color: #9cc1cf;
+		font-weight: 800;
 	}
 
 	.waitList {
 		color: #eb714f;
-	}
-
-	.bold {
-		font-weight: bold;
-		color: #ecfbc7;
 	}
 
 	div.actions {

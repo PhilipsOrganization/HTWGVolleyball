@@ -7,7 +7,11 @@
 	$: form = $page.form;
 
 	let name = 'Beginner';
-	let open = false;
+
+	/**
+	 * @type {HTMLDialogElement}
+	 */
+	let dialogEl;
 
 	/**
 	 * @type {any[]}
@@ -124,8 +128,8 @@
 	}
 </script>
 
-<button class="highlight" id="open" on:click={() => (open = true)}>Create Course</button>
-<dialog {open}>
+<button class="highlight" id="open" on:click={() => dialogEl.showModal()}>Create Course</button>
+<dialog bind:this={dialogEl}>
 	<h1>New Course</h1>
 	<form method="POST" action="?/create-course">
 		<button id="close" value="cancel" formmethod="dialog">x</button>
