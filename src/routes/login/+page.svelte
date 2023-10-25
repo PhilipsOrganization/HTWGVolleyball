@@ -106,7 +106,6 @@
 		border: none;
 		padding: 1.5rem 3rem;
 		margin-top: 2rem;
-		font-weight: 100;
 		box-sizing: border-box;
 		color: black;
 		border: none;

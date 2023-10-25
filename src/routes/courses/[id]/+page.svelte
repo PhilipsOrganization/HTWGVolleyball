@@ -54,7 +54,7 @@
 			</form>
 		{/if}
 		<form action={`?/${course.isEnrolled ? 'drop' : 'enlist'}${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
-			<button type="submit">
+			<button type="submit" disabled={course.isPast}>
 				{#if course.isEnrolled}
 					drop
 				{:else}
@@ -129,6 +129,11 @@
 		max-width: 60vw;
 		margin: 2rem auto 4rem;
 		color: black;
+	}
+
+	button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	div.actions.waitList {

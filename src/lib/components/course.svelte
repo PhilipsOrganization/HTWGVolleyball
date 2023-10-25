@@ -15,6 +15,7 @@
 		class:enlisted={course.isEnrolled}
 		class:on-waitlist={waitlistSpot > 0}
 		class:first={isFirst}
+		class:isPast={course.isPast}
 		style:--course-transition={`course-${course.id}`}
 	>
 		<span>{course.name}</span>
@@ -31,7 +32,7 @@
 
 		<a class="underline right" {href}>
 			<p>
-				{#if admin}
+				{#if admin || course.isPast}
 					details
 				{:else}
 					{course.isEnrolled ? 'drop ' : 'enlist'}
@@ -67,6 +68,7 @@
 		display: flex;
 		justify-content: flex-end;
 	}
+
 	p {
 		all: unset;
 		min-width: 8ch;
@@ -84,6 +86,10 @@
 
 	.enlisted span {
 		font-weight: bold;
+	}
+
+	.isPast {
+		opacity: 0.7;
 	}
 
 	.on-waitlist {

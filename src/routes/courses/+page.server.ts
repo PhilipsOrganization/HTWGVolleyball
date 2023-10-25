@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const courses = await locals.em.find(
 		Course,
-		{ publishOn: { $lt: new Date() }, date: { $gte: startOfYesterday() } },
+		{ publishOn: { $lte: new Date() }, date: { $gte: startOfYesterday() } },
 		{
 			orderBy: { date: 'DESC' }
 		}

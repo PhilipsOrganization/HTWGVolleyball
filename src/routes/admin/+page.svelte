@@ -23,11 +23,11 @@
 	</div>
 
 	<div id="list">
-		{#each data.dates ?? [] as block, i}
+		{#each data.dates ?? [] as block}
 			<div id="block">
 				<h2>{humanReadableDate(block.date)}</h2>
-				{#each block.courses as course}
-					<Course {course} admin />
+				{#each block.courses as course, i}
+					<Course {course} admin isFirst={i === 0} />
 				{/each}
 			</div>
 		{/each}

@@ -2,6 +2,7 @@ import { Cascade, Collection, Embedded, Entity, Index, ManyToMany, ManyToOne, Pr
 import crypto from 'crypto';
 import { Role } from '../role';
 import { Subscription } from './subscription';
+import { isPast } from 'date-fns';
 
 @Entity({ tableName: 'accounts' })
 @Index({ properties: ['username'], options: { unique: true } })
@@ -98,6 +99,14 @@ export class Course {
 
 	@Property({ type: 'datetime', onUpdate: () => new Date() })
 	public updatedAt = new Date();
+
+	@Property({ persist: false })
+	public get isPast() {
+		const clone = new Date(this.date.getTime());
+		const [hours, minutes] = this.time.split(':').map((n) => parseInt(n));
+		clone.setHours(hours, minutes, 0, 0);
+		return isPast(clone);
+	}
 
 	public toJSON(user?: User) {
 		const obj = wrap<Course>(this).toObject();
