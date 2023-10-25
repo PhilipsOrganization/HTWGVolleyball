@@ -39,7 +39,15 @@
 		<p>{course.location}</p>
 
 		{#if data.user.role !== Role.USER}
-			<p>{intl.format(course.publishOn)}</p>
+			{@const intlAdmin = new Intl.DateTimeFormat('de-DE', {
+				weekday: 'long',
+				year: 'numeric',
+				month: 'numeric',
+				day: 'numeric',
+				hour: 'numeric',
+				minute: 'numeric'
+			})}
+			<p>Is published on: {intlAdmin.format(course.publishOn)}</p>
 		{/if}
 		<p class:waitList>
 			{course.signupCount}/{course.maxParticipants} Registrations
