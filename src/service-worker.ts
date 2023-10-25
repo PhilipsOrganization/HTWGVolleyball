@@ -1,4 +1,7 @@
 /// <reference types="@sveltejs/kit" />
+/// <reference lib="WebWorker" />
+declare const self: ServiceWorkerGlobalScope;
+
 import { build, files, version } from '$service-worker';
 
 const ASSETS = `cache${version}`;
@@ -8,15 +11,14 @@ const ASSETS = `cache${version}`;
 const to_cache = build.concat(files);
 const staticAssets = new Set(to_cache);
 
-self.addEventListener('install', (event) => {
-	event.waitUntil(
-		caches
-			.open(ASSETS)
-			.then((cache) => cache.addAll(to_cache))
-			.then(() => {
-				self.skipWaiting();
-			})
-	);
+self.addEventListener('install', async (event) => {
+	async function cacheAssets(files: string[]) {
+		const cache = await caches.open(ASSETS);
+		await cache.addAll(files);
+		await self.skipWaiting();
+	}
+
+	event.waitUntil(cacheAssets(to_cache));
 });
 
 self.addEventListener('activate', (event) => {
@@ -33,11 +35,9 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('push', (ev) => {
-	const data = ev.data.json();
-	console.log('Got push', data);
+	const data = ev.data?.json();
 	self.registration.showNotification(data.title, {
-		// body: 'Hello, World!',
-		icon: 'https://volleyballhtwg.netlify.app/Volleyball_icon.svg'
+		icon: 'https://volleyball.oesterlin.dev/Volleyball_icon.png'
 	});
 });
 
@@ -67,8 +67,7 @@ self.addEventListener('fetch', (event) => {
 
 	// don't try to handle e.g. data: URIs
 	const isHttp = url.protocol.startsWith('http');
-	const isDevServerRequest =
-		url.hostname === self.location.hostname && url.port !== self.location.port;
+	const isDevServerRequest = url.hostname === self.location.hostname && url.port !== self.location.port;
 	const isStaticAsset = url.host === self.location.host && staticAssets.has(url.pathname);
 	const skipBecauseUncached = event.request.cache === 'only-if-cached' && !isStaticAsset;
 

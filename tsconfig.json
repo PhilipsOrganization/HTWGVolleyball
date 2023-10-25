@@ -10,7 +10,8 @@
 		"sourceMap": true,
 		"strict": true,
 		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true
+		"emitDecoratorMetadata": true,
+		"lib": ["esnext", "DOM", "DOM.Iterable", "webworker"]
 	}
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//

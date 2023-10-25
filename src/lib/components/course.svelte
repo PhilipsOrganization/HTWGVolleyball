@@ -1,4 +1,6 @@
 <script>
+	import { fade } from 'svelte/transition';
+
 	/** @type {import('$lib/db/entities').CourseDTO} */
 	export let course;
 	export let isFirst = false;
@@ -9,7 +11,7 @@
 	const href = `courses/${course.id}${admin ? '?admin' : ''}`;
 </script>
 
-<a {href}>
+<a {href} in:fade>
 	<div
 		aria-roledescription="course"
 		class:enlisted={course.isEnrolled}

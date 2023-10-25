@@ -53,7 +53,7 @@
 	}
 
 	/**
-	 * 
+	 *
 	 * @param {number} time
 	 */
 	function approximatelyFormatTime(time) {
@@ -135,6 +135,13 @@
 		margin: 1rem;
 		width: 100%;
 		height: 200px;
+	}
+
+	button {
+		background: #ecfbc7;
+		color: #000;
+		padding: 0.5rem 1rem;
+		margin: 1rem 0;
 	}
 
 	svg {
