@@ -28,8 +28,8 @@
 			return alert('subscription failed');
 		}
 
-		const { user } = await request.json();
-		data.user = user;
+		const user = await request.json();
+		data = { ...data, user };
 	}
 
 	/**
@@ -58,8 +58,8 @@
 			return alert('subscription failed');
 		}
 
-		const { user } = await request.json();
-		data.user = user;
+		const user = await request.json();
+		data = { ...data, user };
 	}
 
 	/**
