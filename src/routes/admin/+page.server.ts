@@ -35,7 +35,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	}
 
 	return {
-		users: users.map((u) => u.toJSON()),
+		users: users.map((u: User) => u.toJSON()),
 		dates: Object.entries(dates).map(([date, courses]) => ({
 			date,
 			courses: courses.map((c) => c.toJSON(locals.user))
@@ -90,9 +90,9 @@ export const actions = {
 
 		await locals.em.persistAndFlush(course);
 
-		return 
+		return;
 	},
-	
+
 	'update-course': async ({ locals, request }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
 			throw redirect(303, '/login');
@@ -114,13 +114,12 @@ export const actions = {
 		assign(course, { name });
 		await locals.em.persistAndFlush(course);
 	},
-	demote: async ({ locals, request }) => {
+	demote: async ({ locals, params }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
 			throw redirect(303, '/login');
 		}
 
-		const form = await request.formData();
-		const userIdString = form.get('userId') as string | undefined;
+		const userIdString = params.id as string | undefined;
 		if (!userIdString) {
 			throw error(400, 'No userId provided');
 		}
@@ -140,13 +139,12 @@ export const actions = {
 		await locals.em.persistAndFlush(user);
 	},
 
-	promote: async ({ locals, request }) => {
+	promote: async ({ locals, params }) => {
 		if (locals.user?.role !== Role.ADMIN && locals.user?.role !== Role.SUPER_ADMIN) {
 			throw redirect(303, '/login');
 		}
 
-		const form = await request.formData();
-		const userIdString = form.get('userId') as string | undefined;
+		const userIdString = params.id as string | undefined;
 		if (!userIdString) {
 			throw error(400, 'No userId provided');
 		}
@@ -163,7 +161,5 @@ export const actions = {
 
 		user.role = Role.USER;
 		await locals.em.persistAndFlush(user);
-	},
-
-	
+	}
 } satisfies Actions;

@@ -58,4 +58,10 @@
 		width: 100%;
 		height: 100%;
 	}
+
+	button {
+		padding: 20px;
+		background: #9cc1cf;
+		margin: 10px;
+	}
 </style>
