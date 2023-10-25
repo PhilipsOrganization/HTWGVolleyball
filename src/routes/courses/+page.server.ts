@@ -1,20 +1,13 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { Course } from '$lib/db/entities';
-import { startOfYesterday } from 'date-fns';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
 		throw redirect(303, '/login');
 	}
 
-	const courses = await locals.em.find(
-		Course,
-		{ publishOn: { $lte: new Date() }, date: { $gte: startOfYesterday() } },
-		{
-			orderBy: { date: 'DESC' }
-		}
-	);
+	const courses = await locals.em.find(Course, { shouldPublish: true }, { orderBy: { date: 'DESC' } });
 
 	const dates: { [date: string]: Course[] } = {};
 

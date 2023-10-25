@@ -1,4 +1,4 @@
-import { Cascade, Collection, Embedded, Entity, Index, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
+import { Cascade, Collection, Embedded, Entity, Formula, Index, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
 import crypto from 'crypto';
 import { Role } from '../role';
 import { Subscription } from './subscription';
@@ -75,6 +75,10 @@ export class Course {
 
 	@Property({ type: 'datetime', length: 3 })
 	public publishOn!: Date;
+
+	// formula to check if the course should be published: publish in the past and date in the future but not more than 1 day ago
+	@Formula("(publish_on <= NOW() AND date >= (NOW() - INTERVAL '1 day'))")
+	public shouldPublish = false;
 
 	@Property()
 	public maxParticipants!: number;
