@@ -1,0 +1,22 @@
+{
+  "name": "scheduler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cron": "^1.7.1",
+    "date-fns": "^2.30.0",
+    "@lib/database": "workspace:..\\database",
+    "@lib/notifications": "workspace:..\\notifications"
+  },
+  "devDependencies": {
+    "@types/cron": "^1.7.1",
+    "typescript": "^4.1.3"
+  }
+}

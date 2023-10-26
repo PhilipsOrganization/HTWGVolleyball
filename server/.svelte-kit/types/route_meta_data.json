@@ -1,0 +1,33 @@
+{
+	"/": [
+		"src/routes/+page.server.ts"
+	],
+	"/admin": [
+		"src/routes/admin/+page.server.ts"
+	],
+	"/admin/users": [
+		"src/routes/admin/users/+page.server.ts"
+	],
+	"/admin/users/[id]/stats": [
+		"src/routes/admin/users/[id]/stats/+page.server.ts"
+	],
+	"/courses": [
+		"src/routes/courses/+page.server.ts"
+	],
+	"/courses/[id]": [
+		"src/routes/courses/[id]/+page.server.ts"
+	],
+	"/login": [
+		"src/routes/login/+page.server.ts"
+	],
+	"/logout": [
+		"src/routes/logout/+page.server.ts"
+	],
+	"/profile": [
+		"src/routes/profile/+page.server.ts",
+		"src/routes/profile/+server.ts"
+	],
+	"/register": [
+		"src/routes/register/+page.server.ts"
+	]
+}

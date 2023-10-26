@@ -1,0 +1,5 @@
+packages:
+  - 'database/**'
+  - 'scheduler/**'
+  - 'server/**'
+  - "notifications/**"

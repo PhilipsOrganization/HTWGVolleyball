@@ -4,87 +4,140 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-dependencies:
-  '@mikro-orm/core':
-    specifier: ^5.8.10
-    version: 5.8.10(@mikro-orm/migrations@5.8.10)(@mikro-orm/postgresql@5.8.10)
-  '@mikro-orm/migrations':
-    specifier: ^5.8.10
-    version: 5.8.10(@mikro-orm/core@5.8.10)(pg@8.11.3)
-  '@mikro-orm/postgresql':
-    specifier: ^5.8.10
-    version: 5.8.10(@mikro-orm/core@5.8.10)(@mikro-orm/migrations@5.8.10)
-  '@sveltejs/adapter-node':
-    specifier: ^1.3.1
-    version: 1.3.1(@sveltejs/kit@1.27.0)
-  date-fns:
-    specifier: ^2.30.0
-    version: 2.30.0
-  date-fns-tz:
-    specifier: ^2.0.0
-    version: 2.0.0(date-fns@2.30.0)
-  dotenv:
-    specifier: ^16.3.1
-    version: 16.3.1
-  uuid:
-    specifier: ^9.0.0
-    version: 9.0.0
-  vite-plugin-ts:
-    specifier: 1.3.2-1
-    version: 1.3.2-1
-  web-push:
-    specifier: ^3.6.6
-    version: 3.6.6
-  zod:
-    specifier: ^3.22.2
-    version: 3.22.2
+importers:
 
-devDependencies:
-  '@playwright/test':
-    specifier: ^1.28.1
-    version: 1.37.1
-  '@sveltejs/kit':
-    specifier: ^1.27.0
-    version: 1.27.0(svelte@4.2.2)(vite@4.5.0)
-  '@types/web-push':
-    specifier: ^3.6.2
-    version: 3.6.2
-  '@typescript-eslint/eslint-plugin':
-    specifier: ^5.45.0
-    version: 5.62.0(@typescript-eslint/parser@5.62.0)(eslint@8.52.0)(typescript@5.2.2)
-  '@typescript-eslint/parser':
-    specifier: ^5.45.0
-    version: 5.62.0(eslint@8.52.0)(typescript@5.2.2)
-  class-validator:
-    specifier: ^0.14.0
-    version: 0.14.0
-  eslint:
-    specifier: ^8.52.0
-    version: 8.52.0
-  eslint-config-prettier:
-    specifier: ^8.5.0
-    version: 8.10.0(eslint@8.52.0)
-  eslint-plugin-svelte:
-    specifier: ^2.30.0
-    version: 2.33.0(eslint@8.52.0)(svelte@4.2.2)
-  prettier:
-    specifier: ^2.8.0
-    version: 2.8.8
-  prettier-plugin-svelte:
-    specifier: ^2.10.1
-    version: 2.10.1(prettier@2.8.8)(svelte@4.2.2)
-  svelte:
-    specifier: ^4.2.2
-    version: 4.2.2
-  svelte-check:
-    specifier: ^3.4.3
-    version: 3.5.1(@babel/core@7.22.17)(postcss@8.4.29)(svelte@4.2.2)
-  typescript:
-    specifier: ^5.2.2
-    version: 5.2.2
-  vite:
-    specifier: ^4.5.0
-    version: 4.5.0
+  database:
+    dependencies:
+      '@mikro-orm/core':
+        specifier: ^5.8.10
+        version: 5.8.10(@mikro-orm/migrations@5.8.10)(@mikro-orm/postgresql@5.8.10)
+      '@mikro-orm/migrations':
+        specifier: ^5.8.10
+        version: 5.8.10(@mikro-orm/core@5.8.10)(pg@8.11.3)
+      '@mikro-orm/postgresql':
+        specifier: ^5.8.10
+        version: 5.8.10(@mikro-orm/core@5.8.10)(@mikro-orm/migrations@5.8.10)
+
+  database/migrations: {}
+
+  notifications:
+    dependencies:
+      '@lib/database':
+        specifier: workspace:..\database
+        version: link:../database
+      web-push:
+        specifier: ^3.4.3
+        version: 3.6.6
+
+  scheduler:
+    dependencies:
+      '@lib/database':
+        specifier: workspace:..\database
+        version: link:../database
+      '@lib/notifications':
+        specifier: workspace:..\notifications
+        version: link:../notifications
+      cron:
+        specifier: ^1.7.1
+        version: 1.8.3
+      date-fns:
+        specifier: ^2.30.0
+        version: 2.30.0
+    devDependencies:
+      '@types/cron':
+        specifier: ^1.7.1
+        version: 1.7.3
+      typescript:
+        specifier: ^4.1.3
+        version: 4.9.5
+
+  server:
+    dependencies:
+      '@mikro-orm/core':
+        specifier: ^5.8.10
+        version: 5.8.10(@mikro-orm/migrations@5.8.10)(@mikro-orm/postgresql@5.8.10)
+      '@mikro-orm/migrations':
+        specifier: ^5.8.10
+        version: 5.8.10(@mikro-orm/core@5.8.10)(pg@8.11.3)
+      '@mikro-orm/postgresql':
+        specifier: ^5.8.10
+        version: 5.8.10(@mikro-orm/core@5.8.10)(@mikro-orm/migrations@5.8.10)
+      '@sveltejs/adapter-node':
+        specifier: ^1.3.1
+        version: 1.3.1(@sveltejs/kit@1.27.0)
+      date-fns:
+        specifier: ^2.30.0
+        version: 2.30.0
+      date-fns-tz:
+        specifier: ^2.0.0
+        version: 2.0.0(date-fns@2.30.0)
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.0
+      vite-plugin-ts:
+        specifier: 1.3.2-1
+        version: 1.3.2-1
+      web-push:
+        specifier: ^3.6.6
+        version: 3.6.6
+      zod:
+        specifier: ^3.22.2
+        version: 3.22.2
+    devDependencies:
+      '@lib/database':
+        specifier: workspace:..\database
+        version: link:../database
+      '@lib/notifications':
+        specifier: workspace:..\notifications
+        version: link:../notifications
+      '@playwright/test':
+        specifier: ^1.28.1
+        version: 1.37.1
+      '@sveltejs/kit':
+        specifier: ^1.27.0
+        version: 1.27.0(svelte@4.2.2)(vite@4.5.0)
+      '@types/web-push':
+        specifier: ^3.6.2
+        version: 3.6.2
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^5.45.0
+        version: 5.62.0(@typescript-eslint/parser@5.62.0)(eslint@8.52.0)(typescript@5.2.2)
+      '@typescript-eslint/parser':
+        specifier: ^5.45.0
+        version: 5.62.0(eslint@8.52.0)(typescript@5.2.2)
+      class-validator:
+        specifier: ^0.14.0
+        version: 0.14.0
+      eslint:
+        specifier: ^8.52.0
+        version: 8.52.0
+      eslint-config-prettier:
+        specifier: ^8.5.0
+        version: 8.10.0(eslint@8.52.0)
+      eslint-plugin-svelte:
+        specifier: ^2.30.0
+        version: 2.33.0(eslint@8.52.0)(svelte@4.2.2)
+      prettier:
+        specifier: ^2.8.0
+        version: 2.8.8
+      prettier-plugin-svelte:
+        specifier: ^2.10.1
+        version: 2.10.1(prettier@2.8.8)(svelte@4.2.2)
+      svelte:
+        specifier: ^4.2.2
+        version: 4.2.2
+      svelte-check:
+        specifier: ^3.4.3
+        version: 3.5.1(@babel/core@7.22.17)(postcss@8.4.29)(svelte@4.2.2)
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+      vite:
+        specifier: ^4.5.0
+        version: 4.5.0
 
 packages:
 
@@ -754,7 +807,7 @@ packages:
       estree-walker: 2.0.2
       glob: 8.1.0
       is-reference: 1.2.1
-      magic-string: 0.30.3
+      magic-string: 0.30.5
       rollup: 3.29.0
     dev: false
 
@@ -848,7 +901,7 @@ packages:
       devalue: 4.3.2
       esm-env: 1.0.0
       kleur: 4.1.5
-      magic-string: 0.30.3
+      magic-string: 0.30.5
       mrmime: 1.0.1
       sade: 1.8.1
       set-cookie-parser: 2.6.0
@@ -886,7 +939,7 @@ packages:
       debug: 4.3.4
       deepmerge: 4.3.1
       kleur: 4.1.5
-      magic-string: 0.30.3
+      magic-string: 0.30.5
       svelte: 4.2.2
       svelte-hmr: 0.15.3(svelte@4.2.2)
       vite: 4.5.0
@@ -900,6 +953,13 @@ packages:
 
   /@types/cookie@0.5.2:
     resolution: {integrity: sha512-DBpRoJGKJZn7RY92dPrgoMew8xCWc2P71beqsjyhEI/Ds9mOyVmBwtekyfhpwFIVt1WrxTonFifiOZ62V8CnNA==}
+
+  /@types/cron@1.7.3:
+    resolution: {integrity: sha512-iPmUXyIJG1Js+ldPYhOQcYU3kCAQ2FWrSkm1FJPoii2eYSn6wEW6onPukNTT0bfiflexNSRPl6KWmAIqS+36YA==}
+    dependencies:
+      '@types/node': 20.6.0
+      moment: 2.29.4
+    dev: true
 
   /@types/estree@1.0.1:
     resolution: {integrity: sha512-LG4opVs2ANWZ1TJoKc937iMmNstM/d0ae1vNbnBvBhqCSezgVUOzcLCqbI5elV8Vy6WKwKjaqR+zO9VKirBBCA==}
@@ -1361,6 +1421,13 @@ packages:
     resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}
     engines: {node: '>= 0.6'}
 
+  /cron@1.8.3:
+    resolution: {integrity: sha512-JYR/QZFklJCIPndBLfd/2nU1nSlCMrUdtQ2mGLXSVM/qqqEK7DOrFR0gsEiyeqs0PdWrs0ve1ggH4V7XksDwXg==}
+    deprecated: Breaking dependency change (moved from moment to luxon). Please move to 2.0.0.
+    dependencies:
+      luxon: 1.28.1
+    dev: false
+
   /cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
@@ -1755,8 +1822,8 @@ packages:
     requiresBuild: true
     optional: true
 
-  /function-bind@1.1.1:
-    resolution: {integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==}
+  /function-bind@1.1.2:
+    resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
     dev: false
 
   /gensync@1.0.0-beta.2:
@@ -1855,7 +1922,7 @@ packages:
     resolution: {integrity: sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==}
     engines: {node: '>= 0.4.0'}
     dependencies:
-      function-bind: 1.1.1
+      function-bind: 1.1.2
     dev: false
 
   /hash-sum@2.0.0:
@@ -2136,18 +2203,16 @@ packages:
       yallist: 4.0.0
     dev: true
 
+  /luxon@1.28.1:
+    resolution: {integrity: sha512-gYHAa180mKrNIUJCbwpmD0aTu9kV0dREDrwNnuyFAsO1Wt0EVYSZelPnJlbj9HplzXX/YWXHFTL45kvZ53M0pw==}
+    dev: false
+
   /magic-string@0.27.0:
     resolution: {integrity: sha512-8UnnX2PeRAPZuN12svgR9j7M1uWMovg/CEnIwIG0LFkXSJJe4PdfUGiTGl8V9bsBHFUtfVINcSyYxd7q+kx9fA==}
     engines: {node: '>=12'}
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
-
-  /magic-string@0.30.3:
-    resolution: {integrity: sha512-B7xGbll2fG/VjP+SWg4sX3JynwIU0mjoTc6MPpKNuIvftk6u6vqhDnk1R80b8C2GBR6ywqy+1DcKBrevBg+bmw==}
-    engines: {node: '>=12'}
-    dependencies:
-      '@jridgewell/sourcemap-codec': 1.4.15
 
   /magic-string@0.30.5:
     resolution: {integrity: sha512-7xlpfBaQaP/T6Vh8MO/EqXSW5En6INHEvEXQiuff7Gku0PWjU3uf6w/j9o7O+SpB5fOAkrI5HeoNgwjEO0pFsA==}
@@ -2204,6 +2269,10 @@ packages:
     hasBin: true
     dependencies:
       minimist: 1.2.8
+    dev: true
+
+  /moment@2.29.4:
+    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
     dev: true
 
   /mri@1.2.0:
@@ -2895,7 +2964,6 @@ packages:
     resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
     engines: {node: '>=4.2.0'}
     hasBin: true
-    dev: false
 
   /typescript@5.2.2:
     resolution: {integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==}

@@ -14,12 +14,17 @@ services:
       - 'traefik.http.services.volleyball.loadbalancer.server.port=3000'
     env_file:
       - .env.local
-    environment:
-      - MIKRO_ORM_DB_NAME=volleyball
-      - MIKRO_ORM_HOST=postgres
-      - MIKRO_ORM_PASSWORD=password
-      - MIKRO_ORM_PORT=5432
-      - MIKRO_ORM_USER=postgres
+
+  scheduler:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    command: node scheduler/build/index.js
+    networks:
+      - traefik_web
+    env_file:
+      - .env.local
 
 networks:
   traefik_web:
