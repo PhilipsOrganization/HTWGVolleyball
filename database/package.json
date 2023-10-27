@@ -2,15 +2,15 @@
   "name": "database",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@mikro-orm/core": "^5.8.10",
-		"@mikro-orm/migrations": "^5.8.10",
-		"@mikro-orm/postgresql": "^5.8.10"
+    "@mikro-orm/migrations": "^5.8.10",
+    "@mikro-orm/postgresql": "^5.8.10"
   }
 }

@@ -1,7 +1,11 @@
-import { entities } from '@lib/database';
+import { entities } from './entities';
 import type { Options } from '@mikro-orm/postgresql';
 
-const env = process.env;
+let env = process.env;
+
+export function setEnv(e: any) {
+	env = e;
+}
 
 export const config: Options = {
 	type: 'postgresql',
