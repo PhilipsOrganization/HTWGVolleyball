@@ -48,7 +48,6 @@ export const actions = {
 		user.sessionToken = undefined;
 		await locals.em.persistAndFlush(user);
 	},
-
 	promote: async ({ locals, params }) => {
 		if (locals.user?.role !== Role.ADMIN && locals.user?.role !== Role.SUPER_ADMIN) {
 			throw redirect(303, '/login');
@@ -71,6 +70,24 @@ export const actions = {
 
 		user.role = Role.ADMIN;
 		user.sessionToken = undefined;
+		await locals.em.persistAndFlush(user);
+	},
+	note: async ({ locals, params, request }) => {
+		if (!locals.user || locals.user.role === Role.USER) {
+			throw redirect(303, '/login');
+		}
+
+		const userIdString = params.id as string | undefined;
+		if (!userIdString) {
+			throw error(400, 'No userId provided');
+		}
+
+		const userId = parseInt(userIdString);
+		const user = await locals.em.findOneOrFail(User, { id: userId });
+		const form = await request.formData();
+		const notes = form.get('notes') as string | undefined;
+		
+		user.notes = notes;
 		await locals.em.persistAndFlush(user);
 	},
 	unstrike: async ({ locals, params }) => {

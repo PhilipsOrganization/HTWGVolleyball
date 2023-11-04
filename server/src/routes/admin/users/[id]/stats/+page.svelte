@@ -83,6 +83,14 @@
 		<path in:draw={{ duration: 1000 }} fill="none" stroke="grey" d={data.svg} />
 	</svg>
 </div>
+<br>
+<div class="column">
+	<h2>Notes</h2>
+	<form class="flex" method="post" action="?/note">
+		<textarea name="notes" id="notes" cols="30" rows="10" value={user.notes}></textarea>
+		<button>Save</button>
+	</form>
+</div>
 
 <style>
 	section {
@@ -133,5 +141,9 @@
 	.small {
 		padding: 10px;
 		background: #ecfbc7;
+	}
+
+	.flex {
+		display: flex;
 	}
 </style>
