@@ -1,8 +1,17 @@
 import { Embeddable, Property } from '@mikro-orm/core';
 
+export interface SubscriptionDTO {
+	keys: {
+		p256dh: string;
+		auth: string;
+	};
+	endpoint: string;
+	expirationTime?: string | null | undefined;
+}
+
 @Embeddable()
 export class Subscription {
-	public constructor(subscription: any) {
+	public constructor(subscription: SubscriptionDTO) {
 		this.endpoint = subscription.endpoint;
 		this.expirationTime = subscription.expirationTime;
 		this.p256dh = subscription.keys.p256dh;
@@ -13,7 +22,7 @@ export class Subscription {
 	public endpoint!: string;
 
 	@Property({ nullable: true })
-	public expirationTime!: number | null;
+	public expirationTime?: string | undefined | null;
 
 	@Property({ nullable: true })
 	public p256dh!: string;

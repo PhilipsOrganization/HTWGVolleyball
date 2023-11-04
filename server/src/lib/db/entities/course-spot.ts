@@ -57,7 +57,7 @@ export class User {
 
 	@Property({ persist: false })
 	public get hasNotificationsEnabled() {
-		return this.subscription !== undefined;
+		return this.subscription !== undefined && this.subscription !== null;
 	}
 }
 

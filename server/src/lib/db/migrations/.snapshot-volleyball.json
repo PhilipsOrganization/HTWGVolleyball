@@ -90,6 +90,16 @@
           "nullable": false,
           "length": 0,
           "mappedType": "datetime"
+        },
+        "notification_sent": {
+          "name": "notification_sent",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "false",
+          "mappedType": "boolean"
         }
       },
       "name": "courses",
