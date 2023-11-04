@@ -1,16 +1,9 @@
-FROM node:20-slim
-WORKDIR /app
+FROM alpine
 
-# pnpm fetch does require only lockfile
-COPY pnpm-lock.yaml ./
+COPY ping.sh /ping.sh
+COPY mycron /etc/crontabs/root
 
-RUN npm i -g pnpm && pnpm fetch
+RUN chmod +x /ping.sh && \
+    touch /var/log/cron.log
 
-ADD . ./
-RUN pnpm install -r --offline && pnpm run build
-
-RUN pwd && mkdir ./build/migrations && echo "{ \"type\": \"commonjs\" }" >> ./build/migrations/package.json && cat ./build/migrations/package.json
-
-EXPOSE 3000
-
-CMD ["node", "build/index.js"]
+CMD crond && tail -f /var/log/cron.log

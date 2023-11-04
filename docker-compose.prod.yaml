@@ -3,7 +3,7 @@ version: '3.8'
 services:
   volleyball:
     build:
-      context: ./
+      context: ./server
       dockerfile: Dockerfile
     restart: always
     networks:
@@ -20,6 +20,14 @@ services:
       - MIKRO_ORM_PASSWORD=password
       - MIKRO_ORM_PORT=5432
       - MIKRO_ORM_USER=postgres
+    
+  scheduler: 
+    build:
+      context: ./scheduler
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - traefik_web
 
 networks:
   traefik_web:

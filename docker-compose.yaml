@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # volleyball:
   #   build:
-  #     context: ./
+  #     context: ./server
   #     dockerfile: Dockerfile
   #   restart: always
   #   ports:
@@ -14,6 +14,12 @@ services:
   #     - MIKRO_ORM_PASSWORD=password
   #     - MIKRO_ORM_PORT=5433
   #     - MIKRO_ORM_USER=postgres
+
+  scheduler:
+    build:
+      context: ./scheduler
+      dockerfile: Dockerfile
+    restart: always
 
   postgres:
     image: postgres:latest
