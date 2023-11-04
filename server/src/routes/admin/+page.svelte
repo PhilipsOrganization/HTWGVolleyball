@@ -56,12 +56,17 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		margin-bottom: 6rem;
+		margin-bottom: 3rem;
+		border-radius: 12px 12px 0 0;
+		background: #2a2a2a;
+		padding-top: 1rem;
 	}
 
 	h2 {
 		text-align: center;
 		margin: 0 0 2rem;
 		text-transform: capitalize;
+		letter-spacing: 1.1px;
+		font-weight: 200;
 	}
 </style>

@@ -37,7 +37,7 @@ export function humanReadableDate(date: Date | string) {
 		if (isAfter(today, comp)) {
 			modifier = 'last';
 		} else {
-			modifier = 'on';
+			modifier = '';
 		}
 		return `${modifier} ${weekday}`;
 	}
@@ -49,11 +49,11 @@ export function humanReadableDate(date: Date | string) {
 		return 'next week on ' + weekday;
 	}
 	if (Math.abs(weeks) < 4) {
-		const day = comp.toLocaleDateString('en-US', {
-			month: 'short',
+		return comp.toLocaleDateString('en-US', {
+			dateStyle: 'long',
+			month: 'numeric',
 			day: 'numeric'
 		});
-		return `on ${day}`;
 	}
 
 	return comp.toLocaleDateString('en-US', {
