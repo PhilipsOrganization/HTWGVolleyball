@@ -53,7 +53,7 @@
 
 	h2 {
 		text-align: center;
-		margin: 0 0 2rem;
+		margin: 0 0 1rem;
 		text-transform: capitalize;
 		letter-spacing: 1.1px;
 		font-weight: 200;
