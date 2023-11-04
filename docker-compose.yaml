@@ -8,11 +8,13 @@ services:
   #   restart: always
   #   ports:
   #     - 3000:3000
+  #   env_file:
+  #     - .env.local
   #   environment:
   #     - MIKRO_ORM_DB_NAME=volleyball
   #     - MIKRO_ORM_HOST=postgres
   #     - MIKRO_ORM_PASSWORD=password
-  #     - MIKRO_ORM_PORT=5433
+  #     - MIKRO_ORM_PORT=5432
   #     - MIKRO_ORM_USER=postgres
 
   scheduler:
