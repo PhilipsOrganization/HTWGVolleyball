@@ -2,15 +2,27 @@
   "name": "database",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "./dist/index.js",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "scripts": {
-    "build": "tsc"
+    "build": "tsup"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@mikro-orm/core": "^5.8.10",
     "@mikro-orm/migrations": "^5.8.10",
-    "@mikro-orm/postgresql": "^5.8.10"
+    "@mikro-orm/postgresql": "^5.8.10",
+    "date-fns": "^2.30.0"
+  },
+  "devDependencies": {
+    "@types/date-fns": "^2.6.0",
+    "@types/node": "^16.18.59",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "tsup": "^7.2.0"
   }
 }

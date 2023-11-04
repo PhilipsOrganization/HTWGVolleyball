@@ -1,12 +1,11 @@
 // @ts-nocheck
-import { redirect, type Actions, error, fail } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
-import { Course } from '@lib/database';
-import { Role } from '@lib/database';
+import { Course, Role, User } from '@lib/database';
 import { assign } from '@mikro-orm/core';
-import { User } from '@lib/database';
+import { error, fail, redirect, type Actions } from '@sveltejs/kit';
+import { startOfYesterday } from 'date-fns';
+import { zonedTimeToUtc } from "date-fns-tz";
 import { z } from 'zod';
-import { startOfYesterday, sub } from 'date-fns';
+import type { PageServerLoad } from './$types';
 
 export const load = async ({ locals, url }: Parameters<PageServerLoad>[0]) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -83,7 +82,7 @@ export const actions = {
 		const data = {
 			...dto,
 			date: new Date(dto.date),
-			publishOn: sub(publishOn, { minutes: new Date().getTimezoneOffset() }),
+			publishOn: zonedTimeToUtc(publishOn, 'Europe/Berlin'),
 			maxParticipants: parseInt(dto.maxParticipants)
 		};
 

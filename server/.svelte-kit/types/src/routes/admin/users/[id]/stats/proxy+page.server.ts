@@ -1,10 +1,8 @@
 // @ts-nocheck
-import { UserStats } from '@lib/database/user-stats';
-import { Role } from '@lib/database';
+import { Course, Role, User, UserStats } from '$lib/db';
+import { getPath } from '$lib/helpers/stats';
 import { error, redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { Course, User } from '@lib/database';
-import { getPath } from '$lib/helpers/stats';
 
 export const load = async ({ locals, params }: Parameters<PageServerLoad>[0]) => {
 	if (!locals.user || locals.user.role === Role.USER) {

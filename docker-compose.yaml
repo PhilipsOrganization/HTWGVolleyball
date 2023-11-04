@@ -1,19 +1,24 @@
 version: '3.8'
 
 services:
-  # volleyball:
-  #   build:
-  #     context: ./
-  #     dockerfile: Dockerfile
-  #   restart: always
-  #   ports:
-  #     - 3000:3000
-  #   environment:
-  #     - MIKRO_ORM_DB_NAME=volleyball
-  #     - MIKRO_ORM_HOST=postgres
-  #     - MIKRO_ORM_PASSWORD=password
-  #     - MIKRO_ORM_PORT=5433
-  #     - MIKRO_ORM_USER=postgres
+  volleyball:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 3000:3000
+    env_file:
+      - .env.docker
+  
+  scheduler:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    command: node scheduler/build/index.js
+    env_file:
+      - .env.docker
 
   postgres:
     image: postgres:latest

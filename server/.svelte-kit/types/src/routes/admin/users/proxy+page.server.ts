@@ -1,6 +1,5 @@
 // @ts-nocheck
-import { User } from '@lib/database';
-import { Role } from '@lib/database';
+import { Role, User } from '$lib/db';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

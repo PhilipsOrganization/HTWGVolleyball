@@ -8,4 +8,10 @@ export default defineConfig({
 		minifyIdentifiers: false,
 		keepNames: true,
 	},
+	build: {
+		rollupOptions: {
+			external: ['@lib/database', '@mikro-orm/migrations'],
+		},
+	  },
+	resolve: { preserveSymlinks: true }
 });

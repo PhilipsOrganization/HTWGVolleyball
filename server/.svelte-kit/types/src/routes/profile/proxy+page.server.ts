@@ -1,9 +1,8 @@
 // @ts-nocheck
-import { Course, UserStats } from '@lib/database';
 import { getPath } from '$lib/helpers/stats';
+import { Course, RegistrationStats, UserStats } from '@lib/database';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from '../$types';
-import { RegistrationStats } from '@lib/database/registration-stats';
 
 export const load = async ({ locals }: Parameters<PageServerLoad>[0]) => {
 	if (!locals.user) {

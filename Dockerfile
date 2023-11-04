@@ -7,7 +7,7 @@ COPY pnpm-lock.yaml ./
 RUN npm i -g pnpm && pnpm fetch
 
 ADD . ./
-RUN pnpm install -r --offline && cd ./server && pnpm run build && cd ../scheduler && pnpm run build
+RUN pnpm install -r --offline && cd ./database && pnpm run build && cd ../notifications && npm run build && cd ../scheduler && pnpm run build && cd ../server && pnpm run build
 
 
 EXPOSE 3000

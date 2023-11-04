@@ -1,20 +1,21 @@
 import type { Handle } from '@sveltejs/kit';
 import { MikroORM } from '@mikro-orm/core';
 import type { SqlEntityManager } from '@mikro-orm/postgresql';
-import { User, config } from '$lib/db';
 import { building } from '$app/environment';
-import { env } from '$env/dynamic/private';
-import { setEnv } from '@lib/notifications';
+import { setEnv as notificationEnv } from '@lib/notifications';
+import { setEnv as databaseEnv, User, config } from '@lib/database';
 
 let orm: MikroORM;
+
 if (!building) {
+	databaseEnv(process.env);
+	notificationEnv(process.env);
+	
 	orm = await MikroORM.init(config);
 
 	const migrator = orm.getMigrator();
 	await migrator.createMigration();
 	await migrator.up();
-
-	setEnv(env);
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
