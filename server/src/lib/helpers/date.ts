@@ -48,17 +48,10 @@ export function humanReadableDate(date: Date | string) {
 	if (weeks === 1) {
 		return 'next week on ' + weekday;
 	}
-	if (Math.abs(weeks) < 4) {
-		return comp.toLocaleDateString('en-US', {
-			dateStyle: 'long',
-			month: 'numeric',
-			day: 'numeric'
-		});
-	}
 
 	return comp.toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'long',
+		dateStyle: 'full',
+		month: 'numeric',
 		day: 'numeric'
 	});
 }
