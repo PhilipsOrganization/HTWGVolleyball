@@ -5,7 +5,7 @@ import { Role } from '$lib/db/role';
 import { assign } from '@mikro-orm/core';
 import { User } from '$lib/db/entities';
 import { z } from 'zod';
-import { startOfYesterday, sub } from 'date-fns';
+import { startOfYesterday } from 'date-fns';
 import { zonedTimeToUtc } from "date-fns-tz";
 
 export const load: PageServerLoad = async ({ locals, url }) => {
