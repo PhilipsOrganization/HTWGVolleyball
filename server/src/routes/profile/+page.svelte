@@ -107,6 +107,8 @@
 	{/if}
 
 	<h3>Stats</h3>
+	<p class="red">Number of Strikes: {data.user.strikes}</p>
+	<br>
 	<p>Registered for {data.totalRegistrations} courses</p>
 	{#each data.stats as course}
 		<p>{course.courseName}: {course.count}</p>
@@ -158,5 +160,9 @@
 	svg {
 		width: 100%;
 		height: 100%;
+	}
+
+	.red {
+		color: #ecfbc7;
 	}
 </style>

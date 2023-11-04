@@ -4,13 +4,20 @@
 
 	export let data;
 	let course = data.course;
+	let justSignedUp = false;
 
 	/**
 	 * @returns {(data: {result: any}) => void}
 	 */
 	function updateCourse() {
 		return ({ result }) => {
-			course = result?.data?.course;
+			const update = result?.data?.course;
+			if (!update) {
+				return;
+			}
+
+			justSignedUp = update.isEnrolled && !course.isEnrolled;
+			course = update;
 		};
 	}
 
@@ -53,7 +60,13 @@
 		</p>
 	</section>
 
-	<div class:waitList class="actions" style:--course-transition={`course-${course.id}`}>
+	<div
+		class:waitList
+		class="actions"
+		class:isSignedUp={course.isEnrolled}
+		class:justSignedUp
+		style:--course-transition={`course-${course.id}`}
+	>
 		<a href={admin ? '/admin' : '/courses'}>back</a>
 		{#if admin}
 			<form class="waitlist" action="?/delete-course" method="post">
@@ -61,13 +74,11 @@
 			</form>
 		{/if}
 		<form action={`?/${course.isEnrolled ? 'drop' : 'enlist'}${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
-			<button type="submit" disabled={course.isPast}>
-				{#if course.isEnrolled}
-					drop
-				{:else}
-					enlist
-				{/if}
-			</button>
+			{#if course.isEnrolled}
+				<button type="submit" disabled={course.isPast}> drop </button>
+			{:else}
+				<button type="submit" disabled={course.isPast}> enlist </button>
+			{/if}
 		</form>
 	</div>
 	{#if admin}
@@ -77,6 +88,10 @@
 				<div class="user">
 					<span>{participant.username}</span>
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
+					<form action="?/strike" method="post" use:enhance={updateCourse}>
+						<input type="hidden" name="userId" value={participant.id} />
+						<button class="underline">strike</button>
+					</form>
 					<form action="?/cancel" method="post" use:enhance={updateCourse}>
 						<input type="hidden" name="userId" value={participant.id} />
 						<button class="underline">cancel</button>
@@ -126,16 +141,46 @@
 	}
 
 	div.actions {
+		position: relative;
 		view-transition-name: var(--course-transition);
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
-		background: #ecfbc7;
+		background: #9cc1cf;
 		padding: 1rem 2rem;
 		width: min(80%, 450px);
 		max-width: 60vw;
 		margin: 2rem auto 4rem;
 		color: black;
+		transition: background 0.1s ease-in-out 0.2s;
+	}
+
+	div.actions.isSignedUp {
+		background: #ecfbc7;
+	}
+
+	div.actions.justSignedUp::after {
+		content: '';
+		position: absolute;
+		inset: 0 0 0 auto;
+		background: #b3f117;
+		box-shadow: 0 0 15px 0 #ecfbc7;
+		pointer-events: none;
+		animation: scale 0.3s cubic-bezier(0.8, 0.25, 0.9, 0.5) forwards;
+	}
+
+	@keyframes scale {
+		0% {
+			left: 100%;
+			opacity: 0.7;
+		}
+		80% {
+			left: 0;
+			opacity: 0.4;
+		}
+		100% {
+			opacity: 0;
+		}
 	}
 
 	button:disabled {

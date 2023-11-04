@@ -15,6 +15,9 @@ export class User {
 	@Property()
 	public username: string;
 
+	@Property({ type: 'date' })
+	public createdAt = new Date();
+
 	@Property({ hidden: true })
 	public email: string;
 

@@ -148,5 +148,31 @@ export const actions = {
         return {
             course: course.toJSON(locals.user),
         };
-    }
+    },
+    strike: async ({ locals, request, params }) => {
+        if (!locals.user || locals.user.role === Role.USER) {
+            throw redirect(303, '/login');
+        }
+
+        const form = await request.formData();
+        const courseId = parseInt(params.id as string);
+        const course = await locals.em.findOneOrFail(Course, { id: courseId });
+
+        const userIdString = form.get('userId') as string | undefined;
+        if (!userIdString) {
+            throw error(400, 'No userId provided');
+        }
+
+        const userId = parseInt(userIdString);
+        const user = await locals.em.findOneOrFail(User, { id: userId });
+
+        user.strikes += 1;
+        await locals.em.persistAndFlush(user);
+
+        sendNotification(user, `You have been striked for Course "${course.name}" by ${locals.user.username}`);
+
+        return {
+            course: course.toJSON(locals.user),
+        };
+    },
 };

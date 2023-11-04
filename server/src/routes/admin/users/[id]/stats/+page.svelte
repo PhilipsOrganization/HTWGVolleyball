@@ -5,6 +5,19 @@
 	export let data;
 
 	const user = data.user;
+
+	/**
+	 *
+	 * @param date {Date}
+	 */
+	function format(date) {
+		return new Intl.DateTimeFormat('de-DE', {
+			weekday: 'long',
+			year: 'numeric',
+			month: 'numeric',
+			day: 'numeric'
+		}).format(date);
+	}
 </script>
 
 <section>
@@ -19,7 +32,10 @@
 		</form>
 	{/if}
 
-	<p>Registered for {data.totalRegistrations} courses</p>
+	<p>Registered: {format(user.createdAt)}</p>
+	<p class="red">Number of Strikes: {user.strikes}</p>
+	<br />
+	<p>Registered for {data.totalRegistrations} Courses</p>
 	{#each data.stats as course}
 		<p>{course.courseName}: {course.count}</p>
 	{:else}
@@ -64,5 +80,9 @@
 		background: #9cc1cf;
 		margin: 10px;
 		color: black;
+	}
+
+	.red {
+		color: #ecfbc7;
 	}
 </style>
