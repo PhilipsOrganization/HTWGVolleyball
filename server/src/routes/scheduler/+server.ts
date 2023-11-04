@@ -1,13 +1,14 @@
 import { Course } from "$lib/db/entities";
 import { sendNotification } from "$lib/helpers/notification";
 import type { RequestHandler } from "@sveltejs/kit";
-import { isToday } from "date-fns";
+import { differenceInHours, isToday } from "date-fns";
 
-export const POST: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals }) => {
     const em = locals.em;
     const courses = await em.find(Course, { shouldPublish: true, notificationSent: false });
     for (const course of courses) {
-        if (!isToday(course.date)) {
+        const hoursToCourse = differenceInHours(course.date, new Date())
+        if (!isToday(course.date) || course.notificationSent || hoursToCourse > 6) {
             continue;
         }
 

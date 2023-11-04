@@ -1,4 +1,8 @@
 #!/bin/sh
 
-curl -s -X POST http://volleyball:3000/scheduler > /dev/null
-echo "Successfully pinged the endpoint"
+while true
+do
+    curl -s http://volleyball:3000/scheduler > /dev/null
+    echo "Successfully pinged the endpoint"
+    sleep 120
+done
