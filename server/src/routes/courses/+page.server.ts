@@ -7,8 +7,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw redirect(303, '/login');
 	}
 
-	const courses = await locals.em.find(Course, { shouldPublish: true }, { orderBy: { date: 'DESC' } });
-
+	const courses = await locals.em.find(Course, { shouldPublish: true }, { orderBy: { date: 'ASC', time: "ASC" } });
 	const dates: { [date: string]: Course[] } = {};
 
 	for (const course of courses) {

@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	// find all courses that take place in the future
 	const showArchived = url.searchParams.has('archived');
-	const courses = await locals.em.find(Course, showArchived ? {} : { date: { $gte: startOfYesterday() } }, { orderBy: { date: 'DESC' } });
+	const courses = await locals.em.find(Course, showArchived ? {} : { date: { $gte: startOfYesterday() } }, { orderBy: { date: 'DESC', time: "ASC" } });
 
 	const dates: { [date: string]: Course[] } = {};
 
