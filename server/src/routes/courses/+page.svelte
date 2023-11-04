@@ -14,6 +14,13 @@
 					<Course {course} isFirst={i === 0} />
 				{/each}
 			</div>
+		{:else}
+			<p>No courses are found.</p>
+			{#if data.user.hasNotificationsEnabled}
+				<p>Notifications for updates are enabled.</p>
+			{:else}
+				<p>you can enable notifications in your <a href="/profile">Profile</a> for updates.</p>
+			{/if}
 		{/each}
 	</div>
 </main>

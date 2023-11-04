@@ -57,7 +57,7 @@ export class User {
 
 	@Property({ persist: false })
 	public get hasNotificationsEnabled() {
-		return this.subscription !== undefined;
+		return this.subscription !== undefined && this.subscription !== null;
 	}
 }
 
@@ -103,6 +103,9 @@ export class Course {
 
 	@Property({ type: 'datetime', onUpdate: () => new Date() })
 	public updatedAt = new Date();
+
+	@Property({ type: 'boolean', default: false })
+	public notificationSent = false;
 
 	@Property({ persist: false })
 	public get isPast() {

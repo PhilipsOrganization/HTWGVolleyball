@@ -14,7 +14,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		.object({
 			subscription: z.object({
 				endpoint: z.string(),
-				expirationTime: z.union([z.string(), z.undefined()]),
+				expirationTime: z.union([z.string(), z.undefined(), z.null()]),
 				keys: z.object({
 					p256dh: z.string(),
 					auth: z.string()
@@ -23,7 +23,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		})
 		.parse(body);
 
-	const subscription = new Subscription(safeSubscription);
+	const subscription = new Subscription(safeSubscription.subscription);
 	locals.user.subscription = subscription;
 
 	try {
