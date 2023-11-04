@@ -92,5 +92,32 @@ export const actions = {
 		user.strikes = Math.max(0, user.strikes - 1);
 
 		await locals.em.persistAndFlush(user);
+	},
+	delete: async ({ locals, params }) => {
+		if (!locals.user || locals.user.role !== Role.SUPER_ADMIN) {
+			throw redirect(303, "/login");
+		}
+
+		const userId = params.id as string | undefined;
+		if (!userId) {
+			throw error(400, "No userId provided");
+		}
+
+		const user = await locals.em.findOneOrFail(User, { id: parseInt(userId) });
+		if (user.role !== Role.USER) {
+			throw error(400, "Cannot delete user");
+		}
+
+		const courses = await locals.em.find(Course, { users: user });
+		for (const course of courses) {
+			course.users.remove(user);
+		}
+
+		await locals.em.transactional(async em => {
+			await em.persistAndFlush(courses);
+			await em.removeAndFlush(user);
+		});
+
+		throw redirect(303, "/admin/users");
 	}
 } satisfies Actions;

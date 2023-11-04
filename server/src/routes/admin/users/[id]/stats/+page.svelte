@@ -48,8 +48,10 @@
 
 	<div>
 		<p>Registered: {format(user.createdAt)}</p>
-
 		<button class="small" on:click={copyResetPasswordLink}>Copy Reset Password Link</button>
+		<form action="?/delete" method="post">
+			<button class="small">delete</button>
+		</form>
 	</div>
 
 	<br />
