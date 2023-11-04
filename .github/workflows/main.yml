@@ -27,5 +27,6 @@ jobs:
           echo "MIKRO_ORM_PORT=5432" >> .env.local
           echo "MIKRO_ORM_USER=postgres" >> .env.local
           cat .env.local
+          cp .env.local ./server/.env.local
 
           docker compose -f docker-compose.prod.yaml up --build -d 
