@@ -10,7 +10,7 @@
 	<form action="?/register" method="post" use:enhance>
 		<field>
 			<label for="username"
-				>username
+				>full name
 
 				{#if form?.missingCredentials}
 					<small class="error">required</small>
@@ -21,16 +21,6 @@
 				{/if}
 			</label>
 			<input type="text" name="username" id="username" autocomplete="nickname" />
-		</field>
-		<field>
-			<label for="name"
-				>display name
-
-				{#if form?.missingCredentials}
-					<small class="error">required</small>
-				{/if}
-			</label>
-			<input type="name" name="name" id="name" autocomplete="name" />
 		</field>
 		<field>
 			<label for="email"

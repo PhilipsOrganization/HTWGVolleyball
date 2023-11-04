@@ -19,7 +19,9 @@ export const actions = {
 			return fail(400, { missingCredentials: true });
 		}
 
-		const user = await locals.em.findOne(User, { username });
+		// login with username or email
+		const user = await locals.em.findOne(User, { $or: [{ username }, { email: username }] });
+
 		if (!user) {
 			return fail(400, { username, userNotFound: true });
 		}
