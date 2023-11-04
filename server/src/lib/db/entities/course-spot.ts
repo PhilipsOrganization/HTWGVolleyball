@@ -104,6 +104,9 @@ export class Course {
 	@Property({ type: 'datetime', onUpdate: () => new Date() })
 	public updatedAt = new Date();
 
+	@Property({ type: 'boolean', default: false })
+	public notificationSent = false;
+
 	@Property({ persist: false })
 	public get isPast() {
 		const clone = new Date(this.date.getTime());
