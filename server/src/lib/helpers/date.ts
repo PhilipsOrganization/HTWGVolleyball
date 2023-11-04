@@ -36,23 +36,19 @@ export function humanReadableDate(date: Date | string) {
 		let modifier = '';
 		if (isAfter(today, comp)) {
 			modifier = 'last';
-		} else {
-			modifier = '';
 		}
 		return `${modifier} ${weekday}`;
 	}
 
 	if (weeks === -1) {
-		return 'last week on ' + weekday;
+		return weekday + ' last week';
 	}
 	if (weeks === 1) {
-		return 'next week on ' + weekday;
+		return weekday + ' next week';
 	}
 
 	return comp.toLocaleDateString('en-US', {
 		dateStyle: 'full',
-		month: 'numeric',
-		day: 'numeric'
 	});
 }
 
