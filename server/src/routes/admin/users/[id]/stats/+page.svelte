@@ -47,11 +47,15 @@
 	{/if}
 
 	<div>
-		<p>Registered: {format(user.createdAt)}</p>
 		<button class="small" on:click={copyResetPasswordLink}>Copy Reset Password Link</button>
 		<form action="?/delete" method="post">
-			<button class="small">delete</button>
+			<button class="small">Delete User</button>
 		</form>
+	</div>
+	<br>
+	<div class="column">
+		<p>Registered: {format(user.createdAt)}</p>
+		<p>Last Login: {format(user.lastLogin)}</p>
 	</div>
 
 	<br />
@@ -101,6 +105,11 @@
 		margin: 1rem;
 		width: 80%;
 		height: 200px;
+	}
+
+	div.column {
+		flex-direction: column;
+		align-items: flex-start;
 	}
 
 	svg {

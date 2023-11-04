@@ -18,6 +18,9 @@ export class User {
 	@Property({ type: 'date' })
 	public createdAt = new Date();
 
+	@Property({ type: 'date', nullable: true, onUpdate: () => new Date() })
+	public lastLogin = new Date();
+
 	@Property({ hidden: true })
 	public email: string;
 
