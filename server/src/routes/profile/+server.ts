@@ -1,5 +1,5 @@
 import { Subscription } from '$lib/db/entities/subscription';
-import { sendNotification } from '$lib/helpers/notification';
+import { OpenAppAction, OpenProfileAction, sendNotification } from '$lib/helpers/notification';
 import { redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	locals.user.subscription = subscription;
 
 	try {
-		await sendNotification(locals.user, 'test notification');
+		await sendNotification(locals.user, 'test notification', [new OpenAppAction(), new OpenProfileAction()]);
 	} catch (e) {
 		locals.user.subscription = undefined;
 	}

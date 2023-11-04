@@ -34,12 +34,79 @@ self.addEventListener('activate', (event) => {
 	);
 });
 
+self.addEventListener('notificationclick', function (event) {
+	if (!event.action) {
+		// Was a normal notification click
+		console.log('Notification Click.');
+		return;
+	}
+
+	switch (event.action) {
+		case 'coffee-action':
+			console.log('User ❤️️\'s coffee.');
+			break;
+		case 'doughnut-action':
+			console.log('User ❤️️\'s doughnuts.');
+			break;
+		case 'gramophone-action':
+			console.log('User ❤️️\'s music.');
+			break;
+		case 'atom-action':
+			console.log('User ❤️️\'s science.');
+			break;
+		default:
+			console.log(`Unknown action clicked: '${event.action}'`);
+			break;
+	}
+});
+
 self.addEventListener('push', (ev) => {
 	const data = ev.data?.json();
 	self.registration.showNotification(data.title, {
-		icon: 'https://volleyball.oesterlin.dev/Volleyball_icon.png'
+		icon: 'https://volleyball.oesterlin.dev/Volleyball_icon.png',
+		actions: data.actions ?? [],
+		data
 	});
 });
+
+self.addEventListener('notificationclick', function (event) {
+	if (!event.action) {
+		return;
+	}
+
+	const data = event.notification.data
+	if (!data || !data.actions || !Array.isArray(data.actions)) {
+		return;
+	}
+	
+	const clickedAction = data.actions.find((action) => action.action === event.action);
+	event.waitUntil(openUrl(clickedAction.openUrl));
+});
+
+async function openUrl(url: string) {
+	const urlToOpen = new URL(url, self.location.origin).href;
+
+	const windowClients = await clients.matchAll({
+		type: 'window',
+		includeUncontrolled: true
+	})
+
+	let matchingClient = null;
+
+	for (let i = 0; i < windowClients.length; i++) {
+		const windowClient = windowClients[i];
+		if (windowClient.url === urlToOpen) {
+			matchingClient = windowClient;
+			break;
+		}
+	}
+
+	if (matchingClient) {
+		return matchingClient.focus();
+	} else {
+		return clients.openWindow(urlToOpen);
+	}
+}
 
 /**
  * Fetch the asset from the network and store it in the cache.

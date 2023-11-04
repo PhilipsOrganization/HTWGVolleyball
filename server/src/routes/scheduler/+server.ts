@@ -1,5 +1,5 @@
 import { Course } from "$lib/db/entities";
-import { sendNotification } from "$lib/helpers/notification";
+import { OpenCourseAction, sendNotification } from "$lib/helpers/notification";
 import type { RequestHandler } from "@sveltejs/kit";
 import { differenceInHours, isToday } from "date-fns";
 
@@ -15,7 +15,7 @@ export const GET: RequestHandler = async ({ locals }) => {
         console.log(`Sending notifications for course ${course.id}`);
         for (const user of course.users.getItems()) {
             // TODO: add course link to notification
-            await sendNotification(user, `You have a course today: ${course.name}`);
+            await sendNotification(user, `You have a course today: ${course.name}`, [new OpenCourseAction(course.id)]);
         }
 
         course.notificationSent = true;

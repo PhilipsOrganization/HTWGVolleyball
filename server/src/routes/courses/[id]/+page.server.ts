@@ -2,7 +2,7 @@ import { error, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
 import { Course, User } from "$lib/db/entities";
 import { Role } from "$lib/db/role";
-import { sendNotification } from "$lib/helpers/notification";
+import { DropCourseAction, OpenCourseAction, OpenProfileAction, sendNotification } from "$lib/helpers/notification";
 
 export const load: PageServerLoad = async ({ locals, params }) => {
     if (!locals.user) {
@@ -37,7 +37,7 @@ function notifyNextUser(course: Course) {
         return;
     }
 
-    return sendNotification(userOnWaitlist, `A spot in ${course.name} Course has opened up for you!`);
+    return sendNotification(userOnWaitlist, `A spot in ${course.name} Course has opened up for you!`, [new OpenCourseAction(course.id), new DropCourseAction(course.id)]);
 }
 
 export const actions = {
@@ -169,7 +169,7 @@ export const actions = {
         user.strikes += 1;
         await locals.em.persistAndFlush(user);
 
-        sendNotification(user, `You have been striked for Course "${course.name}" by ${locals.user.username}`);
+        sendNotification(user, `You have been striked for Course "${course.name}" by ${locals.user.username}`, [new OpenCourseAction(course.id), new OpenProfileAction()]);
 
         return {
             course: course.toJSON(locals.user),
