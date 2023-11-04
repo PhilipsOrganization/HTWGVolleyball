@@ -57,7 +57,7 @@ export const actions = {
 			return fail(400, { token, userId, error: "Password too weak" });
 		}
 
-        user.password = User.hashPassword(password);
+        user.password = await User.hashPassword(password);
         user.resetToken = undefined;
         user.resetTokenExpires = undefined;
 

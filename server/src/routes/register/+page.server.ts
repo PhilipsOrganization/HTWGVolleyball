@@ -24,7 +24,8 @@ export const actions = {
 			return fail(400, { username, email, userAlreadyExists: true });
 		}
 
-		const newUser = new User(username, email, password);
+		const hash = await User.hashPassword(password);
+		const newUser = new User(username, email, hash);
 
 		const isFirstUser = (await locals.em.count(User)) === 0;
 		if (isFirstUser) {

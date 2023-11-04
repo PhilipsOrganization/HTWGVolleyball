@@ -1,5 +1,5 @@
 import { User } from '$lib/db/entities';
-import { error, type Actions, redirect, fail } from '@sveltejs/kit';
+import { type Actions, redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from '../$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -24,7 +24,8 @@ export const actions = {
 			return fail(400, { username, userNotFound: true });
 		}
 
-		if (!user.isPasswordCorrect(password)) {
+		const correct = await user.isPasswordCorrect(password);
+		if (!correct) {
 			return fail(400, { username, wrongPassword: true });
 		}
 

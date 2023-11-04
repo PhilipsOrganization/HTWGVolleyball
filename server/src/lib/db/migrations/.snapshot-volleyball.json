@@ -192,6 +192,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "default": "'user'",
           "mappedType": "string"
         },
         "strikes": {
@@ -201,6 +202,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "default": "0",
           "mappedType": "integer"
         },
         "notes": {

@@ -52,6 +52,9 @@ devDependencies:
   '@sveltejs/kit':
     specifier: ^1.27.0
     version: 1.27.3(svelte@4.2.2)(vite@4.5.0)
+  '@types/bcrypt':
+    specifier: ^5.0.1
+    version: 5.0.1
   '@types/web-push':
     specifier: ^3.6.2
     version: 3.6.2
@@ -922,6 +925,12 @@ packages:
   /@types/argparse@1.0.38:
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
     dev: false
+
+  /@types/bcrypt@5.0.1:
+    resolution: {integrity: sha512-dIIrEsLV1/v0AUNI8oHMaRRTSeVjoy5ID8oclJavtPj8CwPJoD1eFoNXEypuu6k091brEzBeOo3LlxeAH9zRZg==}
+    dependencies:
+      '@types/node': 20.8.10
+    dev: true
 
   /@types/cookie@0.5.3:
     resolution: {integrity: sha512-SLg07AS9z1Ab2LU+QxzU8RCmzsja80ywjf/t5oqw+4NSH20gIGlhLOrBDm1L3PBWzPa4+wkgFQVZAjE6Ioj2ug==}

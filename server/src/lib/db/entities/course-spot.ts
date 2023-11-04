@@ -1,8 +1,8 @@
 import { Cascade, Collection, Embedded, Entity, Formula, Index, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
-import crypto from 'crypto';
 import { isPast } from 'date-fns';
 import { Role } from '../role';
 import { Subscription } from './subscription';
+import { hash, compare } from 'bcrypt';
 
 @Entity({ tableName: 'accounts' })
 @Index({ properties: ['username'], options: { unique: true } })
@@ -22,7 +22,7 @@ export class User {
 	public email: string;
 
 	@Property({ hidden: true })
-	public password: string;
+	public password!: string;
 
 	@Property({ hidden: true, nullable: true })
 	public sessionToken?: string;
@@ -48,10 +48,10 @@ export class User {
 	@ManyToMany({ hidden: true, entity: () => Course, eager: true })
 	public courses = new Collection<Course>(this);
 
-	constructor(username: string, email: string, password: string) {
+	constructor(username: string, email: string, hash: string) {
 		this.username = username;
 		this.email = email;
-		this.password = User.hashPassword(password);
+		this.password = hash;
 		this.strikes = 0;
 	}
 
@@ -60,12 +60,11 @@ export class User {
 	}
 
 	public static hashPassword(password: string) {
-		return crypto.createHmac('sha256', password).digest('hex');
+		return hash(password, 10);
 	}
 
-	public isPasswordCorrect(password: string) {
-		const hash = User.hashPassword(password);
-		return hash === this.password;
+	public async isPasswordCorrect(password: string) {
+		return compare(password, this.password);
 	}
 
 	@Property({ persist: false })
