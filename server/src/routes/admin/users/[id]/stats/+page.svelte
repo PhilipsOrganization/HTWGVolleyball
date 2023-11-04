@@ -18,6 +18,20 @@
 			day: 'numeric'
 		}).format(date);
 	}
+
+	async function copyResetPasswordLink() {
+		const req = await fetch(`/admin/users/${user.id}/reset-pw`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: user.id + ''
+		});
+
+		const url = new URL(window.location.href);
+		const { link } = await req.json();
+		await navigator.clipboard.writeText(url.origin + link);
+	}
 </script>
 
 <section>
@@ -32,7 +46,12 @@
 		</form>
 	{/if}
 
-	<p>Registered: {format(user.createdAt)}</p>
+	<div>
+		<p>Registered: {format(user.createdAt)}</p>
+
+		<button class="small" on:click={copyResetPasswordLink}>Copy Reset Password Link</button>
+	</div>
+
 	<br />
 	<div>
 		<p class="red">Number of Strikes: {user.strikes}</p>

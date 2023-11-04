@@ -36,6 +36,12 @@ export class User {
 	@Property({ nullable: true })
 	public notes?: string;
 
+	@Property({ nullable: true, hidden: true })
+	public resetToken?: string;
+
+	@Property({ nullable: true, type: 'datetime' })
+	public resetTokenExpires?: Date;
+
 	@Embedded(() => Subscription, { nullable: true })
 	public subscription?: Subscription;
 
@@ -45,7 +51,7 @@ export class User {
 	constructor(username: string, email: string, password: string) {
 		this.username = username;
 		this.email = email;
-		this.password = crypto.createHmac('sha256', password).digest('hex');
+		this.password = User.hashPassword(password);
 		this.strikes = 0;
 	}
 
@@ -53,8 +59,12 @@ export class User {
 		return wrap<User>(this).toObject();
 	}
 
+	public static hashPassword(password: string) {
+		return crypto.createHmac('sha256', password).digest('hex');
+	}
+
 	public isPasswordCorrect(password: string) {
-		const hash = crypto.createHmac('sha256', password).digest('hex');
+		const hash = User.hashPassword(password);
 		return hash === this.password;
 	}
 

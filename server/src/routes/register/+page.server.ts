@@ -31,8 +31,7 @@ export const actions = {
 			newUser.role = Role.SUPER_ADMIN;
 		}
 
-		const sessionToken =
-			Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+		const sessionToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 		newUser.sessionToken = sessionToken;
 		cookies.set('user', newUser.sessionToken, { path: '/' });
 
