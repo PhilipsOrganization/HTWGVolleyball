@@ -72,5 +72,25 @@ export const actions = {
 		user.role = Role.ADMIN;
 		user.sessionToken = undefined;
 		await locals.em.persistAndFlush(user);
+	},
+	unstrike: async ({ locals, params }) => {
+		if (!locals.user || locals.user.role === Role.USER) {
+			throw redirect(303, '/login');
+		}
+
+		const userIdString = params.id as string | undefined;
+		if (!userIdString) {
+			throw error(400, 'No userId provided');
+		}
+
+		const userId = parseInt(userIdString);
+		const user = await locals.em.findOne(User, { id: userId });
+		if (!user) {
+			throw error(400, 'User not found');
+		}
+
+		user.strikes = Math.max(0, user.strikes - 1);
+
+		await locals.em.persistAndFlush(user);
 	}
 } satisfies Actions;

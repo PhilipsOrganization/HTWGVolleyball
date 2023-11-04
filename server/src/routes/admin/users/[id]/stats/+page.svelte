@@ -33,7 +33,15 @@
 	{/if}
 
 	<p>Registered: {format(user.createdAt)}</p>
-	<p class="red">Number of Strikes: {user.strikes}</p>
+	<br />
+	<div>
+		<p class="red">Number of Strikes: {user.strikes}</p>
+		{#if user.strikes > 0}
+			<form action="?/unstrike" method="post">
+				<button class="small">remove</button>
+			</form>
+		{/if}
+	</div>
 	<br />
 	<p>Registered for {data.totalRegistrations} Courses</p>
 	{#each data.stats as course}
@@ -43,7 +51,7 @@
 	{/each}
 </section>
 
-<div>
+<div class="center">
 	<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
 		<path in:draw={{ duration: 1000 }} fill="none" stroke="grey" d={data.svg} />
 	</svg>
@@ -63,8 +71,12 @@
 
 	div {
 		display: flex;
-		justify-content: center;
+		flex-direction: row;
 		align-items: center;
+	}
+
+	div.center {
+		justify-content: center;
 		margin: 1rem;
 		width: 80%;
 		height: 200px;
@@ -84,5 +96,10 @@
 
 	.red {
 		color: #ecfbc7;
+	}
+
+	.small {
+		padding: 10px;
+		background: #ecfbc7;
 	}
 </style>
