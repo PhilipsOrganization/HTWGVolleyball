@@ -15,6 +15,9 @@ export class User {
 	@Property()
 	public username: string;
 
+	@Property({ nullable: true })
+	public displayName: string;
+
 	@Property({ type: 'date' })
 	public createdAt = new Date();
 
@@ -51,15 +54,22 @@ export class User {
 	@ManyToMany({ hidden: true, entity: () => Course, eager: true })
 	public courses = new Collection<Course>(this);
 
-	constructor(username: string, email: string, hash: string) {
+	constructor(username: string, email: string, displayName: string, hash: string) {
 		this.username = username;
 		this.email = email;
 		this.password = hash;
 		this.strikes = 0;
+		this.displayName = displayName;
 	}
 
 	public toJSON() {
-		return wrap<User>(this).toObject();
+		const user = wrap<User>(this).toObject();
+
+		if (user.displayName) {
+			user.username = user.displayName;
+		}
+
+		return user;
 	}
 
 	public static hashPassword(password: string) {

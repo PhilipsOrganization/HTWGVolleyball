@@ -278,6 +278,15 @@
           "primary": false,
           "nullable": true,
           "mappedType": "string"
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "string"
         }
       },
       "name": "accounts",

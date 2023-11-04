@@ -7,11 +7,12 @@ export const actions = {
 		const form = await request.formData();
 
 		const username = form.get('username') as string | undefined;
+		const displayName = form.get('displayName') as string | undefined;
 		const password = form.get('password') as string | undefined;
 		const email = form.get('email') as string | undefined;
 
-		if (!username || !password || !email) {
-			return fail(400, { username, email, missingCredentials: true });
+		if (!username || !displayName || !password || !email) {
+			return fail(400, { username, displayName, email, missingCredentials: true });
 		}
 
 		const weakPassword = password.length < 8;
@@ -25,7 +26,7 @@ export const actions = {
 		}
 
 		const hash = await User.hashPassword(password);
-		const newUser = new User(username, email, hash);
+		const newUser = new User(username, email, displayName, hash);
 
 		const isFirstUser = (await locals.em.count(User)) === 0;
 		if (isFirstUser) {

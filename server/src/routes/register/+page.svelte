@@ -20,7 +20,17 @@
 					<small class="error">user not found</small>
 				{/if}
 			</label>
-			<input type="text" name="username" id="username" autocomplete="username" />
+			<input type="text" name="username" id="username" autocomplete="nickname" />
+		</field>
+		<field>
+			<label for="name"
+				>display name
+
+				{#if form?.missingCredentials}
+					<small class="error">required</small>
+				{/if}
+			</label>
+			<input type="name" name="name" id="name" autocomplete="name" />
 		</field>
 		<field>
 			<label for="email"
@@ -87,6 +97,7 @@
 
 	label {
 		color: rgb(182, 182, 182);
+		font-weight: 300;
 	}
 
 	form {
