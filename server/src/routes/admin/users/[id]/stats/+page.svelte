@@ -36,23 +36,25 @@
 
 <section>
 	<h1>Stats for {user.username}</h1>
-	{#if user.role === Role.ADMIN}
-		<form action="?/demote" method="post">
-			<button>demote to user</button>
-		</form>
-	{:else if user.role === Role.USER}
-		<form action="?/promote" method="post">
-			<button>promote to admin</button>
-		</form>
-	{/if}
 
 	<div>
-		<button class="small" on:click={copyResetPasswordLink}>Copy Reset Password Link</button>
-		<form action="?/delete" method="post">
-			<button class="small">Delete User</button>
-		</form>
+		{#if user.role === Role.ADMIN}
+			<form action="?/demote" method="post">
+				<button>demote to user</button>
+			</form>
+		{:else if user.role === Role.USER}
+			<form action="?/promote" method="post">
+				<button>promote to admin</button>
+			</form>
+		{/if}
+		<button on:click={copyResetPasswordLink}>Copy Reset Password Link</button>
+		{#if user.role === Role.USER}
+			<form action="?/delete" method="post">
+				<button>Delete User</button>
+			</form>
+		{/if}
 	</div>
-	<br>
+	<br />
 	<div class="column">
 		<p>Registered: {format(user.createdAt)}</p>
 		<p>Last Login: {format(user.lastLogin)}</p>
