@@ -45,6 +45,7 @@
 	@font-face {
 		font-family: Nono;
 		src: local(Nono), url('/fonts/NotoSansMono-VariableFont_wdth,wght.ttf') format('truetype');
+		font-display: swap;
 	}
 
 	:root:view-transition-group(*) {
