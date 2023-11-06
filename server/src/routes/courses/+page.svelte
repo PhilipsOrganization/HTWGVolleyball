@@ -1,8 +1,16 @@
 <script>
 	import Course from '$lib/components/course.svelte';
 	import { humanReadableDate } from '$lib/helpers/date';
+	import { addToast } from '$lib/helpers/toast';
+	import { onMount } from 'svelte';
 
 	export let data;
+
+	onMount(() => {
+		if (!data.user.emailVerified) {
+			addToast('info', 'An email has been sent to your email address. Please verify your email address to enable notifications.');
+		}
+	});
 </script>
 
 <main>
