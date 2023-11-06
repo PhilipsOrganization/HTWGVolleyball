@@ -3,6 +3,8 @@ import type { PageServerLoad } from "../$types";
 import { Course, User } from "$lib/db/entities";
 import { Role } from "$lib/db/role";
 import { DropCourseAction, OpenCourseAction, OpenProfileAction, sendNotification } from "$lib/helpers/notification";
+import { sendEmail } from "$lib/email";
+import OpenSpot from "$lib/email/templates/open-spot.svelte";
 
 export const load: PageServerLoad = async ({ locals, params }) => {
     if (!locals.user) {
@@ -37,13 +39,25 @@ function notifyNextUser(course: Course) {
         return;
     }
 
-    return sendNotification(userOnWaitlist, `A spot in ${course.name} Course has opened up for you!`, [new OpenCourseAction(course.id), new DropCourseAction(course.id)]);
+    if (userOnWaitlist.hasNotificationsEnabled) {
+        return sendNotification(userOnWaitlist, `A spot in ${course.name} Course has opened up for you!`, [new OpenCourseAction(course.id), new DropCourseAction(course.id)]);
+    } else {
+        return sendEmail(OpenSpot, {
+            user: userOnWaitlist,
+            subject: `A spot in ${course.name} Course has opened up for you!`,
+            props: { course, user: userOnWaitlist }
+        });
+    }
 }
 
 export const actions = {
     enlist: async ({ locals, params }) => {
         if (!locals.user) {
             throw redirect(303, '/login');
+        }
+
+        if (!locals.user.emailVerified) {
+            throw error(400, 'Your Email is not verified. Check your inbox for the verification email or request a new one in your profile.');
         }
 
         const courseIdString = params.id as string | undefined;

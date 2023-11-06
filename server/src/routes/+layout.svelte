@@ -1,6 +1,8 @@
 <script>
 	import { onNavigate } from '$app/navigation';
 	import Header from '$lib/components/header.svelte';
+	import Toast from '$lib/components/toast.svelte';
+	import { toasts } from '$lib/helpers/toast';
 
 	/**
 	 * @param {() => Promise<void>} callback
@@ -23,6 +25,11 @@
 </script>
 
 <Header />
+<div id="toasts">
+	{#each $toasts as toast}
+		<Toast {...toast} />
+	{/each}
+</div>
 <slot />
 
 <style>
@@ -46,6 +53,19 @@
 		font-family: Nono;
 		src: local(Nono), url('/fonts/NotoSansMono-VariableFont_wdth,wght.ttf') format('truetype');
 		font-display: swap;
+	}
+
+	#toasts {
+		position: fixed;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 1rem;
+		padding: 1rem;
+		z-index: 1000;
+		bottom: 0;
+		right: 0;
+		width: min(80%, 450px);
 	}
 
 	:root:view-transition-group(*) {

@@ -16,6 +16,10 @@
 					<small class="error">required</small>
 				{/if}
 
+				{#if form?.invalidUsername}
+					<small class="error">invalid username, use your full name</small>
+				{/if}
+
 				{#if form?.userAlreadyExists}
 					<small class="error">user not found</small>
 				{/if}
@@ -32,6 +36,10 @@
 
 				{#if form?.userAlreadyExists}
 					<small class="error">user not found</small>
+				{/if}
+
+				{#if form?.invalidEmail}
+					<small class="error">invalid email</small>
 				{/if}
 			</label>
 			<input type="email" name="email" id="email" autocomplete="email" />

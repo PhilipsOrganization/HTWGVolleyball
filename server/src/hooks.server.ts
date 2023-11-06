@@ -6,15 +6,30 @@ import { User } from '$lib/db/entities';
 import { building } from '$app/environment';
 
 let orm: MikroORM;
+let isMigrating: Promise<void> | undefined = undefined;
+
 if (!building) {
 	orm = await MikroORM.init(config);
 
-	const migrator = orm.getMigrator();
-	await migrator.createMigration();
-	await migrator.up();
+	if (!isMigrating) {
+		isMigrating = new Promise((resolve) => {
+			const migrator = orm.getMigrator();
+
+			migrator.createMigration()
+				.then(() => migrator.up())
+				.then(() => {
+					resolve();
+					isMigrating = undefined;
+				});
+		});
+	}
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
+	if (isMigrating) {
+		await isMigrating;
+	}
+
 	if (building) {
 		return await resolve(event);
 	}

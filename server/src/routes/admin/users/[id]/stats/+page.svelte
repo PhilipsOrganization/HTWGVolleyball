@@ -47,7 +47,9 @@
 				<button>promote to admin</button>
 			</form>
 		{/if}
-		<button on:click={copyResetPasswordLink}>Copy Reset Password Link</button>
+		<form action="?/reset-pw" method="post">
+			<button>Send Password Reset Email</button>
+		</form>
 		{#if user.role === Role.USER}
 			<form action="?/delete" method="post">
 				<button>Delete User</button>

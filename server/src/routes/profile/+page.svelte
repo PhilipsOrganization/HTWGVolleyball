@@ -54,7 +54,6 @@
 			method: 'DELETE'
 		});
 
-
 		if (!request.ok) {
 			return alert('subscription failed');
 		}
@@ -95,6 +94,16 @@
 <section>
 	<h1>Profile</h1>
 
+	<h3>Email</h3>
+	{#if data.user.emailVerified}
+		<p>Email verified</p>
+	{:else}
+		<p class="red">Email not verified</p>
+		<form action="?/reverify" method="post">
+			<button>Resend verification email</button>
+		</form>
+	{/if}
+
 	<h3>Notifications</h3>
 	<p>
 		Notifications make it easier to keep up to date. You'll get a notification when something happens that you might want to know about. You
@@ -108,7 +117,7 @@
 
 	<h3>Stats</h3>
 	<p class="red">Number of Strikes: {data.user.strikes}</p>
-	<br>
+	<br />
 	<p>Registered for {data.totalRegistrations} courses</p>
 	{#each data.stats as course}
 		<p>{course.courseName}: {course.count}</p>

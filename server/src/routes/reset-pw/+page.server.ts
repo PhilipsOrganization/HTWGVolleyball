@@ -6,7 +6,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     const token = url.searchParams.get("token");
     const userId = url.searchParams.get("user");
 
-    if (!token || !userId) {
+    if (!token || userId === null) {
         throw redirect(303, "/login");
     }
 

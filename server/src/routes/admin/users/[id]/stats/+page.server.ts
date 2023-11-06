@@ -4,6 +4,8 @@ import { error, redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { Course, User } from '$lib/db/entities';
 import { getPath } from '$lib/helpers/stats';
+import { sendEmail } from '$lib/email';
+import ResetPassword from '$lib/email/templates/reset-password.svelte';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -86,7 +88,7 @@ export const actions = {
 		const user = await locals.em.findOneOrFail(User, { id: userId });
 		const form = await request.formData();
 		const notes = form.get('notes') as string | undefined;
-		
+
 		user.notes = notes;
 		await locals.em.persistAndFlush(user);
 	},
@@ -136,5 +138,32 @@ export const actions = {
 		});
 
 		throw redirect(303, "/admin/users");
+	},
+	"reset-pw": async ({ locals, params }) => {
+		if (!locals.user || locals.user.role !== Role.SUPER_ADMIN) {
+			throw redirect(303, "/login")
+		}
+
+		const userIdString = params.id as string | undefined;
+		if (!userIdString) {
+			throw error(400, "No userId provided");
+		}
+
+		const userId = parseInt(userIdString);
+		const user = await locals.em.findOne(User, { id: userId });
+		if (!user) {
+			throw error(400, 'User not found');
+		}
+
+		const token = encodeURIComponent(crypto.getRandomValues(new Uint8Array(32)).join(""))
+
+		locals.em.assign(user, {
+			resetToken: token,
+			resetTokenExpires: new Date(Date.now() + 1000 * 60 * 60 * 24)
+		});
+
+		await locals.em.persistAndFlush(user);
+
+		await sendEmail(ResetPassword, { user, subject: "Reset Password", props: { user, token } });
 	}
 } satisfies Actions;

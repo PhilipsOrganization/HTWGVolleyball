@@ -15,6 +15,12 @@ export class User {
 	@Property()
 	public username: string;
 
+	@Property({ default: false, type: 'boolean' })
+	public emailVerified = false;
+
+	@Property({ hidden: true, nullable: true })
+	public emailVerificationToken?: string;
+
 	@Property({ type: 'date' })
 	public createdAt = new Date();
 
@@ -139,6 +145,7 @@ export class Course {
 			signupCount,
 			isEnrolled: false,
 			spot: -1,
+			isOnWaitlist: false,
 			participants: [] as ReturnType<User['toJSON']>[]
 		};
 
@@ -147,6 +154,7 @@ export class Course {
 
 			if (result.isEnrolled) {
 				result.spot = this.users.getItems().indexOf(user);
+				result.isOnWaitlist = result.spot >= this.maxParticipants;
 			}
 
 			if (user.role !== Role.USER) {

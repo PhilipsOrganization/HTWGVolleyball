@@ -1,6 +1,7 @@
 <script>
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
+	import { addToast } from '$lib/helpers/toast';
 
 	export let data;
 	let course = data.course;
@@ -11,12 +12,25 @@
 	 */
 	function updateCourse() {
 		return ({ result }) => {
+			if (result.error) {
+				addToast('error', result.error.message);
+				return;
+			}
+
 			const update = result?.data?.course;
 			if (!update) {
 				return;
 			}
 
-			justSignedUp = update.isEnrolled && !course.isEnrolled;
+			justSignedUp = update.isEnrolled && !course.isEnrolled && !course.isOnWaitlist;
+			if (justSignedUp) {
+				addToast('success', 'You have successfully signed up for this course!', 2000);
+			}
+
+			if(course.isOnWaitlist){
+				addToast('info', 'You have been put on the waitlist for this course.');
+			}
+
 			course = update;
 		};
 	}

@@ -1,8 +1,10 @@
 import { Course, UserStats } from '$lib/db/entities';
 import { getPath } from '$lib/helpers/stats';
-import { redirect } from '@sveltejs/kit';
+import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from '../$types';
 import { RegistrationStats } from '$lib/db/entities/registration-stats';
+import { sendEmail } from '$lib/email';
+import ConfirmEmail from '$lib/email/templates/confirm-email.svelte';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
@@ -25,3 +27,19 @@ export const load: PageServerLoad = async ({ locals }) => {
 		svg: getPath(totalRegistrations)
 	};
 };
+
+export const actions = {
+	reverify: async ({ locals }) => {
+		const user = locals.user;
+		if (!user) {
+			throw redirect(303, '/login');
+		}
+
+		// token is used to verify the email
+		const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+		user.emailVerificationToken = token;
+		await locals.em.persistAndFlush(user);
+
+		await sendEmail(ConfirmEmail, { user, subject: 'Confirm your Email', props: { user: locals.user, token } });
+	}
+} satisfies Actions;

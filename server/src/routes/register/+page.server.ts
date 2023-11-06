@@ -1,5 +1,7 @@
 import { User } from '$lib/db/entities';
 import { Role } from '$lib/db/role';
+import { sendEmail } from '$lib/email';
+import ConfirmEmail from '$lib/email/templates/confirm-email.svelte';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 
 export const actions = {
@@ -8,16 +10,28 @@ export const actions = {
 
 		const username = form.get('username') as string | undefined;
 		const password = form.get('password') as string | undefined;
-		const email = form.get('email') as string | undefined;
+		let email = form.get('email') as string | undefined;
 
 		if (!username || !password || !email) {
 			return fail(400, { username, email, missingCredentials: true });
+		}
+
+		const invalidUsername = username.length < 5 || !username.includes(' ');
+		if (invalidUsername) {
+			return fail(400, { username, email, invalidUsername: true });
+		}
+
+		const invalidEmail = !email.includes('@');
+		if (invalidEmail) {
+			return fail(400, { username, email, invalidEmail: true });
 		}
 
 		const weakPassword = password.length < 8;
 		if (weakPassword) {
 			return fail(400, { username, email, weakPassword: true });
 		}
+
+		email = email.toLowerCase();
 
 		const existingUser = await locals.em.findOne(User, { $or: [{ username }, { email }] });
 		if (existingUser) {
@@ -36,8 +50,17 @@ export const actions = {
 		newUser.sessionToken = sessionToken;
 		cookies.set('user', newUser.sessionToken, { path: '/' });
 
+		// token is used to verify the email
+		const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+		newUser.emailVerificationToken = token;
+
+		console.log('Creating new user', newUser);
+
 		const user = locals.em.create(User, newUser);
 		await locals.em.persistAndFlush(user);
+
+		await sendEmail(ConfirmEmail, { user, subject: 'Confirm your Email', props: { user, token } });
+
 		throw redirect(303, '/courses'); // 307 is a temporary redirect, 301 is permanent
 	}
 } satisfies Actions;
