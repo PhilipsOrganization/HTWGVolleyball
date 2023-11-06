@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { addToast } from '$lib/helpers/toast';
+	import { tick } from 'svelte';
 
 	export let data;
 	let course = data.course;
@@ -27,12 +28,35 @@
 				addToast('success', 'You have successfully signed up for this course!', 2000);
 			}
 
-			if(course.isOnWaitlist){
+			if (course.isOnWaitlist) {
 				addToast('info', 'You have been put on the waitlist for this course.');
 			}
 
 			course = update;
 		};
+	}
+
+	function enroll() {
+		if (course.signupCount >= course.maxParticipants) {
+			vibrate(200, 0, 200);
+		} else {
+			vibrate(200);
+		}
+	}
+
+	/**
+	 * @param {number[]} pattern
+	 */
+	function vibrate(...pattern) {
+		if (!('vibrate' in navigator)) {
+			return;
+		}
+
+		try {
+			navigator.vibrate(pattern);
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
 	const intl = new Intl.DateTimeFormat('de-DE', {
@@ -91,7 +115,7 @@
 			{#if course.isEnrolled}
 				<button type="submit" disabled={course.isPast}> drop </button>
 			{:else}
-				<button type="submit" disabled={course.isPast}> enlist </button>
+				<button type="submit" disabled={course.isPast} on:click={enroll}> enlist </button>
 			{/if}
 		</form>
 	</div>
