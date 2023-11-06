@@ -5,11 +5,11 @@ const { Migration } = require('@mikro-orm/migrations');
 class Migration20231106120143 extends Migration {
 
   async up() {
-    this.addSql('alter table "accounts" alter column "email_verified" type boolean using ("email_verified"::boolean);');
+    this.addSql('alter table "accounts" add column "email_verified" boolean not null default false');
   }
 
   async down() {
-    this.addSql('alter table "accounts" alter column "email_verified" type varchar(255) using ("email_verified"::varchar(255));');
+    this.addSql('alter table "accounts" drop column "email_verified";');
   }
 
 }
