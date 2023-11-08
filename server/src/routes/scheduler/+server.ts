@@ -12,7 +12,10 @@ export const GET: RequestHandler = async ({ locals }) => {
     console.log(`Found ${courses.length} courses to send notifications for`);
 
     for (const course of courses) {
-        const hoursToCourse = differenceInHours(course.date, new Date())
+        const [hours, minutes] = course.time.split(":").map(Number);
+        const date = new Date(course.date);
+		date.setHours(hours, minutes, 0, 0);
+        const hoursToCourse = differenceInHours(date, new Date())
         if (!isToday(course.date) || hoursToCourse > 6) {
             continue;
         }
