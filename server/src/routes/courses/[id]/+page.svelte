@@ -51,7 +51,7 @@
 			.map((r) => r.username)
 			.sort((a, b) => a.localeCompare(b));
 
-		let registrations = `*${course.name}:*\n${enlisted.join(',\n')}}`;
+		let registrations = `*${course.name}:*\n${enlisted.join(',\n')}`;
 
 		if (waitList) {
 			const waitList = course.participants.slice(course.maxParticipants).map((r, i) => `#${i + 1}: ${r.username}`);
@@ -59,6 +59,7 @@
 		}
 
 		navigator.clipboard.writeText(registrations);
+		addToast('success', 'Copied registrations to clipboard.');
 	}
 </script>
 
@@ -227,7 +228,7 @@
 	#users {
 		display: flex;
 		flex-direction: column;
-		margin: 0 auto;
+		margin: 0 auto 6rem;
 		width: min(90%, 650px);
 	}
 
