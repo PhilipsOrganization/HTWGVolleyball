@@ -1,7 +1,7 @@
-import { User } from '$lib/db/entities';
-import { type Actions, redirect, fail } from '@sveltejs/kit';
-import type { PageServerLoad } from '../$types';
 import { env } from '$env/dynamic/private';
+import { User } from '$lib/db/entities';
+import { fail, redirect, type Actions } from '@sveltejs/kit';
+import type { PageServerLoad } from '../$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
@@ -62,5 +62,5 @@ export const actions = {
 		url.searchParams.set("nonce", nonce);
 
 		throw redirect(303, url.toString());
-	}
+	},
 } satisfies Actions;

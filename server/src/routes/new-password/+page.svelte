@@ -1,22 +1,34 @@
-<script lang="ts">
+<script>
 	import { enhance } from '$app/forms';
+	import { page } from '$app/stores';
 
 	export let form;
+
+	$: token = $page.url.searchParams.get('token');
+	$: userId = $page.url.searchParams.get('user');
 </script>
 
 <div>
-	<h1><span>reset password /</span> <a href="/login">back</a></h1>
+	<h1>reset password</h1>
 
-	<form action="?/reset-pw" method="post" use:enhance>
+	<form method="post" use:enhance>
+		<input type="hidden" name="token" value={token} />
+		<input type="hidden" name="user" value={userId} />
+
 		<field>
-			<label for="username">username </label>
-			<input type="text" name="username" id="username" autocomplete="username" />
+			<label for="password">password</label>
+			<input type="password" name="password" id="password" autocomplete="new-password" />
 		</field>
-        {#if form}
-            <p class="error">{form.error}</p>
-        {/if}
 
-		<button id="login-btn">send reset email</button>
+		<field>
+			<label for="password2">confirm password</label>
+			<input type="password" name="password2" id="password2" autocomplete="new-password" />
+		</field>
+
+		<button type="submit">Reset</button>
+		{#if form && form.error}
+			<p class="error">{form.error}</p>
+		{/if}
 	</form>
 </div>
 
@@ -31,14 +43,6 @@
 		width: 100%;
 		text-align: center;
 		padding-bottom: 10px;
-	}
-
-	span {
-		view-transition-name: login-header;
-	}
-
-	a {
-		view-transition-name: register-header;
 	}
 
 	input {
@@ -60,10 +64,6 @@
 		gap: 20px;
 	}
 
-	a {
-		font-size: 18px;
-	}
-
 	form field {
 		display: flex;
 		flex-direction: column;
@@ -77,7 +77,7 @@
 		align-items: center;
 	}
 
-	button#login-btn {
+	button {
 		display: flex;
 		flex-direction: row;
 		justify-content: flex-end;
@@ -95,12 +95,10 @@
 		view-transition-name: action-button;
 	}
 
-	button#login-btn:hover {
-		background: #d9f1a9;
-	}
-
 	.error {
 		color: #eb714f;
+		font-weight: bold;
 		margin: 5px 1rem;
+		text-align: center;
 	}
 </style>

@@ -58,7 +58,7 @@
 		<Container style={container}>
 			<Text style={heading}>Hello, {user.username}!</Text>
 			<Hr />
-			<Button style={button} href="https://volleyball.oesterlin.dev/reset-pw?token={token}&user={user.id}">Reset Password</Button>
+			<Button style={button} href="https://volleyball.oesterlin.dev/new-password?token={token}&user={user.id}">Reset Password</Button>
 		</Container>
 	</Section>
 	<Text>If you did not create an account, no further action is required.</Text>

@@ -10,8 +10,8 @@
 		{#each data.users as user}
 			<p>
 				<span>{user.username}</span>
-				<span>{user.role}</span>
-				<a href="/admin/users/{user.id}/stats">info</a>
+				<span class="center">{user.role}</span>
+				<a class="center" href="/admin/users/{user.id}/stats">info</a>
 			</p>
 		{/each}
 	</div>
@@ -25,10 +25,12 @@
 		max-width: min(1000px, 90%);
 		margin: 0 auto;
 		align-items: center;
+		width: 100%;
 	}
 
 	p {
-		display: flex;
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
 		justify-content: space-between;
 		align-items: center;
 		width: 80vw;
@@ -38,5 +40,9 @@
 
 	a {
 		text-decoration: underline;
+	}
+
+	.center {
+		text-align: center;
 	}
 </style>

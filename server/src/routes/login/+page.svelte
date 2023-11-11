@@ -40,9 +40,13 @@
 
 	<div id="line" />
 
-	<form action="?/authenticate" method="post">
-		<button>login with Google</button>
-	</form>
+	<div id="more">
+		<form action="?/authenticate" method="post">
+			<button>login with Google</button>
+		</form>
+
+		<a href="/reset-pw">reset password</a>
+	</div>
 </div>
 
 <style>
@@ -134,5 +138,14 @@
 		height: 1px;
 		background: #9cc1cf;
 		margin: 2rem 0;
+	}
+	#more {
+		display: flex;
+		flex-direction: row;
+		width: 100%;
+		box-sizing: border-box;
+		padding: 0 10vw;
+		gap: 1rem;
+		justify-content: space-between;
 	}
 </style>

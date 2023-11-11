@@ -1,68 +1,31 @@
-import { redirect, type Actions, fail } from "@sveltejs/kit";
-import type { PageServerLoad } from "../$types";
-import { User } from "$lib/db/entities";
-
-export const load: PageServerLoad = async ({ locals, url }) => {
-    const token = url.searchParams.get("token");
-    const userId = url.searchParams.get("user");
-
-    if (!token || userId === null) {
-        throw redirect(303, "/login");
-    }
-
-    const user = await locals.em.findOne(User, { id: parseInt(userId), resetToken: token });
-
-    if (!user || !user.resetTokenExpires || user.resetTokenExpires < new Date()) {
-        throw redirect(303, "/login");
-    }
-
-    return { error: false };
-};
+import { User } from '$lib/db/entities/course-spot.js';
+import { sendEmail } from '$lib/email/index.js';
+import ResetPassword from '$lib/email/templates/reset-password.svelte';
+import { type Actions, fail, redirect } from '@sveltejs/kit';
 
 export const actions = {
-    default: async ({ locals, request, cookies }) => {
-        cookies.delete('user', { path: '/' });
-        const body = await request.formData();
-
-        const password = body.get("password") as string;
-        const passwordConfirm = body.get("password2") as string;
-
-        const userId = body.get("user") as string;
-        const token = body.get("token") as string;
-
-        if (!userId || !token) {
-            throw redirect(303, "/login");
+    "reset-pw": async ({ locals, request }) => {
+        const form = await request.formData();
+        const userNameOrEmail = form.get("username") as string | undefined;
+        if (!userNameOrEmail) {
+            return fail(400, { error: "Missing credentials" });
         }
 
-        const user = await locals.em.findOne(User, { id: parseInt(userId), resetToken: token });
-
+        const user = await locals.em.findOne(User, { $or: [{ username: userNameOrEmail }, { email: userNameOrEmail }] });
         if (!user) {
-            throw fail(400, { error: "User not found" });
+            return fail(400, { error: 'User not found' });
         }
 
-        if (!user.resetTokenExpires || user.resetTokenExpires < new Date()) {
-            user.resetToken = undefined;
-            user.resetTokenExpires = undefined;
-            await locals.em.persistAndFlush(user);
+        const token = encodeURIComponent(crypto.getRandomValues(new Uint8Array(32)).join(""))
 
-            return fail(400, { error: "Token expired" });
-        }
-
-        if (password !== passwordConfirm) {
-            return fail(400, { token, userId, error: "Passwords do not match" });
-        }
-
-        const weakPassword = password.length < 8;
-		if (weakPassword) {
-			return fail(400, { token, userId, error: "Password too weak" });
-		}
-
-        user.password = await User.hashPassword(password);
-        user.resetToken = undefined;
-        user.resetTokenExpires = undefined;
+        locals.em.assign(user, {
+            resetToken: token,
+            resetTokenExpires: new Date(Date.now() + 1000 * 60 * 60 * 24)
+        });
 
         await locals.em.persistAndFlush(user);
 
+        await sendEmail(ResetPassword, { user, subject: "Reset Password", props: { user, token } });
         throw redirect(303, "/login");
-    },
+    }
 } satisfies Actions;
