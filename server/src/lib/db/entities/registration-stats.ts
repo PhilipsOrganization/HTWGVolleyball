@@ -10,6 +10,7 @@ import { CourseSpot } from '.';
 				.createQueryBuilder(CourseSpot, 'spot')
 				// find time between course publishOn and date of registration
 				.select([`avg(${timeDiff}) as average_time`, `min(${timeDiff}) as min_time`, 'u.id as user_id'])
+				.where("spot.created_at > c.publish_on")
 				.join('spot.user', 'u')
 				.leftJoin('spot.course', 'c')
 				.groupBy('u.id')
