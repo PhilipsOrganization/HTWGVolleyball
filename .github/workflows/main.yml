@@ -22,6 +22,8 @@ jobs:
           echo "VITE_VAPID_PUBLIC=${{ secrets.VITE_VAPID_PUBLIC }}" >> .env.local
           echo "VAPID_PRIVATE=${{ secrets.VAPID_PRIVATE }}" >> .env.local
           echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
+          echo "VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}" >> .env.local
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env.local
           echo "MIKRO_ORM_DB_NAME=volleyball" >> .env.local
           echo "MIKRO_ORM_HOST=postgres" >> .env.local
           echo "MIKRO_ORM_PASSWORD=password" >> .env.local

@@ -30,8 +30,8 @@ export class User {
 	@Property({ hidden: true })
 	public email: string;
 
-	@Property({ hidden: true })
-	public password!: string;
+	@Property({ hidden: true, nullable: true })
+	public password?: string;
 
 	@Property({ hidden: true, nullable: true })
 	public sessionToken?: string;
@@ -57,7 +57,7 @@ export class User {
 	@ManyToMany({ hidden: true, entity: () => Course, eager: true })
 	public courses = new Collection<Course>(this);
 
-	constructor(username: string, email: string, hash: string) {
+	constructor(username: string, email: string, hash?: string) {
 		this.username = username;
 		this.email = email;
 		this.password = hash;
@@ -73,6 +73,10 @@ export class User {
 	}
 
 	public async isPasswordCorrect(password: string) {
+		if (!this.password) {
+			return false;
+		}
+
 		return compare(password, this.password);
 	}
 

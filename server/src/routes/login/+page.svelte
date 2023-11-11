@@ -35,7 +35,13 @@
 			<input type="password" name="password" id="password" autocomplete="current-password" />
 		</field>
 
-		<button>login</button>
+		<button id="login-btn">login</button>
+	</form>
+
+	<div id="line" />
+
+	<form action="?/authenticate" method="post">
+		<button>login with Google</button>
 	</form>
 </div>
 
@@ -96,7 +102,7 @@
 		align-items: center;
 	}
 
-	button {
+	button#login-btn {
 		display: flex;
 		flex-direction: row;
 		justify-content: flex-end;
@@ -114,8 +120,19 @@
 		view-transition-name: action-button;
 	}
 
+	button#login-btn:hover {
+		background: #d9f1a9;
+	}
+
 	.error {
 		color: #eb714f;
 		margin: 5px 1rem;
+	}
+
+	#line {
+		width: 80vw;
+		height: 1px;
+		background: #9cc1cf;
+		margin: 2rem 0;
 	}
 </style>
