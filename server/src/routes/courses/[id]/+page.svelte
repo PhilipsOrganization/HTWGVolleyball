@@ -44,6 +44,22 @@
 
 	const admin = $page.url.searchParams.has('admin');
 	const waitList = course.signupCount > course.maxParticipants;
+
+	function copyUsers() {
+		const enlisted = course.participants
+			.slice(0, course.maxParticipants)
+			.map((r) => r.username)
+			.sort((a, b) => a.localeCompare(b));
+
+		let registrations = `*${course.name}:*\n${enlisted.join(',\n')}}`;
+
+		if (waitList) {
+			const waitList = course.participants.slice(course.maxParticipants).map((r, i) => `#${i + 1}: ${r.username}`);
+			registrations += `\n_Warteliste:_\n${waitList.join(',\n')}`;
+		}
+
+		navigator.clipboard.writeText(registrations);
+	}
 </script>
 
 <main>
@@ -97,7 +113,13 @@
 	</div>
 	{#if admin}
 		<div id="users">
-			<h2>Participants</h2>
+			<div class="header">
+				<h2>Participants</h2>
+				{#if course.participants.length}
+					<button class="underline" on:click={copyUsers}>Copy for WhatsApp</button>
+				{/if}
+			</div>
+
 			{#each course.participants ?? [] as participant}
 				<div class="user">
 					<span class="ellipsis">{participant.username}</span>
@@ -135,10 +157,6 @@
 	h2,
 	p {
 		text-align: center;
-	}
-
-	h2 {
-		margin: 0 0 2rem;
 	}
 
 	p {
@@ -225,11 +243,19 @@
 		gap: 1rem;
 	}
 
+	.header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.5rem;
+	}
+
 	.ellipsis {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		width: 100px;
+		width: 100%;
 	}
 
 	.underline {

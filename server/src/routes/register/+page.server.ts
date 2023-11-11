@@ -8,7 +8,7 @@ export const actions = {
 	register: async ({ locals, request, cookies }) => {
 		const form = await request.formData();
 
-		const username = form.get('username') as string | undefined;
+		let username = form.get('username') as string | undefined;
 		const password = form.get('password') as string | undefined;
 		let email = form.get('email') as string | undefined;
 
@@ -16,6 +16,7 @@ export const actions = {
 			return fail(400, { username, email, missingCredentials: true });
 		}
 
+		username = username.trim();
 		const invalidUsername = username.length < 5 || !username.includes(' ');
 		if (invalidUsername) {
 			return fail(400, { username, email, invalidUsername: true });

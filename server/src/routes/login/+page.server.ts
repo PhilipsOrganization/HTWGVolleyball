@@ -13,12 +13,14 @@ export const actions = {
 	login: async ({ locals, request, cookies }) => {
 		const form = await request.formData();
 
-		const username = form.get('username') as string | undefined;
+		let username = form.get('username') as string | undefined;
 		const password = form.get('password') as string | undefined;
 
 		if (!username || !password) {
 			return fail(400, { missingCredentials: true });
 		}
+
+		username = username.trim();
 
 		// login with username or email
 		const user = await locals.em.findOne(User, { $or: [{ username }, { email: username.toLowerCase() }] });
