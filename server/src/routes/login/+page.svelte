@@ -4,8 +4,8 @@
 	export let form;
 </script>
 
-<div>
-	<h1><span>login /</span> <a href="/register">register</a></h1>
+<section>
+	<h1><span class="main">login /</span> <a class="secondary" href="/register">register</a></h1>
 
 	<form action="?/login" method="post" use:enhance>
 		<field>
@@ -47,11 +47,23 @@
 
 		<a href="/reset-pw">reset password</a>
 	</div>
-</div>
+</section>
 
 <style>
-	div {
+	.main {
+		view-transition-name: login-header;
+	}
+
+	.secondary {
+		view-transition-name: register-header;
+		font-size: 1.4rem;
+	}
+
+	section {
 		margin: 2rem auto 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 
 	h1 {
@@ -60,14 +72,7 @@
 		width: 100%;
 		text-align: center;
 		padding-bottom: 10px;
-	}
-
-	span {
-		view-transition-name: login-header;
-	}
-
-	a {
-		view-transition-name: register-header;
+		font-size: 2rem;
 	}
 
 	input {
@@ -89,21 +94,11 @@
 		gap: 20px;
 	}
 
-	a {
-		font-size: 18px;
-	}
-
 	form field {
 		display: flex;
 		flex-direction: column;
 		border: none;
 		padding: 2px;
-	}
-
-	div {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
 	}
 
 	button#login-btn {
@@ -137,15 +132,27 @@
 		width: 80vw;
 		height: 1px;
 		background: #9cc1cf;
-		margin: 2rem 0;
+		margin: 1.5rem 0;
 	}
 	#more {
 		display: flex;
 		flex-direction: row;
 		width: 100%;
 		box-sizing: border-box;
-		padding: 0 10vw;
+		padding: 0 10vw 10rem;
 		gap: 1rem;
 		justify-content: space-between;
+	}
+
+	#more a {
+		font-size: 16px;
+	}
+
+	/* break flex into colums at 545px width */
+	@media (max-width: 545px) {
+		#more {
+			flex-direction: column;
+			align-items: center;
+		}
 	}
 </style>

@@ -4,8 +4,8 @@
 	export let form;
 </script>
 
-<div>
-	<h1><span>register /</span> <a href="/login">login</a></h1>
+<section>
+	<h1><span class="main">register /</span> <a class="secondary" href="/login">login</a></h1>
 
 	<form action="?/register" method="post" use:enhance>
 		<field>
@@ -61,11 +61,23 @@
 
 		<button>register</button>
 	</form>
-</div>
+</section>
 
 <style>
-	div {
+	.main {
+		view-transition-name: login-header;
+	}
+
+	.secondary {
+		view-transition-name: register-header;
+		font-size: 1.4rem;
+	}
+
+	section {
 		margin: 2rem auto 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 
 	h1 {
@@ -74,14 +86,7 @@
 		width: 100%;
 		text-align: center;
 		padding-bottom: 10px;
-	}
-
-	span {
-		view-transition-name: register-header;
-	}
-
-	a {
-		view-transition-name: login-header;
+		font-size: 2rem;
 	}
 
 	input {
@@ -113,12 +118,6 @@
 		flex-direction: column;
 		border: none;
 		padding: 2px;
-	}
-
-	div {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
 	}
 
 	button {

@@ -9,7 +9,7 @@
 
 	<form action="?/reset-pw" method="post" use:enhance>
 		<field>
-			<label for="username">username </label>
+			<label for="username">username or email</label>
 			<input type="text" name="username" id="username" autocomplete="username" />
 		</field>
         {#if form}
@@ -35,10 +35,6 @@
 
 	span {
 		view-transition-name: login-header;
-	}
-
-	a {
-		view-transition-name: register-header;
 	}
 
 	input {

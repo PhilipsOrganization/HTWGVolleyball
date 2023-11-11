@@ -26,7 +26,7 @@
 
 <Header />
 <div id="toasts">
-	{#each $toasts as toast}
+	{#each $toasts as toast (toast.id)}
 		<Toast {...toast} />
 	{/each}
 </div>
