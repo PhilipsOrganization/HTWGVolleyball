@@ -9,7 +9,7 @@
 	<div id="users">
 		{#each data.users as user}
 			<p>
-				<span>{user.username}</span>
+				<span class="ellipsis">{user.username}</span>
 				<span class="center">{user.role}</span>
 				<a class="center" href="/admin/users/{user.id}/stats">info</a>
 			</p>
@@ -44,5 +44,10 @@
 
 	.center {
 		text-align: center;
+	}
+	.ellipsis {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 </style>

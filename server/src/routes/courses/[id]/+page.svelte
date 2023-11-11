@@ -27,7 +27,7 @@
 				addToast('success', 'You have successfully signed up for this course!', 2000);
 			}
 
-			if(course.isOnWaitlist){
+			if (course.isOnWaitlist) {
 				addToast('info', 'You have been put on the waitlist for this course.');
 			}
 
@@ -100,7 +100,7 @@
 			<h2>Participants</h2>
 			{#each course.participants ?? [] as participant}
 				<div class="user">
-					<span>{participant.username}</span>
+					<span class="ellipsis">{participant.username}</span>
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
 					<form action="?/strike" method="post" use:enhance={updateCourse}>
 						<input type="hidden" name="userId" value={participant.id} />
@@ -210,15 +210,26 @@
 		display: flex;
 		flex-direction: column;
 		margin: 0 auto;
-		width: min(80%, 450px);
+		width: min(90%, 650px);
 	}
 
 	.user {
-		display: flex;
+		display: grid;
+		grid-template-columns: 2fr repeat(3, 1fr);
+		justify-items: center;
+		align-items: center;
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
 		margin-bottom: 0.5rem;
+		gap: 1rem;
+	}
+
+	.ellipsis {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		width: 100px;
 	}
 
 	.underline {
