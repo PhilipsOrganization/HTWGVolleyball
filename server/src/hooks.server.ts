@@ -1,9 +1,16 @@
+import { sequence } from '@sveltejs/kit/hooks';
+import * as Sentry from '@sentry/sveltekit';
 import type { Handle } from '@sveltejs/kit';
 import { config } from './lib/db/micro-orm.config';
 import { MikroORM } from '@mikro-orm/core';
 import type { SqlEntityManager } from '@mikro-orm/postgresql';
 import { User } from '$lib/db/entities';
 import { building } from '$app/environment';
+
+Sentry.init({
+	dsn: "https://85cdfcf11ffe4ab1b7ef383e33b29945@o4505130185261056.ingest.sentry.io/4505130186440704",
+	tracesSampleRate: 1
+})
 
 let orm: MikroORM;
 let isMigrating: Promise<void> | undefined = undefined;
@@ -25,7 +32,7 @@ if (!building) {
 	}
 }
 
-export const handle: Handle = async ({ event, resolve }) => {
+export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, resolve }) => {
 	if (isMigrating) {
 		await isMigrating;
 	}
@@ -49,4 +56,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	return await resolve(event);
-};
+});
+
+export const handleError = Sentry.handleErrorWithSentry();
