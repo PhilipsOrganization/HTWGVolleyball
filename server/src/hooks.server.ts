@@ -8,7 +8,7 @@ import { User } from '$lib/db/entities';
 import { building } from '$app/environment';
 
 Sentry.init({
-	dsn: "https://85cdfcf11ffe4ab1b7ef383e33b29945@o4505130185261056.ingest.sentry.io/4505130186440704",
+	dsn: "https://be81ce9ae21bfe95942756c397f31dfe@o4505130185261056.ingest.sentry.io/4506236862988288",
 	tracesSampleRate: 1
 })
 
