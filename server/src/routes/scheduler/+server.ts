@@ -5,47 +5,68 @@ import CourseNotification from "$lib/email/templates/course-notification.svelte"
 import { OpenCourseAction, sendNotification } from "$lib/helpers/notification";
 import type { RequestHandler } from "@sveltejs/kit";
 import { differenceInHours, isToday } from "date-fns";
+import * as Sentry from '@sentry/sveltekit';
+
 
 export const GET: RequestHandler = async ({ locals }) => {
-    const em = locals.em;
-    const courses = await em.find(Course, { shouldPublish: true, notificationSent: false });
-    console.log(`Found ${courses.length} courses to send notifications for`);
+    const checkInId = Sentry.captureCheckIn({
+        monitorSlug: "notification-cron",
+        status: "in_progress",
+    });
 
-    for (const course of courses) {
-        const [hours, minutes] = course.time.split(":").map(Number);
-        const date = new Date(course.date);
-		date.setHours(hours, minutes, 0, 0);
-        const hoursToCourse = differenceInHours(date, new Date())
-        if (!isToday(course.date) || hoursToCourse > 6) {
-            continue;
-        }
+    try {
+        const em = locals.em;
+        const courses = await em.find(Course, { shouldPublish: true, notificationSent: false });
+        console.log(`Found ${courses.length} courses to send notifications for`);
 
-        if (!dev && course.notificationSent) {
-            continue;
-        }
+        for (const course of courses) {
+            const [hours, minutes] = course.time.split(":").map(Number);
+            const date = new Date(course.date);
+            date.setHours(hours, minutes, 0, 0);
+            const hoursToCourse = differenceInHours(date, new Date())
+            if (!isToday(course.date) || hoursToCourse > 6) {
+                continue;
+            }
 
-        console.log(`Sending notifications for course ${course.id}`);
-        for (const user of course.users.getItems()) {
-            if (user.hasNotificationsEnabled) {
-                try {
-                    await sendNotification(user, `You have a course today: ${course.name}`, [new OpenCourseAction(course.id)]);
-                } catch (e) {
-                    user.subscription = undefined;
-                    await em.persistAndFlush(user);
+            if (!dev && course.notificationSent) {
+                continue;
+            }
+
+            console.log(`Sending notifications for course ${course.id}`);
+            for (const user of course.users.getItems()) {
+                if (user.hasNotificationsEnabled) {
+                    try {
+                        await sendNotification(user, `You have a course today: ${course.name}`, [new OpenCourseAction(course.id)]);
+                    } catch (e) {
+                        user.subscription = undefined;
+                        await em.persistAndFlush(user);
+                    }
+                }
+
+                if (!user.hasNotificationsEnabled || dev) {
+                    await sendEmail(CourseNotification, {
+                        user,
+                        subject: `You have a course today: ${course.name}`,
+                        props: { course, user }
+                    });
                 }
             }
 
-            if (!user.hasNotificationsEnabled || dev) {
-                await sendEmail(CourseNotification, {
-                    user,
-                    subject: `You have a course today: ${course.name}`,
-                    props: { course, user }
-                });
-            }
+            course.notificationSent = true;
+            await em.persistAndFlush(course);
         }
 
-        course.notificationSent = true;
-        await em.persistAndFlush(course);
+        Sentry.captureCheckIn({
+            checkInId,
+            monitorSlug: 'notification-cron',
+            status: 'ok',
+        });
+    } catch (e) {
+        Sentry.captureCheckIn({
+            checkInId,
+            monitorSlug: "notification-cron",
+            status: "error",
+        });
     }
 
     return new Response(JSON.stringify({ message: "ok" }));
