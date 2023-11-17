@@ -1,38 +1,29 @@
-# create-svelte
+# Course Registration Application
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+This Repo contains the code for an application created to manage course registrations. 
+Its build as fullstack SvelteKit application, together with another container for cron jobs. 
+It has build-in user management, support for sending emails and push notifications.
 
-## Creating a project
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Installation
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+- Install NodeJs from [here](https://nodejs.org/en/download/)
+- Install Docker from [here](https://docs.docker.com/get-docker/)
+- Install Docker Compose from [here](https://docs.docker.com/compose/install/)
+- Clone this repo
+- Run `pnpm install` in the `server` folder
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+## Usage
 
-## Developing
+- Copy the `.env.example` file in the `server` folder to `.env.local` and fill in the values
+- Run `docker-compose up` in the root folder for the database
+- Run `pnpm dev` in the `server` folder to start the dev server
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Production
 
-```bash
-npm run dev
+- Copy the `.env.example` file in the `server` folder to `.env.local` and fill in the values
+- Run `docker-compose up -f docker-compose.prod.yaml up --build` in the root folder for the database
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+## Contributing
 
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
