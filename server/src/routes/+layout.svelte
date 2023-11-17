@@ -1,6 +1,7 @@
 <script>
 	import { onNavigate } from '$app/navigation';
 	import Header from '$lib/components/header.svelte';
+	import InfoModal from '$lib/components/info-modal.svelte';
 	import Toast from '$lib/components/toast.svelte';
 	import { toasts } from '$lib/helpers/toast';
 
@@ -30,12 +31,15 @@
 		<Toast {...toast} />
 	{/each}
 </div>
+
+<InfoModal />
 <slot />
 
 <style>
 	:global(body) {
 		margin: 0;
 		padding: 0;
+		padding-bottom: 6rem;
 		background: #131313;
 		color: #e0e0e0;
 		font-family: Nono;
