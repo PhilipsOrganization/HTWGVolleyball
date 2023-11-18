@@ -42,7 +42,7 @@
 		padding-bottom: 6rem;
 		background: #131313;
 		color: #e0e0e0;
-		font-family: Nono;
+		font-family: 'Roboto Mono', monospace;
 		font-weight: 100;
 		min-height: 100dvh;
 		font-size: 16px;
@@ -50,13 +50,6 @@
 		flex-direction: column;
 		text-underline-position: under;
 		text-decoration-thickness: 0px;
-	}
-
-	/* variable font */
-	@font-face {
-		font-family: Nono;
-		src: local(Nono), url('/fonts/NotoSansMono-VariableFont_wdth,wght.ttf') format('truetype');
-		font-display: swap;
 	}
 
 	#toasts {
