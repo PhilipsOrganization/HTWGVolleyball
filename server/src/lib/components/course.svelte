@@ -26,7 +26,7 @@
 			{#if waitlistSpot > 0}
 				<span>waitlist: #{waitlistSpot}</span>
 			{:else}
-				<span>#{spot}</span>
+				<span>✅</span>
 			{/if}
 		{:else}
 			<span>{course.signupCount}/{course.maxParticipants}</span>
