@@ -1,6 +1,7 @@
 <script>
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
+	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
 	import { addToast } from '$lib/helpers/toast';
 
 	export let data;
@@ -100,17 +101,25 @@
 	>
 		<a href={admin ? '/admin' : '/courses'}>back</a>
 		{#if admin}
-			<form class="waitlist" action="?/delete-course" method="post">
-				<button type="submit">delete</button>
+			<ConfirmableForm message="Do you really want to delete this course?">
+				<form class="waitlist" action="?/delete-course" method="post" slot="confirm">
+					<button type="submit">delete</button>
+				</form>
+				<button type="button" slot="button">delete</button>
+			</ConfirmableForm>
+		{/if}
+		{#if course.isEnrolled}
+			<ConfirmableForm message="Do you really want to drop this course?">
+				<form action={`?/drop${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse} slot="confirm">
+					<button type="submit"> Drop </button>
+				</form>
+				<button type="button" disabled={course.isPast} slot="button"> drop </button>
+			</ConfirmableForm>
+		{:else}
+			<form action={`?/enlist}${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
+				<button type="submit" disabled={course.isPast}> enlist </button>
 			</form>
 		{/if}
-		<form action={`?/${course.isEnrolled ? 'drop' : 'enlist'}${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
-			{#if course.isEnrolled}
-				<button type="submit" disabled={course.isPast}> drop </button>
-			{:else}
-				<button type="submit" disabled={course.isPast}> enlist </button>
-			{/if}
-		</form>
 	</div>
 	{#if admin}
 		<div id="users">

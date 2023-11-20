@@ -8,11 +8,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw redirect(303, '/courses');
 	}
 
-	const users = await locals.em.find(User, {});
+	const users = await locals.em.find(User, {}, { orderBy: { role: 'ASC', username: 'ASC' } });
 
 	return {
 		users: users.map((u) => u.toJSON()),
 		user: locals.user.toJSON()
 	};
 };
-

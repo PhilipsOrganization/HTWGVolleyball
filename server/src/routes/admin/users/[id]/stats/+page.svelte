@@ -1,4 +1,5 @@
 <script>
+	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
 	import { Role } from '$lib/db/role';
 	import { draw } from 'svelte/transition';
 
@@ -39,21 +40,30 @@
 
 	<div>
 		{#if user.role === Role.ADMIN}
-			<form action="?/demote" method="post">
-				<button>demote to user</button>
-			</form>
+			<ConfirmableForm message="Do you really want to demote the user to a normie?">
+				<form action="?/demote" method="post" slot="confirm">
+					<button>demote to user</button>
+				</form>
+				<button slot="button">demote to user</button>
+			</ConfirmableForm>
 		{:else if user.role === Role.USER}
-			<form action="?/promote" method="post">
-				<button>promote to admin</button>
-			</form>
+			<ConfirmableForm message="Do you really want to promote the user to an admin?">
+				<form action="?/promote" method="post" slot="confirm">
+					<button>promote to admin</button>
+				</form>
+				<button slot="button">promote to admin</button>
+			</ConfirmableForm>
 		{/if}
 		<form action="?/reset-pw" method="post">
 			<button>Send Password Reset Email</button>
 		</form>
 		{#if user.role === Role.USER}
-			<form action="?/delete" method="post">
-				<button>Delete User</button>
-			</form>
+			<ConfirmableForm message="Do you really want to delete the user?">
+				<form action="?/delete" method="post" slot="confirm">
+					<button>Delete User</button>
+				</form>
+				<button slot="button">Delete User</button>
+			</ConfirmableForm>
 		{/if}
 	</div>
 	<br />
@@ -85,11 +95,11 @@
 		<path in:draw={{ duration: 1000 }} fill="none" stroke="grey" d={data.svg} />
 	</svg>
 </div>
-<br>
+<br />
 <div class="column">
 	<h2>Notes</h2>
 	<form class="flex" method="post" action="?/note">
-		<textarea name="notes" id="notes" cols="30" rows="10" value={user.notes}></textarea>
+		<textarea name="notes" id="notes" cols="30" rows="10" value={user.notes} />
 		<button>Save</button>
 	</form>
 </div>
