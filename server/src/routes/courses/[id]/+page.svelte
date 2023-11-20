@@ -134,14 +134,20 @@
 				<div class="user" class:waitList={index >= course.maxParticipants}>
 					<span class="ellipsis">{participant.username}</span>
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
-					<form action="?/strike" method="post" use:enhance={updateCourse}>
-						<input type="hidden" name="userId" value={participant.id} />
-						<button class="underline">strike</button>
-					</form>
-					<form action="?/cancel" method="post" use:enhance={updateCourse}>
-						<input type="hidden" name="userId" value={participant.id} />
-						<button class="underline">cancel</button>
-					</form>
+					<ConfirmableForm message="Do you really want to strike this user?">
+						<form action="?/strike" method="post" use:enhance={updateCourse} slot="confirm">
+							<input type="hidden" name="userId" value={participant.id} />
+							<button class="underline">strike</button>
+						</form>
+						<button class="underline" slot="button">strike</button>
+					</ConfirmableForm>
+					<ConfirmableForm message="Do you really want to cancel this user?">
+						<form action="?/cancel" method="post" use:enhance={updateCourse} slot="confirm">
+							<input type="hidden" name="userId" value={participant.id} />
+							<button class="underline">cancel</button>
+						</form>
+						<button class="underline" slot="button">cancel</button>
+					</ConfirmableForm>
 				</div>
 			{:else}
 				<p>There are currently no participants. ☹</p>
