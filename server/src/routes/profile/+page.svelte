@@ -1,4 +1,6 @@
 <script>
+	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
+
 	export let data;
 
 	async function enableNotification() {
@@ -98,9 +100,12 @@
 		<p>Email verified</p>
 	{:else}
 		<p class="red">Email not verified</p>
-		<form action="?/reverify" method="post">
-			<button>Resend verification email</button>
-		</form>
+		<ConfirmableForm message="Do you really want to resend the verification email?">
+			<form action="?/reverify" method="post" slot="confirm">
+				<button class="confirm">Resend verification email</button>
+			</form>
+			<button slot="button">Resend verification email</button>
+		</ConfirmableForm>
 	{/if}
 
 	<h3>Notifications</h3>
@@ -176,6 +181,9 @@
 		background: #ecfbc7;
 		color: #000;
 		padding: 0.5rem 1rem;
+	}
+
+	button:not(.confirm) {
 		margin: 1rem 0 0;
 	}
 

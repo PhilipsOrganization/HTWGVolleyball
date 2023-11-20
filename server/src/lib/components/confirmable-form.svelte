@@ -9,11 +9,13 @@
 <dialog bind:this={dialogEl}>
 	<h1>Confirmation</h1>
 	<p>{message}</p>
-	<div>
+	<div id="actions">
 		<form class="abort" method="dialog">
 			<button>Abort</button>
 		</form>
-		<slot name="confirm" />
+		<div class="form-slot">
+			<slot name="confirm" />
+		</div>
 	</div>
 </dialog>
 
@@ -24,22 +26,42 @@
 <style>
 	dialog {
 		background: #3c3c3c;
-		color: white;
-		padding: 3rem;
+		color: #fff;
+		padding: 2rem min(5rem, 5%) 2rem;
 		border-radius: 20px;
 		border: 4px solid #9cc1cf;
-		box-shadow: 0 0 10px 0 rgba(0, 0, 0);
+		box-shadow: 0 0 10px #000;
+		max-width: 98%;
+		box-sizing: border-box;
+	}
+
+	@keyframes fade-in {
+		0% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
+		}
 	}
 
 	dialog::backdrop {
 		background: rgba(0, 0, 0, 0.5);
 	}
 
-	h1 {
-		margin-top: 0;
+	p {
+		font-weight: 200;
+		margin: 3rem 0;
 	}
 
-	div {
+	h1 {
+		margin-top: 0;
+		font-size: 2rem;
+		font-weight: 100;
+		text-align: center;
+		margin-bottom: 2.5rem;
+	}
+
+	div#actions {
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
@@ -47,11 +69,22 @@
 		gap: 1rem;
 	}
 
-	form.abort {
-		flex: 1 1 20%;
+	form.abort,
+	div.form-slot {
+		flex: 1 1 47%;
 		background: #ecfbc7;
 		color: black;
 		border: none;
+		min-height: 3rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	form.abort {
+		background: transparent;
+		color: #ecfbc7;
+		flex: 1;
 	}
 
 	form.abort button {
