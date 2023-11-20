@@ -24,7 +24,7 @@
 
 		{#if course.isEnrolled}
 			{#if waitlistSpot > 0}
-				<span>waitlist: #{waitlistSpot}</span>
+				<span>#{waitlistSpot}</span>
 			{:else}
 				<span>✅</span>
 			{/if}

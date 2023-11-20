@@ -56,7 +56,7 @@
 
 		let registrations = `*${course.name}:*\n${enlisted.join(',\n')}`;
 
-		if (waitList) {
+		if (course.participants.length > course.maxParticipants) {
 			const waitList = course.participants.slice(course.maxParticipants).map((r, i) => `#${i + 1}: ${r.username}`);
 			registrations += `\n_Warteliste:_\n${waitList.join(',\n')}`;
 		}
