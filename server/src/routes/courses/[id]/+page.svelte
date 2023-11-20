@@ -105,7 +105,7 @@
 				<form class="waitlist" action="?/delete-course" method="post" slot="confirm">
 					<button type="submit">delete</button>
 				</form>
-				<button type="button" slot="button">delete</button>
+				<button type="submit" slot="button">delete</button>
 			</ConfirmableForm>
 		{/if}
 		{#if course.isEnrolled}
@@ -113,7 +113,7 @@
 				<form action={`?/drop${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse} slot="confirm">
 					<button type="submit"> Drop </button>
 				</form>
-				<button type="button" disabled={course.isPast} slot="button"> drop </button>
+				<button type="submit" disabled={course.isPast} slot="button"> drop </button>
 			</ConfirmableForm>
 		{:else}
 			<form action={`?/enlist${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
@@ -137,16 +137,16 @@
 					<ConfirmableForm message="Do you really want to strike this user?">
 						<form action="?/strike" method="post" use:enhance={updateCourse} slot="confirm">
 							<input type="hidden" name="userId" value={participant.id} />
-							<button class="underline">strike</button>
+							<button type="submit" class="underline">strike</button>
 						</form>
-						<button class="underline" slot="button">strike</button>
+						<button type="submit" class="underline" slot="button">strike</button>
 					</ConfirmableForm>
 					<ConfirmableForm message="Do you really want to cancel this user?">
 						<form action="?/cancel" method="post" use:enhance={updateCourse} slot="confirm">
 							<input type="hidden" name="userId" value={participant.id} />
-							<button class="underline">cancel</button>
+							<button type="submit" class="underline">cancel</button>
 						</form>
-						<button class="underline" slot="button">cancel</button>
+						<button type="submit" class="underline" slot="button">cancel</button>
 					</ConfirmableForm>
 				</div>
 			{:else}
