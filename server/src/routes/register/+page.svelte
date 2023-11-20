@@ -21,7 +21,7 @@
 				{/if}
 
 				{#if form?.userAlreadyExists}
-					<small class="error">user not found</small>
+					<small class="error">user already exists</small>
 				{/if}
 			</label>
 			<input type="text" name="username" id="username" autocomplete="nickname" />
@@ -35,7 +35,7 @@
 				{/if}
 
 				{#if form?.userAlreadyExists}
-					<small class="error">user not found</small>
+					<small class="error">user already exists</small>
 				{/if}
 
 				{#if form?.invalidEmail}
