@@ -116,7 +116,7 @@
 				<button type="button" disabled={course.isPast} slot="button"> drop </button>
 			</ConfirmableForm>
 		{:else}
-			<form action={`?/enlist}${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
+			<form action={`?/enlist${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
 				<button type="submit" disabled={course.isPast}> enlist </button>
 			</form>
 		{/if}
