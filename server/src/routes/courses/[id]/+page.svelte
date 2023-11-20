@@ -24,12 +24,14 @@
 			}
 
 			justSignedUp = update.isEnrolled && !course.isEnrolled && !course.isOnWaitlist;
-			if (justSignedUp) {
-				addToast('success', 'You have successfully signed up for this course!', 2000);
-			}
-
 			if (!course.isOnWaitlist && update.isOnWaitlist) {
 				addToast('info', 'You have been put on the waitlist for this course.');
+				course = update;
+				return;
+			}
+
+			if (justSignedUp) {
+				addToast('success', 'You have successfully signed up for this course!', 2000);
 			}
 
 			course = update;
@@ -44,7 +46,7 @@
 	});
 
 	const admin = $page.url.searchParams.has('admin');
-	const waitList = course.signupCount > course.maxParticipants && !course.isEnrolled;
+	const waitList = Math.min(course.signupCount, course.spot < 0 ? Infinity : course.spot) > course.maxParticipants;
 
 	function copyUsers() {
 		const enlisted = course.participants
@@ -69,7 +71,11 @@
 		<h2>
 			{course.name}
 			{#if course.isEnrolled}
-				<small class="isSignedUp"> - registered</small>
+				{#if course.isOnWaitlist}
+					<small class="isSignedUp waitList"> - on waitlist spot #{course.spot - course.maxParticipants + 1}</small>
+				{:else}
+					<small class="isSignedUp"> - registered</small>
+				{/if}
 			{/if}
 		</h2>
 		<p class="bold">{course.time}</p>
