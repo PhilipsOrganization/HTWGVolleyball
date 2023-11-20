@@ -6,7 +6,9 @@
 	let dialogEl;
 </script>
 
-<dialog bind:this={dialogEl}>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<dialog bind:this={dialogEl} on:click|self={() => dialogEl.close()}>
 	<h1>Confirmation</h1>
 	<p>{message}</p>
 	<div id="actions">
