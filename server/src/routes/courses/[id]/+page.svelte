@@ -27,7 +27,7 @@
 				addToast('success', 'You have successfully signed up for this course!', 2000);
 			}
 
-			if (course.isOnWaitlist) {
+			if (!course.isOnWaitlist && update.isOnWaitlist) {
 				addToast('info', 'You have been put on the waitlist for this course.');
 			}
 
@@ -43,7 +43,7 @@
 	});
 
 	const admin = $page.url.searchParams.has('admin');
-	const waitList = course.signupCount > course.maxParticipants;
+	const waitList = course.signupCount > course.maxParticipants && !course.isEnrolled;
 
 	function copyUsers() {
 		const enlisted = course.participants
@@ -121,8 +121,8 @@
 				{/if}
 			</div>
 
-			{#each course.participants ?? [] as participant}
-				<div class="user">
+			{#each course.participants ?? [] as participant, index}
+				<div class="user" class:waitList={index >= course.maxParticipants}>
 					<span class="ellipsis">{participant.username}</span>
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
 					<form action="?/strike" method="post" use:enhance={updateCourse}>
