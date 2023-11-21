@@ -10,7 +10,7 @@ services:
       - traefik_web
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.volleyball.rule=Host(`volleyball.homelab`)'
+      - 'traefik.http.routers.volleyball.rule=Host(`volleyball.homelab`, `volleyball.oesterlin.dev`)'
       - 'traefik.http.services.volleyball.loadbalancer.server.port=3000'
       - 'traefik.http.middlewares.volleyball.compress=true'
 
