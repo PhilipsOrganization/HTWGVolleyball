@@ -11,10 +11,6 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: stop running containers
-        continue-on-error: true
-        run: docker compose down --remove-orphans
-
       - uses: actions/checkout@master
 
       - name: Run all containers
