@@ -13,7 +13,9 @@ services:
       - 'traefik.http.routers.volleyball.rule=Host(`volleyball.homelab`, `volleyball.oesterlin.dev`)'
       - 'traefik.http.services.volleyball.loadbalancer.server.port=3000'
       - 'traefik.http.middlewares.volleyball.compress=true'
-
+      - "traefik.http.middlewares.volleyball.plugin.httpCache.maxTtl=600"
+      - "traefik.http.middlewares.volleyball.plugin.httpCache.memory.limit=500Mi"
+      - "traefik.http.middlewares.volleyball.plugin.httpCache.excludedResponseCodes=300-599"
     env_file:
       - .env.local
     environment:
