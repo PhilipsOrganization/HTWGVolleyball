@@ -344,8 +344,8 @@
     },
     {
       "columns": {
-        "course_id": {
-          "name": "course_id",
+        "user_id": {
+          "name": "user_id",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,
@@ -353,8 +353,8 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "user_id": {
-          "name": "user_id",
+        "course_id": {
+          "name": "course_id",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,
@@ -380,8 +380,8 @@
         {
           "keyName": "course_spots_pkey",
           "columnNames": [
-            "course_id",
-            "user_id"
+            "user_id",
+            "course_id"
           ],
           "composite": true,
           "primary": true,
@@ -390,18 +390,6 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "course_spots_course_id_foreign": {
-          "constraintName": "course_spots_course_id_foreign",
-          "columnNames": [
-            "course_id"
-          ],
-          "localTableName": "public.course_spots",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.courses",
-          "updateRule": "cascade"
-        },
         "course_spots_user_id_foreign": {
           "constraintName": "course_spots_user_id_foreign",
           "columnNames": [
@@ -412,6 +400,18 @@
             "id"
           ],
           "referencedTableName": "public.accounts",
+          "updateRule": "cascade"
+        },
+        "course_spots_course_id_foreign": {
+          "constraintName": "course_spots_course_id_foreign",
+          "columnNames": [
+            "course_id"
+          ],
+          "localTableName": "public.course_spots",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.courses",
           "updateRule": "cascade"
         }
       }

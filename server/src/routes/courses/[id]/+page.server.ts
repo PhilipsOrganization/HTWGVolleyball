@@ -1,6 +1,6 @@
 import { error, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
-import { Course, User } from "$lib/db/entities";
+import { Course, CourseSpot, User } from "$lib/db/entities";
 import { Role } from "$lib/db/role";
 import { DropCourseAction, OpenCourseAction, OpenProfileAction, sendNotification } from "$lib/helpers/notification";
 import { sendEmail } from "$lib/email";
@@ -66,7 +66,7 @@ export const actions = {
         }
 
         const courseId = parseInt(courseIdString);
-        const course = await locals.em.findOne(Course, { id: courseId });
+        let course = await locals.em.findOne(Course, { id: courseId });
         if (!course) {
             throw error(400, 'Course not found');
         }
@@ -75,10 +75,15 @@ export const actions = {
             throw error(400, 'Already enrolled');
         }
 
-        locals.user.courses.add(course);
-        course.users.add(locals.user);
+        const spot = locals.em.create(CourseSpot, {
+            course,
+            user: locals.user,
+            createdAt: new Date(),
+        });
 
-        await locals.em.persistAndFlush([locals.user, course]);
+        await locals.em.persistAndFlush(spot);
+        course = await locals.em.findOneOrFail(Course, { id: courseId }, { refresh: true });
+
         return {
             course: course.toJSON(locals.user),
         };

@@ -54,7 +54,7 @@ export class User {
 	@Embedded(() => Subscription, { nullable: true })
 	public subscription?: Subscription;
 
-	@ManyToMany({ hidden: true, entity: () => Course, eager: true, pivotEntity: () => CourseSpot, cascade: [Cascade.REMOVE] })
+	@ManyToMany({ entity: () => Course, pivotEntity: () => CourseSpot, hidden: true, eager: true, cascade: [Cascade.REMOVE] })
 	public courses = new Collection<Course>(this);
 
 	constructor(username: string, email: string, hash?: string) {
@@ -114,13 +114,7 @@ export class Course {
 	@Property()
 	public time!: string;
 
-	@ManyToMany(() => User, (user) => user.courses, {
-		owner: true,
-		hidden: true,
-		eager: true,
-		cascade: [Cascade.REMOVE],
-		pivotEntity: () => CourseSpot
-	})
+	@ManyToMany({ entity: () => User, mappedBy: o => o.courses, eager: true, cascade: [Cascade.REMOVE] })
 	public users = new Collection<User>(this);
 
 	@Property({ type: 'datetime' })
