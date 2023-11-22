@@ -54,7 +54,7 @@ export class User {
 	@Embedded(() => Subscription, { nullable: true })
 	public subscription?: Subscription;
 
-	@ManyToMany({ hidden: true, entity: () => Course, eager: true })
+	@ManyToMany({ hidden: true, entity: () => Course, eager: true, pivotEntity: () => CourseSpot, cascade: [Cascade.REMOVE] })
 	public courses = new Collection<Course>(this);
 
 	constructor(username: string, email: string, hash?: string) {
