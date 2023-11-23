@@ -1,6 +1,6 @@
 import { redirect, type Actions, error, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { Course } from '$lib/db/entities';
+import { Course, orderCourse } from '$lib/db/entities';
 import { Role } from '$lib/db/role';
 import { assign } from '@mikro-orm/core';
 import { User } from '$lib/db/entities';
@@ -24,6 +24,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		if (!dates[date]) {
 			dates[date] = [];
 		}
+		await orderCourse(course, locals.em);
 		dates[date].push(course);
 	}
 

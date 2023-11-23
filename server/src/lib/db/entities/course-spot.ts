@@ -1,14 +1,16 @@
-import { Cascade, Collection, Embedded, Entity, Formula, Index, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
+import { Cascade, Collection, Embedded, Entity, Formula, Index, ManyToMany, ManyToOne, PrimaryKey, Property, wrap, type EntityDTO } from '@mikro-orm/core';
 import { isPast } from 'date-fns';
 import { Role } from '../role';
 import { Subscription } from './subscription';
 import { hash, compare } from 'bcrypt';
+import type { EntityManager } from '@mikro-orm/postgresql';
 
 @Entity({ tableName: 'accounts' })
 @Index({ properties: ['username'], options: { unique: true } })
 @Index({ properties: ['email'], options: { unique: true } })
 @Index({ properties: ['sessionToken'], options: { unique: true } })
 export class User {
+
 	@PrimaryKey()
 	public id!: number;
 
@@ -71,6 +73,7 @@ export class User {
 	public static hashPassword(password: string) {
 		return hash(password, 10);
 	}
+
 
 	public async isPasswordCorrect(password: string) {
 		if (!this.password) {
@@ -176,4 +179,15 @@ export class CourseSpot {
 
 	@Property({ type: 'datetime', defaultRaw: 'NOW()' })
 	createdAt = new Date();
+}
+
+
+export async function orderCourse(course: Course, em: EntityManager) {
+	const order = await em.find(CourseSpot, { course }, { orderBy: { createdAt: 'ASC' }, populate: [] });
+	const usersIdsInOrder = order.map((o) => o.user.id);
+	const current = course.users.toArray();
+
+	const map = new Map(current.map((u) => [u.id, u]));
+	const ordered = usersIdsInOrder.map((id) => em.create(User, map.get(id)!))
+	course.users = new Collection<User>(course, ordered);
 }
