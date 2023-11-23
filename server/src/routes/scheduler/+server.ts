@@ -1,5 +1,5 @@
 import { dev } from "$app/environment";
-import { Course, orderCourse } from "$lib/db/entities";
+import { Course } from "$lib/db/entities";
 import { sendEmail } from "$lib/email";
 import CourseNotification from "$lib/email/templates/course-notification.svelte";
 import { OpenCourseAction, sendNotification } from "$lib/helpers/notification";
@@ -17,7 +17,6 @@ export const GET: RequestHandler = async ({ locals }) => {
     try {
         const em = locals.em;
         const courses = await em.find(Course, { shouldPublish: true, notificationSent: false });
-
         console.log(`Found ${courses.length} courses to send notifications for`);
 
         for (const course of courses) {
@@ -32,7 +31,6 @@ export const GET: RequestHandler = async ({ locals }) => {
             if (!dev && course.notificationSent) {
                 continue;
             }
-            await orderCourse(course, locals.em);
 
             console.log(`Sending notifications for course ${course.id}`);
             for (const user of course.users.getItems()) {

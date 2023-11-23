@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { Course, orderCourse } from '$lib/db/entities';
+import { Course } from '$lib/db/entities';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
@@ -15,7 +15,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 		if (!dates[date]) {
 			dates[date] = [];
 		}
-		await orderCourse(course, locals.em);
 		dates[date].push(course);
 	}
 
