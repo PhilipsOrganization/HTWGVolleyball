@@ -193,6 +193,6 @@ export async function orderCourse(course: Course, em: EntityManager) {
 	const current = course.users.toArray();
 	const map = new Map(current.map((u) => [u.id, u]));
 
-	const ordered = order.map((reg) => map.get(reg.user.id)).filter(d => !!d).map((dto) => em.create(User, dto!))
+	const ordered = order.map((reg) => map.get(reg.user.id)).filter(d => !!d).map((dto) => em.create(User, dto!, { persist: false }))
 	course.sortedUsers = ordered;
 }
