@@ -197,6 +197,9 @@
 		bottom: 1em;
 		right: 1em;
 		z-index: 100;
+		padding: 0.5em 1em;
+		background: #9cc1cf;
+		color: #000;
 	}
 
 	#close {
