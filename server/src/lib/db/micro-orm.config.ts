@@ -3,7 +3,7 @@ import type { Options } from '@mikro-orm/postgresql';
 
 const env = process.env;
 
-export const config: Options = {
+export const config: Options = {	
 	type: 'postgresql',
 	entities,
 	discovery: {
@@ -13,7 +13,7 @@ export const config: Options = {
 	host: env.MIKRO_ORM_HOST ?? 'localhost',
 	port: parseInt(env.MIKRO_ORM_PORT ?? '5433'),
 	user: env.MIKRO_ORM_USER ?? 'postgres',
-	password: env.MIKRO_ORM_PASSWORD ?? 'password',
+	password: env.MIKRO_ORM_PASSWORD ?? 'postgres',
 	dbName: env.MIKRO_ORM_DB_NAME ?? 'volleyball',
 	cache: {
 		enabled: false

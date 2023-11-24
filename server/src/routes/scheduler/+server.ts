@@ -1,11 +1,11 @@
 import { dev } from "$app/environment";
-import { Course, orderCourse } from "$lib/db/entities";
+import { Course } from "$lib/db/entities";
 import { sendEmail } from "$lib/email";
 import CourseNotification from "$lib/email/templates/course-notification.svelte";
 import { OpenCourseAction, sendNotification } from "$lib/helpers/notification";
+import * as Sentry from '@sentry/sveltekit';
 import type { RequestHandler } from "@sveltejs/kit";
 import { differenceInHours, isToday } from "date-fns";
-import * as Sentry from '@sentry/sveltekit';
 
 
 export const GET: RequestHandler = async ({ locals }) => {
@@ -32,7 +32,6 @@ export const GET: RequestHandler = async ({ locals }) => {
             if (!dev && course.notificationSent) {
                 continue;
             }
-            await orderCourse(course, locals.em);
 
             console.log(`Sending notifications for course ${course.id}`);
             for (const user of course.users.getItems()) {
