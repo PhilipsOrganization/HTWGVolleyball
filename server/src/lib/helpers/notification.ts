@@ -6,13 +6,13 @@ import { building } from '$app/environment';
 const publicVapidKey = env.VITE_VAPID_PUBLIC;
 const privateVapidKey = env.VAPID_PRIVATE;
 
-// if (!building) {
-// 	if (!publicVapidKey || !privateVapidKey) {
-// 		throw new Error('VAPID keys not set');
-// 	}
+if (!building) {
+	if (!publicVapidKey || !privateVapidKey) {
+		throw new Error('VAPID keys not set');
+	}
 
-// 	webpush.setVapidDetails('https://volleyballhtwg.netlify.app', publicVapidKey, privateVapidKey);
-// }
+	webpush.setVapidDetails('https://volleyballhtwg.netlify.app', publicVapidKey, privateVapidKey);
+}
 
 
 interface NotificationAction {
