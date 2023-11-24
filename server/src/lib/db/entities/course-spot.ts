@@ -117,8 +117,10 @@ export class Course {
 	@Property()
 	public time!: string;
 
-	@ManyToMany({ entity: () => User, mappedBy: o => o.courses, eager: true, cascade: [Cascade.REMOVE], orderBy: { createdAt: 'ASC' } })
+	@ManyToMany({ entity: () => User, mappedBy: o => o.courses, eager: true, cascade: [Cascade.REMOVE] })
 	public users = new Collection<User>(this);
+
+	public sortedUsers?: User[];
 
 	@Property({ type: 'datetime' })
 	public createdAt = new Date();
@@ -152,14 +154,18 @@ export class Course {
 
 		if (user) {
 			result.isEnrolled = this.users.contains(user);
+			const base = this.sortedUsers ?? this.users.getItems();
+			if (!this.sortedUsers) {
+				console.error('sorted users not set');
+			}
 
 			if (result.isEnrolled) {
-				result.spot = this.users.getItems().indexOf(user);
+				result.spot = base.indexOf(user);
 				result.isOnWaitlist = result.spot >= this.maxParticipants;
 			}
 
 			if (user.role !== Role.USER) {
-				result.participants = this.users.map((u) => u.toJSON());
+				result.participants = base.map((u) => u.toJSON());
 			}
 		}
 
@@ -179,4 +185,14 @@ export class CourseSpot {
 
 	@Property({ type: 'datetime', defaultRaw: 'NOW()' })
 	createdAt = new Date();
+}
+
+
+export async function orderCourse(course: Course, em: EntityManager) {
+	const order = await em.find(CourseSpot, { course }, { orderBy: { createdAt: 'ASC' }, populate: [] });
+	const current = course.users.toArray();
+	const map = new Map(current.map((u) => [u.id, u]));
+
+	const ordered = order.map((reg) => map.get(reg.user.id)).filter(d => !!d).map((dto) => em.create(User, dto!, { persist: false }))
+	course.sortedUsers = ordered;
 }

@@ -1,10 +1,10 @@
-import { Course, CourseSpot, User } from "$lib/db/entities";
-import { Role } from "$lib/db/role";
-import { sendEmail } from "$lib/email";
-import OpenSpot from "$lib/email/templates/open-spot.svelte";
-import { DropCourseAction, OpenCourseAction, OpenProfileAction, sendNotification } from "$lib/helpers/notification";
 import { error, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
+import { Course, CourseSpot, User, orderCourse } from "$lib/db/entities";
+import { Role } from "$lib/db/role";
+import { DropCourseAction, OpenCourseAction, OpenProfileAction, sendNotification } from "$lib/helpers/notification";
+import { sendEmail } from "$lib/email";
+import OpenSpot from "$lib/email/templates/open-spot.svelte";
 
 export const load: PageServerLoad = async ({ locals, params }) => {
     if (!locals.user) {
@@ -15,6 +15,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     // @ts-ignore
     const id = parseInt(params.id);
     const course = await locals.em.findOneOrFail(Course, { id });
+    await orderCourse(course, locals.em);
 
     if (!course.shouldPublish && locals.user.role === Role.USER) {
         throw error(400, 'Course not jet published');

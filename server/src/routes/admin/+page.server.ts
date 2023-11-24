@@ -1,11 +1,12 @@
-import { Course, User } from '$lib/db/entities';
+import { redirect, type Actions, error, fail } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
+import { Course, orderCourse } from '$lib/db/entities';
 import { Role } from '$lib/db/role';
 import { assign } from '@mikro-orm/core';
-import { error, fail, redirect, type Actions } from '@sveltejs/kit';
+import { User } from '$lib/db/entities';
+import { z } from 'zod';
 import { startOfYesterday } from 'date-fns';
 import { zonedTimeToUtc } from "date-fns-tz";
-import { z } from 'zod';
-import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -23,6 +24,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		if (!dates[date]) {
 			dates[date] = [];
 		}
+		await orderCourse(course, locals.em);
 		dates[date].push(course);
 	}
 
