@@ -1,4 +1,4 @@
-import { User } from '$lib/db/entities/course-spot.js';
+import { User, UserRepository } from '$lib/db/entities/course-spot.js';
 import { sendEmail } from '$lib/email/index.js';
 import ResetPassword from '$lib/email/templates/reset-password.svelte';
 import { type Actions, fail, redirect } from '@sveltejs/kit';
@@ -11,7 +11,8 @@ export const actions = {
             return fail(400, { error: "Missing credentials" });
         }
 
-        const user = await locals.em.findOne(User, { $or: [{ username: userNameOrEmail }, { email: userNameOrEmail }] });
+        const repo = locals.em.getRepository(User) as UserRepository;
+        const user = await repo.findOneByNameOrEmail(userNameOrEmail);
         if (!user) {
             return fail(400, { error: 'User not found' });
         }

@@ -1,11 +1,11 @@
-import { Cascade, Collection, Embedded, Entity, Formula, Index, ManyToMany, ManyToOne, PrimaryKey, Property, wrap, type EntityDTO } from '@mikro-orm/core';
+import { Cascade, Collection, Embedded, Entity, Formula, Index, ManyToMany, ManyToOne, PrimaryKey, Property, wrap } from '@mikro-orm/core';
+import { EntityRepository, type EntityManager } from '@mikro-orm/postgresql';
+import { compare, hash } from 'bcrypt';
 import { isPast } from 'date-fns';
 import { Role } from '../role';
 import { Subscription } from './subscription';
-import { hash, compare } from 'bcrypt';
-import type { EntityManager } from '@mikro-orm/postgresql';
 
-@Entity({ tableName: 'accounts' })
+@Entity({ tableName: 'accounts', customRepository: () => UserRepository })
 @Index({ properties: ['username'], options: { unique: true } })
 @Index({ properties: ['email'], options: { unique: true } })
 @Index({ properties: ['sessionToken'], options: { unique: true } })
@@ -195,4 +195,14 @@ export async function orderCourse(course: Course, em: EntityManager) {
 
 	const ordered = order.map((reg) => map.get(reg.user.id)).filter(d => !!d).map((dto) => em.create(User, dto!, { persist: false }))
 	course.sortedUsers = ordered;
+}
+
+
+export class UserRepository extends EntityRepository<User> {
+
+	public async findOneByNameOrEmail(usernameOrEmail: string) {
+		usernameOrEmail = usernameOrEmail.trim();
+		return this.findOne({ $or: [{ username: usernameOrEmail }, { email: usernameOrEmail.toLowerCase() }] });
+	}
+
 }

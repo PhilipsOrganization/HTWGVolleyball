@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/private';
-import { User } from '$lib/db/entities';
+import { User, UserRepository } from '$lib/db/entities';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from '../$types';
 
@@ -13,18 +13,15 @@ export const actions = {
 	login: async ({ locals, request, cookies }) => {
 		const form = await request.formData();
 
-		let username = form.get('username') as string | undefined;
+		const username = form.get('username') as string | undefined;
 		const password = form.get('password') as string | undefined;
 
 		if (!username || !password) {
 			return fail(400, { missingCredentials: true });
 		}
 
-		username = username.trim();
-
-		// login with username or email
-		const user = await locals.em.findOne(User, { $or: [{ username }, { email: username.toLowerCase() }] });
-
+		const repo = locals.em.getRepository(User) as UserRepository;
+        const user = await repo.findOneByNameOrEmail(username);
 		if (!user) {
 			return fail(400, { username, userNotFound: true });
 		}
