@@ -33,6 +33,9 @@ export const GET: RequestHandler = async ({ locals }) => {
                 continue;
             }
             await orderCourse(course, locals.em);
+            
+            course.notificationSent = true;
+            await em.persistAndFlush(course);
 
             console.log(`Sending notifications for course ${course.id}`);
             for (const user of course.users.getItems()) {
@@ -54,8 +57,6 @@ export const GET: RequestHandler = async ({ locals }) => {
                 }
             }
 
-            course.notificationSent = true;
-            await em.persistAndFlush(course);
         }
 
         Sentry.captureCheckIn({

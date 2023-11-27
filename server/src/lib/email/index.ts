@@ -14,7 +14,11 @@ if (!building) {
 
 export async function sendEmail<T extends Record<string, any>>(component: ComponentType<SvelteComponent<T, any, any>>, config: { user: User, subject: string, props: T }) {
     console.log('Sending email to', config.user.email);
-    const html = render({ template: component, props: config.props });
-    const response = await resend.emails.send({ from: 'VolleyballHTWG@volleyball.oesterlin.dev', to: config.user.email, subject: config.subject, html });
-    console.log(response);
+    try {
+        const html = render({ template: component, props: config.props });
+        await resend.emails.send({ from: 'VolleyballHTWG@volleyball.oesterlin.dev', to: config.user.email, subject: config.subject, html });
+    } catch (error) {
+        console.log('Error sending email');
+        console.error(error);
+    }
 }
