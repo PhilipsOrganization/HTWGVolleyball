@@ -21,7 +21,7 @@ export const actions = {
 		}
 
 		const repo = locals.em.getRepository(User) as UserRepository;
-        const user = await repo.findOneByNameOrEmail(username);
+		const user = await repo.findOneByNameOrEmail(username);
 		if (!user) {
 			return fail(400, { username, userNotFound: true });
 		}
@@ -35,7 +35,8 @@ export const actions = {
 		user.sessionToken = sessionToken;
 		await locals.em.persistAndFlush(user);
 
-		cookies.set('user', sessionToken, { path: '/' });
+		const expirationDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 21);
+		cookies.set('user', sessionToken, { path: '/', expires: expirationDate });
 
 		throw redirect(303, '/courses');
 	},
