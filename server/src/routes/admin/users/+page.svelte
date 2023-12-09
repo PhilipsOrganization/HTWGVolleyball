@@ -1,11 +1,9 @@
 <script>
-	import { Role } from '$lib/db/role';
-
 	export let data;
 </script>
 
 <section>
-	<h1>Users</h1>
+	<h1>Users ({data.users.length})</h1>
 	<div id="users">
 		{#each data.users as user}
 			<p>
