@@ -49,7 +49,8 @@ export const actions = {
 
 		const sessionToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 		newUser.sessionToken = sessionToken;
-		cookies.set('user', newUser.sessionToken, { path: '/' });
+		const expirationDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 21);
+		cookies.set('user', newUser.sessionToken, { path: '/', expires: expirationDate });
 
 		// token is used to verify the email
 		const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);

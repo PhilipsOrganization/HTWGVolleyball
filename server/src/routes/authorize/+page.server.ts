@@ -78,7 +78,8 @@ export const load: PageServerLoad = async ({ url, cookies, locals, fetch }) => {
     user.emailVerified = data.verified_email;
     await locals.em.persistAndFlush(user);
 
-    cookies.set('user', sessionToken, { path: '/' });
+    const expirationDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 21);
+    cookies.set('user', sessionToken, { path: '/', expires: expirationDate });
     throw redirect(303, '/courses');
 };
 
