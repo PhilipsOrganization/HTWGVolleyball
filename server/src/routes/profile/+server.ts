@@ -6,7 +6,7 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) {
-		throw redirect(303, '/login');
+		redirect(303, '/login');
 	}
 
 	const body = (await request.json()) as unknown;
@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 export const DELETE: RequestHandler = async ({ locals }) => {
 	if (!locals.user) {
-		throw redirect(303, '/login');
+		redirect(303, '/login');
 	}
 
 	locals.user.subscription = undefined;

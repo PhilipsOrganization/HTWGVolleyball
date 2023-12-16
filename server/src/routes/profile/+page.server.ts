@@ -8,7 +8,7 @@ import ConfirmEmail from '$lib/email/templates/confirm-email.svelte';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
-		throw redirect(303, '/login');
+		redirect(303, '/login');
 	}
 
 	const stats = await locals.em.find(UserStats, { userId: locals.user.id });
@@ -32,7 +32,7 @@ export const actions = {
 	reverify: async ({ locals }) => {
 		const user = locals.user;
 		if (!user) {
-			throw redirect(303, '/login');
+			redirect(303, '/login');
 		}
 
 		// token is used to verify the email

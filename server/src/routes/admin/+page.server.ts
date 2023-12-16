@@ -10,7 +10,7 @@ import { zonedTimeToUtc } from "date-fns-tz";
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
-		throw redirect(303, '/courses');
+		redirect(303, '/courses');
 	}
 
 	// find all courses that take place in the future
@@ -62,7 +62,7 @@ const courseValidation = z.object({
 export const actions = {
 	'create-course': async ({ locals, request }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
-			throw redirect(303, '/login');
+			redirect(303, '/login');
 		}
 
 		const form = await request.formData();
@@ -98,20 +98,20 @@ export const actions = {
 
 	'update-course': async ({ locals, request }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
-			throw redirect(303, '/login');
+			redirect(303, '/login');
 		}
 
 		const form = await request.formData();
 		const courseIdString = form.get('courseId') as string | undefined;
 		const name = form.get('title') as string | undefined;
 		if (!courseIdString || !name) {
-			throw error(400, 'No courseId or title provided');
+			error(400, 'No courseId or title provided');
 		}
 
 		const courseId = parseInt(courseIdString);
 		const course = await locals.em.findOne(Course, { id: courseId });
 		if (!course) {
-			throw error(400, 'Course not found');
+			error(400, 'Course not found');
 		}
 
 		assign(course, { name });

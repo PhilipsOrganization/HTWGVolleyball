@@ -7,13 +7,13 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     const userId = url.searchParams.get("user");
 
     if (!token || userId === null) {
-        throw redirect(303, "/login");
+        redirect(303, "/login");
     }
 
     const user = await locals.em.findOne(User, { id: parseInt(userId), resetToken: token });
 
     if (!user || !user.resetTokenExpires || user.resetTokenExpires < new Date()) {
-        throw redirect(303, "/login");
+        redirect(303, "/login");
     }
 
     return { error: false };
@@ -31,7 +31,7 @@ export const actions = {
         const token = body.get("token") as string;
 
         if (!userId || !token) {
-            throw redirect(303, "/login");
+            redirect(303, "/login");
         }
 
         const user = await locals.em.findOne(User, { id: parseInt(userId), resetToken: token });
@@ -63,6 +63,6 @@ export const actions = {
 
         await locals.em.persistAndFlush(user);
 
-        throw redirect(303, "/login");
+        redirect(303, "/login");
     },
 } satisfies Actions;

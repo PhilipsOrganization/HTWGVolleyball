@@ -9,7 +9,7 @@ import ResetPassword from '$lib/email/templates/reset-password.svelte';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
-		throw redirect(303, '/courses');
+		redirect(303, '/courses');
 	}
 
 	const user = await locals.em.findOneOrFail(User, { id: parseInt(params.id) });
@@ -27,23 +27,23 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 export const actions = {
 	demote: async ({ locals, params }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
-			throw redirect(303, '/login');
+			redirect(303, '/login');
 		}
 
 		const userIdString = params.id as string | undefined;
 		if (!userIdString) {
-			throw error(400, 'No userId provided');
+			error(400, 'No userId provided');
 		}
 
 		const userId = parseInt(userIdString);
 		const user = await locals.em.findOne(User, { id: userId });
 
 		if (!user) {
-			throw error(400, 'User not found');
+			error(400, 'User not found');
 		}
 
 		if (user.role === Role.SUPER_ADMIN) {
-			throw error(400, 'Cannot demote super admin');
+			error(400, 'Cannot demote super admin');
 		}
 
 		user.role = Role.USER;
@@ -52,22 +52,22 @@ export const actions = {
 	},
 	promote: async ({ locals, params }) => {
 		if (locals.user?.role !== Role.ADMIN && locals.user?.role !== Role.SUPER_ADMIN) {
-			throw redirect(303, '/login');
+			redirect(303, '/login');
 		}
 
 		const userIdString = params.id as string | undefined;
 		if (!userIdString) {
-			throw error(400, 'No userId provided');
+			error(400, 'No userId provided');
 		}
 
 		const userId = parseInt(userIdString);
 		const user = await locals.em.findOne(User, { id: userId });
 		if (!user) {
-			throw error(400, 'User not found');
+			error(400, 'User not found');
 		}
 
 		if (user.role === Role.SUPER_ADMIN) {
-			throw error(400, 'Cannot promote super admin');
+			error(400, 'Cannot promote super admin');
 		}
 
 		user.role = Role.ADMIN;
@@ -76,12 +76,12 @@ export const actions = {
 	},
 	note: async ({ locals, params, request }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
-			throw redirect(303, '/login');
+			redirect(303, '/login');
 		}
 
 		const userIdString = params.id as string | undefined;
 		if (!userIdString) {
-			throw error(400, 'No userId provided');
+			error(400, 'No userId provided');
 		}
 
 		const userId = parseInt(userIdString);
@@ -94,18 +94,18 @@ export const actions = {
 	},
 	unstrike: async ({ locals, params }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
-			throw redirect(303, '/login');
+			redirect(303, '/login');
 		}
 
 		const userIdString = params.id as string | undefined;
 		if (!userIdString) {
-			throw error(400, 'No userId provided');
+			error(400, 'No userId provided');
 		}
 
 		const userId = parseInt(userIdString);
 		const user = await locals.em.findOne(User, { id: userId });
 		if (!user) {
-			throw error(400, 'User not found');
+			error(400, 'User not found');
 		}
 
 		user.strikes = Math.max(0, user.strikes - 1);
@@ -114,17 +114,17 @@ export const actions = {
 	},
 	delete: async ({ locals, params }) => {
 		if (!locals.user || locals.user.role !== Role.SUPER_ADMIN) {
-			throw redirect(303, "/login");
+			redirect(303, "/login");
 		}
 
 		const userId = params.id as string | undefined;
 		if (!userId) {
-			throw error(400, "No userId provided");
+			error(400, "No userId provided");
 		}
 
 		const user = await locals.em.findOneOrFail(User, { id: parseInt(userId) });
 		if (user.role !== Role.USER) {
-			throw error(400, "Cannot delete user");
+			error(400, "Cannot delete user");
 		}
 
 		const courses = await locals.em.find(Course, { users: user });
@@ -137,22 +137,22 @@ export const actions = {
 			await em.removeAndFlush(user);
 		});
 
-		throw redirect(303, "/admin/users");
+		redirect(303, "/admin/users");
 	},
 	"reset-pw": async ({ locals, params }) => {
 		if (!locals.user || locals.user.role !== Role.SUPER_ADMIN) {
-			throw redirect(303, "/login")
+			redirect(303, "/login");
 		}
 
 		const userIdString = params.id as string | undefined;
 		if (!userIdString) {
-			throw error(400, "No userId provided");
+			error(400, "No userId provided");
 		}
 
 		const userId = parseInt(userIdString);
 		const user = await locals.em.findOne(User, { id: userId });
 		if (!user) {
-			throw error(400, 'User not found');
+			error(400, 'User not found');
 		}
 
 		const token = encodeURIComponent(crypto.getRandomValues(new Uint8Array(32)).join(""))

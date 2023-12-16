@@ -5,7 +5,7 @@ import type { PageServerLoad } from '../$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
-		throw redirect(303, '/courses');
+		redirect(303, '/courses');
 	}
 };
 
@@ -38,7 +38,7 @@ export const actions = {
 		const expirationDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 21);
 		cookies.set('user', sessionToken, { path: '/', expires: expirationDate });
 
-		throw redirect(303, '/courses');
+		redirect(303, '/courses');
 	},
 	authenticate: async () => {
 		const googleEndpoint = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -61,6 +61,6 @@ export const actions = {
 		url.searchParams.set("state", state);
 		url.searchParams.set("nonce", nonce);
 
-		throw redirect(303, url.toString());
+		redirect(303, url.toString());
 	},
 } satisfies Actions;

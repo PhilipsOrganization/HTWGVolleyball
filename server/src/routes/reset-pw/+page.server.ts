@@ -27,6 +27,6 @@ export const actions = {
         await locals.em.persistAndFlush(user);
 
         await sendEmail(ResetPassword, { user, subject: "Reset Password", props: { user, token } });
-        throw redirect(303, "/login");
+        redirect(303, "/login");
     }
 } satisfies Actions;

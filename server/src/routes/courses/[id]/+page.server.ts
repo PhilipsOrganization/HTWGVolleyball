@@ -8,7 +8,7 @@ import OpenSpot from "$lib/email/templates/open-spot.svelte";
 
 export const load: PageServerLoad = async ({ locals, params }) => {
     if (!locals.user) {
-        throw redirect(303, '/login');
+        redirect(303, '/login');
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     await orderCourse(course, locals.em);
 
     if (!course.shouldPublish && locals.user.role === Role.USER) {
-        throw error(400, 'Course not jet published');
+        error(400, 'Course not jet published');
     }
 
     return {
@@ -54,26 +54,26 @@ function notifyNextUser(course: Course) {
 export const actions = {
     enlist: async ({ locals, params }) => {
         if (!locals.user) {
-            throw redirect(303, '/login');
+            redirect(303, '/login');
         }
 
         if (!locals.user.emailVerified) {
-            throw error(400, 'Your Email is not verified. Check your inbox for the verification email or request a new one in your profile.');
+            error(400, 'Your Email is not verified. Check your inbox for the verification email or request a new one in your profile.');
         }
 
         const courseIdString = params.id as string | undefined;
         if (!courseIdString) {
-            throw error(400, 'No courseId provided');
+            error(400, 'No courseId provided');
         }
 
         const courseId = parseInt(courseIdString);
         let course = await locals.em.findOne(Course, { id: courseId });
         if (!course) {
-            throw error(400, 'Course not found');
+            error(400, 'Course not found');
         }
 
         if (locals.user.courses.contains(course)) {
-            throw error(400, 'Already enrolled');
+            error(400, 'Already enrolled');
         }
 
         const spot = locals.em.create(CourseSpot, {
@@ -91,22 +91,22 @@ export const actions = {
     },
     drop: async ({ locals, params }) => {
         if (!locals.user) {
-            throw redirect(303, '/login');
+            redirect(303, '/login');
         }
 
         const courseIdString = params.id as string | undefined;
         if (!courseIdString) {
-            throw error(400, 'No courseId provided');
+            error(400, 'No courseId provided');
         }
 
         const courseId = parseInt(courseIdString);
         const course = await locals.em.findOne(Course, { id: courseId });
         if (!course) {
-            throw error(400, 'Course not found');
+            error(400, 'Course not found');
         }
 
         if (!locals.user.courses.contains(course)) {
-            throw error(400, 'Not enrolled');
+            error(400, 'Not enrolled');
         }
 
         locals.user.courses.remove(course);
@@ -120,12 +120,12 @@ export const actions = {
     },
     'delete-course': async ({ locals, params }) => {
         if (!locals.user || locals.user.role === Role.USER) {
-            throw redirect(303, '/login');
+            redirect(303, '/login');
         }
 
         const courseIdString = params.id as string | undefined;
         if (!courseIdString) {
-            throw error(400, 'No courseId provided');
+            error(400, 'No courseId provided');
         }
 
         const courseId = parseInt(courseIdString);
@@ -133,7 +133,7 @@ export const actions = {
         const course = await locals.em.findOne(Course, { id: courseId });
 
         if (!course) {
-            throw error(400, 'Course not found');
+            error(400, 'Course not found');
         }
 
         await locals.em.transactional(async em => {
@@ -142,11 +142,11 @@ export const actions = {
             await em.removeAndFlush(course);
         })
 
-        throw redirect(303, `/admin`);
+        redirect(303, `/admin`);
     },
     cancel: async ({ locals, request, params }) => {
         if (!locals.user || locals.user.role === Role.USER) {
-            throw redirect(303, '/login');
+            redirect(303, '/login');
         }
 
         const form = await request.formData();
@@ -155,7 +155,7 @@ export const actions = {
 
         const userIdString = form.get('userId') as string | undefined;
         if (!userIdString) {
-            throw error(400, 'No userId provided');
+            error(400, 'No userId provided');
         }
 
         const userId = parseInt(userIdString);
@@ -171,7 +171,7 @@ export const actions = {
     },
     strike: async ({ locals, request, params }) => {
         if (!locals.user || locals.user.role === Role.USER) {
-            throw redirect(303, '/login');
+            redirect(303, '/login');
         }
 
         const form = await request.formData();
@@ -180,7 +180,7 @@ export const actions = {
 
         const userIdString = form.get('userId') as string | undefined;
         if (!userIdString) {
-            throw error(400, 'No userId provided');
+            error(400, 'No userId provided');
         }
 
         const userId = parseInt(userIdString);

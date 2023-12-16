@@ -52,7 +52,7 @@ async function getUserInfo(fetchFn: typeof fetch, token: string) {
         const data = await request.json();
         console.error(data);
 
-        throw error(request.status, 'Failed to get google user info');
+        error(request.status, 'Failed to get google user info');
     }
 
     const data = await request.json();
@@ -80,6 +80,6 @@ export const load: PageServerLoad = async ({ url, cookies, locals, fetch }) => {
 
     const expirationDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 21);
     cookies.set('user', sessionToken, { path: '/', expires: expirationDate });
-    throw redirect(303, '/courses');
+    redirect(303, '/courses');
 };
 

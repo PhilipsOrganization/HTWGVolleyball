@@ -5,7 +5,7 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
-		throw redirect(303, '/courses');
+		redirect(303, '/courses');
 	}
 
 	const users = await locals.em.find(User, {}, { orderBy: { role: 'ASC', username: 'ASC' } });

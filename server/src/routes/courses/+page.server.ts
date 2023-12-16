@@ -4,7 +4,7 @@ import { Course, orderCourse } from '$lib/db/entities';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
-		throw redirect(303, '/login');
+		redirect(303, '/login');
 	}
 
 	const courses = await locals.em.find(Course, { shouldPublish: true }, { orderBy: { date: 'ASC', time: "ASC" } });

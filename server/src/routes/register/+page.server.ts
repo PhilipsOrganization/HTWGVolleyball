@@ -63,6 +63,6 @@ export const actions = {
 
 		await sendEmail(ConfirmEmail, { user, subject: 'Confirm your Email', props: { user, token } });
 
-		throw redirect(303, '/courses'); // 307 is a temporary redirect, 301 is permanent
+		redirect(303, '/courses'); // 307 is a temporary redirect, 301 is permanent
 	}
 } satisfies Actions;
