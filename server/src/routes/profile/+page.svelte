@@ -1,7 +1,13 @@
 <script>
 	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
+	import { onMount } from 'svelte';
 
 	export let data;
+	let notificationsSupported = false;
+
+	onMount(() => {
+		notificationsSupported = 'serviceWorker' in navigator && 'PushManager' in window;
+	});
 
 	async function enableNotification() {
 		await Notification.requestPermission();
@@ -108,15 +114,17 @@
 		</ConfirmableForm>
 	{/if}
 
-	<h3>Notifications</h3>
-	<p>
-		Notifications make it easier to keep up to date. You'll get a notification when something happens that you might want to know about. You
-		can turn them off any time from your profile. If they are disabled, you'll get an email instead. However, emails are not instant.
-	</p>
-	{#if data.user.hasNotificationsEnabled}
-		<button on:click={disableNotification}>Disable notifications</button>
-	{:else}
-		<button on:click={enableNotification}>Enable notifications</button>
+	{#if notificationsSupported}
+		<h3>Push Notifications</h3>
+		<p>
+			Notifications make it easier to keep up to date. You'll get a notification when something happens that you might want to know about.
+			You can turn them off any time from your profile. If they are disabled, you'll get an email instead. However, emails are not instant.
+		</p>
+		{#if data.user.hasNotificationsEnabled}
+			<button on:click={disableNotification}>Disable notifications</button>
+		{:else}
+			<button on:click={enableNotification}>Enable notifications</button>
+		{/if}
 	{/if}
 
 	<h3>Strikes</h3>
