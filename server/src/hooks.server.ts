@@ -13,29 +13,29 @@ Sentry.init({
 })
 
 let orm: MikroORM;
-let isMigrating: Promise<void> | undefined = undefined;
+// let isMigrating: Promise<void> | undefined = undefined;
 
 if (!building) {
 	orm = await MikroORM.init(config);
 
-	if (!isMigrating) {
-		isMigrating = new Promise((resolve) => {
-			const migrator = orm.getMigrator();
+	// if (!isMigrating) {
+	// 	isMigrating = new Promise((resolve) => {
+	// 		const migrator = orm.getMigrator();
 
-			migrator.createMigration()
-				.then(() => migrator.up())
-				.then(() => {
-					resolve();
-					isMigrating = undefined;
-				});
-		});
-	}
+	// 		migrator.createMigration()
+	// 			.then(() => migrator.up())
+	// 			.then(() => {
+	// 				resolve();
+	// 				isMigrating = undefined;
+	// 			});
+	// 	});
+	// }
 }
 
 export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, resolve }) => {
-	if (isMigrating) {
-		await isMigrating;
-	}
+	// if (isMigrating) {
+	// 	await isMigrating;
+	// }
 
 	if (building) {
 		return await resolve(event);

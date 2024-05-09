@@ -1,32 +1,78 @@
-import { error, redirect } from "@sveltejs/kit";
-import type { PageServerLoad } from "../$types";
-import { Course, CourseSpot, User, orderCourse } from "$lib/db/entities";
+import { Course, CourseSpot, User } from "$lib/db/entities";
 import { Role } from "$lib/db/role";
-import { DropCourseAction, OpenCourseAction, OpenProfileAction, sendNotification } from "$lib/helpers/notification";
+import { accounts, courseSpots, courses, sanitizeUser, type Account, type SanitizedAccount } from "$lib/db/schema.js";
 import { sendEmail } from "$lib/email";
 import OpenSpot from "$lib/email/templates/open-spot.svelte";
+import { DropCourseAction, OpenCourseAction, OpenProfileAction, sendNotification } from "$lib/helpers/notification";
+import { error, redirect } from "@sveltejs/kit";
+import { eq, sql } from "drizzle-orm";
+import type { PageServerLoad } from "./$types.js";
 
 export const load: PageServerLoad = async ({ locals, params }) => {
     if (!locals.user) {
         redirect(303, '/login');
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     const id = parseInt(params.id);
-    const course = await locals.em.findOneOrFail(Course, { id });
-    await orderCourse(course, locals.em);
+    const [course] = await locals.db.select({
+        courses,
+        accountsJson: sql<Account[]>`json_agg(accounts order by course_spots.created_at asc)`.as('accountsJson'),
+        shouldPublish: sql<boolean>`(publish_on <= NOW() AND date >= (NOW() - INTERVAL '1 day'))`.as('shouldPublish'),
+    })
+        .from(courseSpots)
+        .leftJoin(courses, eq(courseSpots.courseId, courses.id))
+        .leftJoin(accounts, eq(courseSpots.userId, accounts.id))
+        .groupBy(courses.id)
+        .where(eq(courses.id, id))
+        .limit(1);
 
     if (!course.shouldPublish && locals.user.role === Role.USER) {
         error(400, 'Course not jet published');
     }
 
     return {
-        course: course.toJSON(locals.user),
+        course: serialize(course, locals.user),
         user: locals.user.toJSON()
     };
 };
 
+function serialize(data: { courses: Course | null, accountsJson: Account[] }, user?: Account) {
+    if (!data.courses) {
+        error(404, 'Course not found');
+    }
+
+    const course = data.courses;
+    const accounts = data.accountsJson;
+
+    const signupCount = accounts.length;
+
+    const serialized = {
+        ...course,
+        date: new Date(course.date),
+        publishOn: new Date(course.publishOn),
+        signupCount,
+        participants: [] as SanitizedAccount[],
+    };
+
+    if (!user) {
+        return serialized;
+    }
+
+    if (user.role !== Role.USER) {
+        serialized.participants = accounts.map(sanitizeUser);
+    }
+
+    const isEnrolled = accounts.some((a) => a.id === user.id);
+    const spot = accounts.findIndex((a) => a.id === user.id);
+    const isOnWaitlist = spot >= course.maxParticipants;
+
+    return {
+        ...serialized,
+        isEnrolled,
+        spot,
+        isOnWaitlist,
+    };
+}
 
 function notifyNextUser(course: Course) {
     const spots = course.maxParticipants;

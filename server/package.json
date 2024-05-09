@@ -43,6 +43,8 @@
 		"date-fns": "^2.30.0",
 		"date-fns-tz": "^2.0.1",
 		"dotenv": "^16.4.5",
+		"drizzle-orm": "^0.30.10",
+		"postgres": "^3.4.4",
 		"resend": "^2.1.0",
 		"svelte-email": "^0.0.4",
 		"uuid": "^9.0.1",
