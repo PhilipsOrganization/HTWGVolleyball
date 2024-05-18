@@ -3,22 +3,18 @@ import { accounts, courseSpots, courses, type Account } from '$lib/db/schema';
 import { serializeUser } from '$lib/helpers/account';
 import { serializeCourse } from '$lib/helpers/course';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
-import { zonedTimeToUtc } from "date-fns-tz";
+import { startOfYesterday } from 'date-fns';
 import { desc, eq, gte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { PageServerLoad } from './$types';
-import { startOfYesterday } from 'date-fns';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
 		redirect(303, '/courses');
 	}
 
-	// find all courses that take place in the future
 	const showArchived = url.searchParams.has('archived');
-	const dateQuery = showArchived ?
-		sql<boolean>`true` : // show all courses
-		gte(courses.publishOn, startOfYesterday().toISOString()); // show all courses that are not in the past
+	const dateQuery = showArchived ? sql<boolean>`true` : gte(courses.publishOn, startOfYesterday().toISOString());
 
 	const result = await locals.db
 		.select({

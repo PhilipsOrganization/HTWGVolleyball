@@ -48,7 +48,7 @@ export async function getCourseWithUsers(db: DB, id: number) {
     const [updated] = await db.select({
         courses,
         accountsJson: sql<Account[] | [null]>`json_agg(accounts order by course_spots.created_at asc)`.as('accountsJson'),
-        shouldPublish: sql<boolean>`(publish_on <= NOW() AND date >= (NOW() - INTERVAL '1 day'))`.as('shouldPublish'),
+        shouldPublish: sql<boolean>`(${courses.publishOn} <= NOW() AND ${courses.date} >= (NOW() - INTERVAL '1 day'))`.as('shouldPublish'),
     })
         .from(courseSpots)
         .fullJoin(courses, eq(courseSpots.courseId, courses.id))

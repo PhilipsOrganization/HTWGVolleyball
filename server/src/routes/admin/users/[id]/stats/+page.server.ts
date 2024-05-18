@@ -19,11 +19,11 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	const userId = parseInt(userIdString);
 	const stats = await locals.db
-		.select({ name: courses.name, count: count() })
+		.select({ courseName: courses.name, count: count(courses.name) })
 		.from(courseSpots)
-		.leftJoin(courses, eq(courseSpots.courseId, courses.id))
+		.innerJoin(courses, eq(courseSpots.courseId, courses.id))
 		.where(eq(courseSpots.userId, userId))
-		.groupBy(courses.name, accounts.id)
+		.groupBy(courses.name)
 		.limit(10);
 
 	const timeDiff = sql`extract(epoch from ${courseSpots.createdAt}) - extract(epoch from ${courses.publishOn})`;

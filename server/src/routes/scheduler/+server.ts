@@ -6,7 +6,7 @@ import { OpenCourseAction, sendNotification } from "$lib/helpers/notification.js
 import * as Sentry from '@sentry/sveltekit';
 import type { RequestHandler } from "@sveltejs/kit";
 import { differenceInHours, isToday } from "date-fns";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
 
 export const GET: RequestHandler = async ({ locals }) => {
     const checkInId = Sentry.captureCheckIn({
@@ -16,11 +16,11 @@ export const GET: RequestHandler = async ({ locals }) => {
 
     try {
         const db = locals.db;
-        // { shouldPublish: true, notificationSent: false }
         const result = await db.select().from(courses).where(
             and(
-                eq(sql<boolean>`publish_on <= NOW() AND date >= (NOW() - INTERVAL '1 day')`, true),
-                eq(courses.notificationSent, false)
+                eq(courses.notificationSent, false),
+                lte(courses.publishOn, sql`NOW()`),	// Only show courses that have been published
+                gte(courses.date, sql`NOW() - INTERVAL '1 day'`), // Only show courses that are 24 hours in the future
             )
         );
 

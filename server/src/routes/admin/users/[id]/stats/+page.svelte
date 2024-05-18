@@ -76,11 +76,11 @@
 	{/each}
 </section>
 
-<div class="center">
+<!-- <div class="center">
 	<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
 		<path in:draw={{ duration: 1000 }} fill="none" stroke="grey" d={data.svg} />
 	</svg>
-</div>
+</div> -->
 <br />
 <div class="column">
 	<h2>Notes</h2>
