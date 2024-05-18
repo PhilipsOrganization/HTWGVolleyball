@@ -1,6 +1,8 @@
-import { redirect, type Actions, fail } from "@sveltejs/kit";
-import type { PageServerLoad } from "../$types";
-import { User } from "$lib/db/entities";
+import { accounts } from "$lib/db/schema.js";
+import { hashPassword } from "$lib/helpers/account.js";
+import { error, fail, redirect, type Actions } from "@sveltejs/kit";
+import { and, eq } from "drizzle-orm";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals, url }) => {
     const token = url.searchParams.get("token");
@@ -10,9 +12,12 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         redirect(303, "/login");
     }
 
-    const user = await locals.em.findOne(User, { id: parseInt(userId), resetToken: token });
+    const [user] = await locals.db.select().from(accounts).where(and(
+        eq(accounts.id, parseInt(userId)),
+        eq(accounts.resetToken, token)
+    )).limit(1);
 
-    if (!user || !user.resetTokenExpires || user.resetTokenExpires < new Date()) {
+    if (!user || !user.resetTokenExpires || new Date(user.resetTokenExpires) < new Date()) {
         redirect(303, "/login");
     }
 
@@ -34,16 +39,25 @@ export const actions = {
             redirect(303, "/login");
         }
 
-        const user = await locals.em.findOne(User, { id: parseInt(userId), resetToken: token });
+        const [user] = await locals.db.select().from(accounts).where(and(
+            eq(accounts.id, parseInt(userId)),
+            eq(accounts.resetToken, token)
+        )).limit(1);
 
         if (!user) {
-            throw fail(400, { error: "User not found" });
+            error(400, new Error("User not found"));
         }
 
-        if (!user.resetTokenExpires || user.resetTokenExpires < new Date()) {
-            user.resetToken = undefined;
-            user.resetTokenExpires = undefined;
-            await locals.em.persistAndFlush(user);
+        if (!user.resetTokenExpires) {
+            error(400, new Error("Token expired"));
+        }
+
+        const expirationDate = new Date(user.resetTokenExpires as string);
+        if (expirationDate < new Date()) {
+            await locals.db
+                .update(accounts)
+                .set({ resetToken: null, resetTokenExpires: null })
+                .where(eq(accounts.id, parseInt(userId)));
 
             return fail(400, { error: "Token expired" });
         }
@@ -53,15 +67,16 @@ export const actions = {
         }
 
         const weakPassword = password.length < 8;
-		if (weakPassword) {
-			return fail(400, { token, userId, error: "Password too weak" });
-		}
+        if (weakPassword) {
+            return fail(400, { token, userId, error: "Password too weak" });
+        }
 
-        user.password = await User.hashPassword(password);
-        user.resetToken = undefined;
-        user.resetTokenExpires = undefined;
+        const hash = await hashPassword(password);
 
-        await locals.em.persistAndFlush(user);
+        await locals.db
+            .update(accounts)
+            .set({ resetToken: null, resetTokenExpires: null, password: hash })
+            .where(eq(accounts.id, parseInt(userId)));
 
         redirect(303, "/login");
     },

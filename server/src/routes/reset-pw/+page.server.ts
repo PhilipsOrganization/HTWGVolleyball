@@ -1,7 +1,9 @@
-import { User, UserRepository } from '$lib/db/entities/course-spot.js';
+import { accounts } from '$lib/db/schema.js';
 import { sendEmail } from '$lib/email/index.js';
 import ResetPassword from '$lib/email/templates/reset-password.svelte';
-import { type Actions, fail, redirect } from '@sveltejs/kit';
+import { findOneByNameOrEmail } from '$lib/helpers/account.js';
+import { fail, redirect, type Actions } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 
 export const actions = {
     "reset-pw": async ({ locals, request }) => {
@@ -11,20 +13,20 @@ export const actions = {
             return fail(400, { error: "Missing credentials" });
         }
 
-        const repo = locals.em.getRepository(User) as UserRepository;
-        const user = await repo.findOneByNameOrEmail(userNameOrEmail);
+        const db = locals.db;
+        const user = await findOneByNameOrEmail(userNameOrEmail, db);
         if (!user) {
             return fail(400, { error: 'User not found' });
         }
 
         const token = encodeURIComponent(crypto.getRandomValues(new Uint8Array(32)).join(""))
 
-        locals.em.assign(user, {
-            resetToken: token,
-            resetTokenExpires: new Date(Date.now() + 1000 * 60 * 60 * 24)
-        });
-
-        await locals.em.persistAndFlush(user);
+        db.update(accounts)
+            .set({
+                resetToken: token,
+                resetTokenExpires: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString()
+            })
+            .where(eq(accounts.id, user.id));
 
         await sendEmail(ResetPassword, { user, subject: "Reset Password", props: { user, token } });
         redirect(303, "/login");

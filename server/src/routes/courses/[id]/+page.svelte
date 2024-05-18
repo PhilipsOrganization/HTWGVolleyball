@@ -79,7 +79,7 @@
 			{/if}
 		</h2>
 		<p class="bold">{course.time}</p>
-		<p>{intl.format(course.date)}</p>
+		<p>{intl.format(new Date(course.date))}</p>
 		<p>{course.location}</p>
 
 		{#if admin}
@@ -91,7 +91,7 @@
 				hour: 'numeric',
 				minute: 'numeric'
 			})}
-			<p>Is published on: {intlAdmin.format(course.publishOn)}</p>
+			<p>Is published on: {intlAdmin.format(new Date(course.publishOn))}</p>
 		{/if}
 		<p class:waitList>
 			{course.signupCount}/{course.maxParticipants} Registrations

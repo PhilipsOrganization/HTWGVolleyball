@@ -1,4 +1,7 @@
 import { pgTable, serial, varchar, timestamp, index, integer, boolean, primaryKey } from "drizzle-orm/pg-core"
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+
+export type DB = PostgresJsDatabase<Record<string, never>>;
 
 export const courses = pgTable("courses", {
 	id: serial("id").primaryKey().notNull(),
@@ -62,16 +65,3 @@ export const courseSpots = pgTable("course_spots", {
 		}
 	}
 );
-
-export type SanitizedAccount = Pick<Account, 'id' | 'username' | 'role'>;
-
-export function sanitizeUser(account: Account): SanitizedAccount {
-	const user = {
-		id: account.id,
-		username: account.username,
-		role: account.role,
-	};
-
-	return user;
-}
-

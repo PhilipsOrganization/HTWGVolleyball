@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
-import type { User } from '$lib/db/entities';
 import webpush from 'web-push';
 import { building } from '$app/environment';
+import type { Account } from '$lib/db/schema.js';
 
 const publicVapidKey = env.VITE_VAPID_PUBLIC;
 const privateVapidKey = env.VAPID_PRIVATE;
@@ -55,12 +55,19 @@ export class DropCourseAction extends BasicAction {
 	}
 }
 
-export async function sendNotification(user: User, payload: string, actions: NotificationAction[] = []) {
-	const subscription = user.subscription;
-
-	if (!subscription) {
+export async function sendNotification(user: Account, payload: string, actions: NotificationAction[] = []) {
+	if (!user.subscriptionEndpoint || !user.subscriptionAuth || !user.subscriptionP256Dh) {
 		return;
 	}
 
-	await webpush.sendNotification(subscription.toJSON(), JSON.stringify({ title: payload, actions }));
+	const subscription = {
+		endpoint: user.subscriptionEndpoint,
+		expirationTime: user.subscriptionExpirationTime,
+		keys: {
+			auth: user.subscriptionAuth,
+			p256dh: user.subscriptionP256Dh
+		},
+	};
+
+	await webpush.sendNotification(subscription, JSON.stringify({ title: payload, actions }));
 }

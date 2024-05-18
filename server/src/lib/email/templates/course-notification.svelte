@@ -2,12 +2,12 @@
 	import { Container, Head, Hr, Html, Section, Text, Preview, Link, Column } from 'svelte-email';
 
 	/**
-	 * @type {import("$lib/db/entities").User}
+	 * @type {import("$lib/db/schema").Account}
 	 */
 	export let user;
 
 	/**
-	 * @type {import("$lib/db/entities").Course}
+	 * @type {import("$lib/db/schema").Course}
 	 */
 	export let course;
 

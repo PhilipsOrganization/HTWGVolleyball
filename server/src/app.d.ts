@@ -1,19 +1,20 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { User } from '$lib/db/entities';
-import type { SqlEntityManager } from '@mikro-orm/postgresql';
+import type { Account, DB } from '$lib/db/schema.ts';
+
 
 // for information about these interfaces
 declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-			em: SqlEntityManager;
-			user?: User;
+			db: DB;
+			user?: Account;
 		}
 		// interface PageData {}
 		// interface Platform {}
 	}
 }
 
-export {};
+export { };
+

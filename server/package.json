@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
+		"migrate": "drizzle-orm migrate",
 		"preview": "vite preview --host",
 		"test": "playwright test",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -33,9 +34,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@mikro-orm/core": "^5.9.8",
-		"@mikro-orm/migrations": "^5.9.8",
-		"@mikro-orm/postgresql": "^5.9.8",
 		"@neoconfetti/svelte": "^1.0.0",
 		"@sentry/sveltekit": "^7.113.0",
 		"@sveltejs/adapter-node": "^2.1.2",
@@ -43,6 +41,7 @@
 		"date-fns": "^2.30.0",
 		"date-fns-tz": "^2.0.1",
 		"dotenv": "^16.4.5",
+		"drizzle-kit": "^0.21.2",
 		"drizzle-orm": "^0.30.10",
 		"postgres": "^3.4.4",
 		"resend": "^2.1.0",
@@ -51,11 +50,5 @@
 		"vite-plugin-ts": "1.3.2-1",
 		"web-push": "^3.6.7",
 		"zod": "^3.23.6"
-	},
-	"mikro-orm": {
-		"useTsNode": true,
-		"configPaths": [
-			"./src/lib/db/mikro-orm.config.ts"
-		]
 	}
 }

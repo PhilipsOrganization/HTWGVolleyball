@@ -2,7 +2,7 @@
 	import { Button, Container, Head, Hr, Html, Section, Text } from 'svelte-email';
 
 	/**
-	 * @type {import("$lib/db/entities").User}
+	 * @type {import("$lib/db/schema").Account}
 	 */
 	export let user;
 

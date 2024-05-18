@@ -1,5 +1,6 @@
-import { User } from '$lib/db/entities';
 import { Role } from '$lib/db/role';
+import { accounts } from '$lib/db/schema';
+import { sanitizeUser, serializeUser } from '$lib/helpers/account';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
@@ -8,10 +9,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(303, '/courses');
 	}
 
-	const users = await locals.em.find(User, {}, { orderBy: { role: 'ASC', username: 'ASC' } });
-
+	const users = await locals.db.select().from(accounts).orderBy(accounts.role, accounts.username);
 	return {
-		users: users.map((u) => u.toJSON()),
-		user: locals.user.toJSON()
+		users: users.map((u) => sanitizeUser(u)),
+		user: serializeUser(locals.user)
 	};
 };

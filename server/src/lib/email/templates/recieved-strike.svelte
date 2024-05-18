@@ -1,6 +1,5 @@
 <script>
-	import { format } from 'date-fns';
-	import { Container, Head, Hr, Html, Section, Text, Preview, Link, Column } from 'svelte-email';
+	import { Column, Container, Head, Html, Link, Preview, Section, Text } from 'svelte-email';
 
 	/**
 	 * @type {import("$lib/db/schema").Account}
@@ -12,7 +11,11 @@
 	 */
 	export let course;
 
-	const date = format(new Date(course.date), 'EEEE, MMMM do, yyyy');
+    /**
+     * @type {import("$lib/db/schema").Account}
+     */
+    export let admin;
+
 	const fontFamily = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';
 	const main = { backgroundColor: '#fff' };
 
@@ -20,19 +23,6 @@
 		margin: '0 auto',
 		padding: '20px 0 48px',
 		width: '580px'
-	};
-
-	const button = {
-		fontFamily,
-		padding: '12px',
-		backgroundColor: '#9cc1cf',
-		borderRadius: '3px',
-		color: '#000',
-		fontSize: '18px',
-		textDecoration: 'none',
-		textAlign: 'center',
-		display: 'block',
-		width: '90%'
 	};
 
 	const paragraph = {
@@ -60,19 +50,20 @@
 
 <Html lang="en">
 	<Head />
-	<Preview preview={'Course Signup Notification'} />
+	<Preview preview={'You have received a strike :('} />
 	<Section style={main}>
 		<Container style={container}>
 			<Text style={heading}>Hello, {user.username}!</Text>
-			<Text style={paragraph}>A spot opened up for you!</Text>
+			<Text style={paragraph}>You have signed up for a course today:</Text>
 			<Section style={box}>
 				<Text style={{ ...heading, fontSize: '22px' }}>{course.name}</Text>
-				<Text style={paragraph}>Date: {date}</Text>
 				<Text style={paragraph}>Time: {course.time}</Text>
 				<Text style={paragraph}>Location: {course.location}</Text>
-
-				<Link style={button} href="https://volleyball.oesterlin.dev/course/{course.id}">View Course</Link>
 			</Section>
+
+            <Text style={paragraph}>You have received a strike for not showing up to the course.</Text>
+            <Text style={paragraph}>Number of Strikes: {user.strikes}</Text>
+            <Text style={paragraph}>If you have any questions, please contact {admin.username}.</Text>
 		</Container>
 	</Section>
 

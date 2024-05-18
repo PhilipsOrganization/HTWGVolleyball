@@ -1,11 +1,13 @@
-import { Course, CourseSpot, User } from "$lib/db/entities";
 import { Role } from "$lib/db/role";
-import { accounts, courseSpots, courses, sanitizeUser, type Account, type SanitizedAccount } from "$lib/db/schema.js";
+import { accounts, courseSpots, courses, type Course, type DB } from "$lib/db/schema.js";
 import { sendEmail } from "$lib/email";
 import OpenSpot from "$lib/email/templates/open-spot.svelte";
+import RecievedStrike from "$lib/email/templates/recieved-strike.svelte";
+import { serializeUser } from "$lib/helpers/account.js";
+import { getCourseWithUsers, isCourseInThePast, serializeCourse } from "$lib/helpers/course.js";
 import { DropCourseAction, OpenCourseAction, OpenProfileAction, sendNotification } from "$lib/helpers/notification";
 import { error, redirect } from "@sveltejs/kit";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { PageServerLoad } from "./$types.js";
 
 export const load: PageServerLoad = async ({ locals, params }) => {
@@ -14,83 +16,52 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     }
 
     const id = parseInt(params.id);
-    const [course] = await locals.db.select({
-        courses,
-        accountsJson: sql<Account[]>`json_agg(accounts order by course_spots.created_at asc)`.as('accountsJson'),
-        shouldPublish: sql<boolean>`(publish_on <= NOW() AND date >= (NOW() - INTERVAL '1 day'))`.as('shouldPublish'),
-    })
-        .from(courseSpots)
-        .leftJoin(courses, eq(courseSpots.courseId, courses.id))
-        .leftJoin(accounts, eq(courseSpots.userId, accounts.id))
-        .groupBy(courses.id)
-        .where(eq(courses.id, id))
-        .limit(1);
+    const course = await getCourseWithUsers(locals.db, id);
+
+    if (!course || !course.courses) {
+        error(400, 'Course not found');
+    }
 
     if (!course.shouldPublish && locals.user.role === Role.USER) {
         error(400, 'Course not jet published');
     }
 
     return {
-        course: serialize(course, locals.user),
-        user: locals.user.toJSON()
+        course: serializeCourse(course, locals.user),
+        user: serializeUser(locals.user)
     };
 };
 
-function serialize(data: { courses: Course | null, accountsJson: Account[] }, user?: Account) {
-    if (!data.courses) {
-        error(404, 'Course not found');
-    }
 
-    const course = data.courses;
-    const accounts = data.accountsJson;
-
-    const signupCount = accounts.length;
-
-    const serialized = {
-        ...course,
-        date: new Date(course.date),
-        publishOn: new Date(course.publishOn),
-        signupCount,
-        participants: [] as SanitizedAccount[],
-    };
-
-    if (!user) {
-        return serialized;
-    }
-
-    if (user.role !== Role.USER) {
-        serialized.participants = accounts.map(sanitizeUser);
-    }
-
-    const isEnrolled = accounts.some((a) => a.id === user.id);
-    const spot = accounts.findIndex((a) => a.id === user.id);
-    const isOnWaitlist = spot >= course.maxParticipants;
-
-    return {
-        ...serialized,
-        isEnrolled,
-        spot,
-        isOnWaitlist,
-    };
-}
-
-function notifyNextUser(course: Course) {
+async function notifyNextUser(course: Course, db: DB) {
     const spots = course.maxParticipants;
-    const users = course.users.getItems();
+
+    const users = await db.select()
+        .from(courseSpots)
+        .leftJoin(accounts, eq(courseSpots.userId, accounts.id))
+        .where(eq(courseSpots.courseId, course.id))
+        .orderBy(courseSpots.createdAt);
+
+    // If there are no users on the waitlist, return
     if (users.length <= spots) {
         return;
     }
 
+    // Get the user on the waitlist that is next in line 
     const userOnWaitlist = users.at(spots - 1);
-    if (!userOnWaitlist) {
+    if (!userOnWaitlist || !userOnWaitlist.accounts) {
         return;
     }
 
-    if (userOnWaitlist.hasNotificationsEnabled) {
-        return sendNotification(userOnWaitlist, `A spot in ${course.name} Course has opened up for you!`, [new OpenCourseAction(course.id), new DropCourseAction(course.id)]);
+    // Notify the user that a spot has opened up
+    if (userOnWaitlist.accounts.subscriptionAuth) {
+        return sendNotification(userOnWaitlist.accounts,
+            `A spot in ${course.name} Course has opened up for you!`,
+            [new OpenCourseAction(course.id), new DropCourseAction(course.id)]
+        );
     } else {
         return sendEmail(OpenSpot, {
-            user: userOnWaitlist,
+            user: userOnWaitlist.accounts,
             subject: `A spot in ${course.name} Course has opened up for you!`,
             props: { course, user: userOnWaitlist }
         });
@@ -113,26 +84,52 @@ export const actions = {
         }
 
         const courseId = parseInt(courseIdString);
-        let course = await locals.em.findOne(Course, { id: courseId });
+
+        const [course] = await locals.db
+            .select({
+                courses,
+                shouldPublish: sql<boolean>`(${courses.publishOn} <= NOW() AND ${courses.date} >= (NOW() - INTERVAL '1 day'))`.as('shouldPublish'),
+            })
+            .from(courses)
+            .where(eq(courses.id, courseId))
+            .limit(1);
+
         if (!course) {
             error(400, 'Course not found');
         }
 
-        if (locals.user.courses.contains(course)) {
+        if (isCourseInThePast(course.courses)) {
+            error(400, 'Course is in the past');
+        }
+
+        if (locals.user.role === Role.USER && !course.shouldPublish) {
+            error(400, 'Course not jet published');
+        }
+
+        const [isEnrolled] = await locals.db
+            .select()
+            .from(courseSpots)
+            .where(and(
+                eq(courseSpots.userId, locals.user.id),
+                eq(courseSpots.courseId, courseId)
+            ))
+            .limit(1);
+
+        if (isEnrolled) {
             error(400, 'Already enrolled');
         }
 
-        const spot = locals.em.create(CourseSpot, {
-            course,
-            user: locals.user,
-            createdAt: new Date(),
-        });
+        await locals.db
+            .insert(courseSpots)
+            .values({
+                userId: locals.user.id,
+                courseId: courseId,
+            });
 
-        await locals.em.persistAndFlush(spot);
-        course = await locals.em.findOneOrFail(Course, { id: courseId }, { refresh: true });
+        const updated = await getCourseWithUsers(locals.db, courseId);
 
         return {
-            course: course.toJSON(locals.user),
+            course: serializeCourse(updated, locals.user),
         };
     },
     drop: async ({ locals, params }) => {
@@ -146,22 +143,43 @@ export const actions = {
         }
 
         const courseId = parseInt(courseIdString);
-        const course = await locals.em.findOne(Course, { id: courseId });
+        const [course] = await locals.db.select().from(courses).where(eq(courses.id, courseId)).limit(1);
         if (!course) {
             error(400, 'Course not found');
         }
 
-        if (!locals.user.courses.contains(course)) {
+        if (isCourseInThePast(course)) {
+            error(400, 'Course is in the past');
+        }
+
+        const [isEnrolled] = await locals.db
+            .select()
+            .from(courseSpots)
+            .where(and(
+                eq(courseSpots.userId, locals.user.id),
+                eq(courseSpots.courseId, courseId)
+            ))
+            .limit(1);
+
+        if (!isEnrolled) {
             error(400, 'Not enrolled');
         }
 
-        locals.user.courses.remove(course);
-        course.users.remove(locals.user);
-        await locals.em.persistAndFlush([locals.user, course]);
+        await locals.db
+            .delete(courseSpots)
+            .where(and(
+                eq(courseSpots.userId, locals.user.id),
+                eq(courseSpots.courseId, courseId)
+            ));
 
-        notifyNextUser(course);
+        const updated = await getCourseWithUsers(locals.db, courseId);
+
+        if (updated.courses) {
+            notifyNextUser(updated.courses, locals.db);
+        }
+
         return {
-            course: course.toJSON(locals.user),
+            course: serializeCourse(updated, locals.user),
         };
     },
     'delete-course': async ({ locals, params }) => {
@@ -175,18 +193,16 @@ export const actions = {
         }
 
         const courseId = parseInt(courseIdString);
-
-        const course = await locals.em.findOne(Course, { id: courseId });
+        const [course] = await locals.db.select().from(courses).where(eq(courses.id, courseId)).limit(1);
 
         if (!course) {
             error(400, 'Course not found');
         }
 
-        await locals.em.transactional(async em => {
-            course.users.removeAll();
-            await em.persistAndFlush(course);
-            await em.removeAndFlush(course);
-        })
+        await locals.db.transaction(async (db) => {
+            await db.delete(courseSpots).where(eq(courseSpots.courseId, courseId));
+            await db.delete(courses).where(eq(courses.id, courseId));
+        });
 
         redirect(303, `/admin`);
     },
@@ -197,7 +213,7 @@ export const actions = {
 
         const form = await request.formData();
         const courseId = parseInt(params.id as string);
-        const course = await locals.em.findOneOrFail(Course, { id: courseId });
+        const [course] = await locals.db.select().from(courses).where(eq(courses.id, courseId)).limit(1);
 
         const userIdString = form.get('userId') as string | undefined;
         if (!userIdString) {
@@ -205,14 +221,16 @@ export const actions = {
         }
 
         const userId = parseInt(userIdString);
-        const user = await locals.em.findOneOrFail(User, { id: userId });
-        course.users.remove(user);
+        await locals.db.delete(courseSpots).where(and(
+            eq(courseSpots.userId, userId),
+            eq(courseSpots.courseId, courseId)
+        ));
 
-        await locals.em.persistAndFlush(course);
+        notifyNextUser(course, locals.db);
 
-        notifyNextUser(course);
+        const updated = await getCourseWithUsers(locals.db, courseId);
         return {
-            course: course.toJSON(locals.user),
+            course: serializeCourse(updated, locals.user),
         };
     },
     strike: async ({ locals, request, params }) => {
@@ -222,7 +240,7 @@ export const actions = {
 
         const form = await request.formData();
         const courseId = parseInt(params.id as string);
-        const course = await locals.em.findOneOrFail(Course, { id: courseId });
+        const [course] = await locals.db.select().from(courses).where(eq(courses.id, courseId)).limit(1);
 
         const userIdString = form.get('userId') as string | undefined;
         if (!userIdString) {
@@ -230,15 +248,19 @@ export const actions = {
         }
 
         const userId = parseInt(userIdString);
-        const user = await locals.em.findOneOrFail(User, { id: userId });
+        // const user = await locals.db.select().from(accounts).where(eq(accounts.id, userId)).limit(1);
 
-        user.strikes += 1;
-        await locals.em.persistAndFlush(user);
+        await locals.db.update(accounts).set({ strikes: sql`${accounts.strikes} + 1` }).where(eq(accounts.id, userId));
+        const [user] = await locals.db.select().from(accounts).where(eq(accounts.id, userId)).limit(1);
 
-        sendNotification(user, `You have been striked for Course "${course.name}" by ${locals.user.username}`, [new OpenCourseAction(course.id), new OpenProfileAction()]);
-
-        return {
-            course: course.toJSON(locals.user),
-        };
+        if (user.subscriptionAuth) {
+            sendNotification(user, `You have been striked for Course "${course.name}" by ${locals.user.username}`, [new OpenCourseAction(course.id), new OpenProfileAction()]);
+        } else {
+            sendEmail(RecievedStrike, {
+                user: user,
+                subject: `You have been striked for Course "${course.name}" by ${locals.user.username}`,
+                props: { course, user: user, admin: locals.user }
+            });
+        }
     },
 };
