@@ -47,7 +47,7 @@ export function serializeCourse(data: { courses: Course | null, accountsJson: Ac
 export async function getCourseWithUsers(db: DB, id: number) {
     const [updated] = await db.select({
         courses,
-        accountsJson: sql<Account[] | [null]>`json_agg(accounts order by course_spots.created_at asc)`.as('accountsJson'),
+        accountsJson: sql<Account[] | [null]>`json_agg(accounts order by ${courseSpots.createdAt} asc)`.as('accountsJson'),
         shouldPublish: sql<boolean>`(${courses.publishOn} <= NOW() AND ${courses.date} >= (NOW() - INTERVAL '1 day'))`.as('shouldPublish'),
     })
         .from(courseSpots)

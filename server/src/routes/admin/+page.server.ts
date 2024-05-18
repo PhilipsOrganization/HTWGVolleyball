@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const result = await locals.db
 		.select({
 			courses,
-			accountsJson: sql<Account[] | [null]>`json_agg(accounts order by course_spots.created_at asc)`.as('accountsJson'),
+			accountsJson: sql<Account[] | [null]>`json_agg(accounts order by ${courseSpots.createdAt} asc)`.as('accountsJson'),
 		})
 		.from(courseSpots)
 		.fullJoin(courses, eq(courseSpots.courseId, courses.id))
