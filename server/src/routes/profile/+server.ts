@@ -1,8 +1,10 @@
-import { Subscription } from '$lib/db/entities/subscription';
 import { OpenAppAction, OpenProfileAction, sendNotification } from '$lib/helpers/notification';
 import { redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
+import { eq } from 'drizzle-orm';
+import { accounts } from '$lib/db/schema';
+import { serializeUser } from '$lib/helpers/account';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) {
@@ -23,18 +25,37 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		})
 		.parse(body);
 
-	const subscription = new Subscription(safeSubscription.subscription);
-	locals.user.subscription = subscription;
+	await locals.db
+		.update(accounts)
+		.set({
+			subscriptionAuth: safeSubscription.subscription.keys.auth,
+			subscriptionP256Dh: safeSubscription.subscription.keys.p256dh,
+			subscriptionEndpoint: safeSubscription.subscription.endpoint,
+			subscriptionExpirationTime: safeSubscription.subscription.expirationTime
+		})
+		.where(eq(accounts.id, locals.user.id));
 
 	try {
 		await sendNotification(locals.user, 'test notification', [new OpenAppAction(), new OpenProfileAction()]);
 	} catch (e) {
-		locals.user.subscription = undefined;
+		await locals.db
+			.update(accounts)
+			.set({
+				subscriptionAuth: null,
+				subscriptionP256Dh: null,
+				subscriptionEndpoint: null,
+				subscriptionExpirationTime: null
+			})
+			.where(eq(accounts.id, locals.user.id));
 	}
 
-	await locals.em.persistAndFlush(locals.user);
+	const [updated] = await locals.db
+		.select()
+		.from(accounts)
+		.where(eq(accounts.id, locals.user.id))
+		.limit(1);
 
-	return new Response(JSON.stringify(locals.user.toJSON()));
+	return new Response(JSON.stringify(serializeUser(updated)));
 };
 
 export const DELETE: RequestHandler = async ({ locals }) => {
@@ -42,8 +63,21 @@ export const DELETE: RequestHandler = async ({ locals }) => {
 		redirect(303, '/login');
 	}
 
-	locals.user.subscription = undefined;
-	await locals.em.persistAndFlush(locals.user);
+	await locals.db
+		.update(accounts)
+		.set({
+			subscriptionAuth: null,
+			subscriptionP256Dh: null,
+			subscriptionEndpoint: null,
+			subscriptionExpirationTime: null
+		})
+		.where(eq(accounts.id, locals.user.id));
 
-	return new Response(JSON.stringify(locals.user.toJSON()));
+	const [updated] = await locals.db
+		.select()
+		.from(accounts)
+		.where(eq(accounts.id, locals.user.id))
+		.limit(1);
+
+	return new Response(JSON.stringify(serializeUser(updated)));
 };

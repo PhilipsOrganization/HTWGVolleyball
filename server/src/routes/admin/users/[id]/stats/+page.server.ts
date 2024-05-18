@@ -1,26 +1,53 @@
-import { UserStats } from '$lib/db/entities/user-stats';
 import { Role } from '$lib/db/role';
-import { error, redirect, type Actions } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
-import { Course, User } from '$lib/db/entities';
-import { getPath } from '$lib/helpers/stats';
+import { accounts, courseSpots, courses } from '$lib/db/schema';
 import { sendEmail } from '$lib/email';
 import ResetPassword from '$lib/email/templates/reset-password.svelte';
+import { generateRandomToken, serializeUser } from '$lib/helpers/account';
+import { error, redirect, type Actions } from '@sveltejs/kit';
+import { count, eq, sql } from 'drizzle-orm';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
 		redirect(303, '/courses');
 	}
 
-	const user = await locals.em.findOneOrFail(User, { id: parseInt(params.id) });
-	const stats = await locals.em.find(UserStats, { userId: parseInt(params.id) });
-	const totalRegistrations = await locals.em.find(Course, { users: user }, { populate: [], fields: ['date'], orderBy: { date: 'ASC' } });
+	const userIdString = params.id as string | undefined;
+	if (!userIdString) {
+		error(400, 'No userId provided');
+	}
+
+	const userId = parseInt(userIdString);
+	const stats = await locals.db
+		.select({ name: courses.name, count: count() })
+		.from(courseSpots)
+		.leftJoin(courses, eq(courseSpots.courseId, courses.id))
+		.where(eq(courseSpots.userId, userId))
+		.groupBy(courses.name, accounts.id)
+		.limit(10);
+
+	const timeDiff = sql`extract(epoch from ${courseSpots.createdAt}) - extract(epoch from ${courses.publishOn})`;
+	const [registrationStats] = await locals.db.select({
+		avg: sql<number>`avg(${timeDiff})`.as('avg'),
+		min: sql<number>`min(${timeDiff})`.as('min'),
+	})
+		.from(courseSpots)
+		.leftJoin(courses, eq(courseSpots.courseId, courses.id))
+		.where(eq(courseSpots.userId, userId))
+		.groupBy(courseSpots.userId)
+		.limit(1);
+
+	const [totalRegistrations] = await locals.db.select({ count: count() })
+		.from(courseSpots)
+		.where(eq(courseSpots.userId, userId))
+		.limit(1);
 
 	return {
-		user: user.toJSON(),
-		stats: stats.map((s) => s.toJSON()),
-		totalRegistrations: totalRegistrations.length,
-		svg: getPath(totalRegistrations)
+		user: serializeUser(locals.user),
+		stats,
+		registrationStats,
+		totalRegistrations: totalRegistrations.count,
+		// svg: getPath(totalRegistrations)
 	};
 };
 
@@ -36,7 +63,11 @@ export const actions = {
 		}
 
 		const userId = parseInt(userIdString);
-		const user = await locals.em.findOne(User, { id: userId });
+		const [user] = await locals.db
+			.select()
+			.from(accounts)
+			.where(eq(accounts.id, userId))
+			.limit(1);
 
 		if (!user) {
 			error(400, 'User not found');
@@ -46,9 +77,10 @@ export const actions = {
 			error(400, 'Cannot demote super admin');
 		}
 
-		user.role = Role.USER;
-		user.sessionToken = undefined;
-		await locals.em.persistAndFlush(user);
+		await locals.db
+			.update(accounts)
+			.set({ role: Role.USER })
+			.where(eq(accounts.id, userId));
 	},
 	promote: async ({ locals, params }) => {
 		if (locals.user?.role !== Role.ADMIN && locals.user?.role !== Role.SUPER_ADMIN) {
@@ -61,7 +93,12 @@ export const actions = {
 		}
 
 		const userId = parseInt(userIdString);
-		const user = await locals.em.findOne(User, { id: userId });
+		const [user] = await locals.db.
+			select()
+			.from(accounts)
+			.where(eq(accounts.id, userId))
+			.limit(1);
+
 		if (!user) {
 			error(400, 'User not found');
 		}
@@ -70,9 +107,10 @@ export const actions = {
 			error(400, 'Cannot promote super admin');
 		}
 
-		user.role = Role.ADMIN;
-		user.sessionToken = undefined;
-		await locals.em.persistAndFlush(user);
+		await locals.db
+			.update(accounts)
+			.set({ role: Role.ADMIN })
+			.where(eq(accounts.id, userId));
 	},
 	note: async ({ locals, params, request }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
@@ -85,12 +123,13 @@ export const actions = {
 		}
 
 		const userId = parseInt(userIdString);
-		const user = await locals.em.findOneOrFail(User, { id: userId });
 		const form = await request.formData();
 		const notes = form.get('notes') as string | undefined;
 
-		user.notes = notes;
-		await locals.em.persistAndFlush(user);
+		await locals.db
+			.update(accounts)
+			.set({ notes })
+			.where(eq(accounts.id, userId));
 	},
 	unstrike: async ({ locals, params }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
@@ -103,38 +142,39 @@ export const actions = {
 		}
 
 		const userId = parseInt(userIdString);
-		const user = await locals.em.findOne(User, { id: userId });
-		if (!user) {
-			error(400, 'User not found');
-		}
-
-		user.strikes = Math.max(0, user.strikes - 1);
-
-		await locals.em.persistAndFlush(user);
+		await locals.db
+			.update(accounts)
+			.set({ strikes: sql<number>`GREATEST(0, ${accounts.strikes} - 1)` })
+			.where(eq(accounts.id, userId));
 	},
 	delete: async ({ locals, params }) => {
 		if (!locals.user || locals.user.role !== Role.SUPER_ADMIN) {
 			redirect(303, "/login");
 		}
 
-		const userId = params.id as string | undefined;
-		if (!userId) {
+		const userIdString = params.id as string | undefined;
+		if (!userIdString) {
 			error(400, "No userId provided");
 		}
 
-		const user = await locals.em.findOneOrFail(User, { id: parseInt(userId) });
+		const userId = parseInt(userIdString);
+		const [user] = await locals.db
+			.select()
+			.from(accounts)
+			.where(eq(accounts.id, userId))
+			.limit(1);
+
+		if (!user) {
+			error(400, "User not found");
+		}
+
 		if (user.role !== Role.USER) {
 			error(400, "Cannot delete user");
 		}
 
-		const courses = await locals.em.find(Course, { users: user });
-		for (const course of courses) {
-			course.users.remove(user);
-		}
-
-		await locals.em.transactional(async em => {
-			await em.persistAndFlush(courses);
-			await em.removeAndFlush(user);
+		await locals.db.transaction(async db => {
+			await db.delete(courseSpots).where(eq(courseSpots.userId, userId));
+			await db.delete(accounts).where(eq(accounts.id, userId));
 		});
 
 		redirect(303, "/admin/users");
@@ -150,19 +190,24 @@ export const actions = {
 		}
 
 		const userId = parseInt(userIdString);
-		const user = await locals.em.findOne(User, { id: userId });
+		const [user] = await locals.db
+			.select()
+			.from(accounts)
+			.where(eq(accounts.id, userId))
+			.limit(1);
 		if (!user) {
 			error(400, 'User not found');
 		}
 
-		const token = encodeURIComponent(crypto.getRandomValues(new Uint8Array(32)).join(""))
+		const token = generateRandomToken();
 
-		locals.em.assign(user, {
-			resetToken: token,
-			resetTokenExpires: new Date(Date.now() + 1000 * 60 * 60 * 24)
-		});
-
-		await locals.em.persistAndFlush(user);
+		await locals.db
+			.update(accounts)
+			.set({
+				resetToken: token,
+				resetTokenExpires: sql<Date>`NOW() + INTERVAL '1 day'`
+			})
+			.where(eq(accounts.id, userId));
 
 		await sendEmail(ResetPassword, { user, subject: "Reset Password", props: { user, token } });
 	}

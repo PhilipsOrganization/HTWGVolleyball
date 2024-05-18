@@ -1,7 +1,9 @@
 import { env } from '$env/dynamic/private';
-import { User, UserRepository } from '$lib/db/entities';
+import { accounts } from '$lib/db/schema.js';
+import { findOneByNameOrEmail, generateRandomToken, isPasswordCorrect } from '$lib/helpers/account.js';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
-import type { PageServerLoad } from '../$types';
+import { eq } from 'drizzle-orm';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
@@ -20,20 +22,21 @@ export const actions = {
 			return fail(400, { missingCredentials: true });
 		}
 
-		const repo = locals.em.getRepository(User) as UserRepository;
-		const user = await repo.findOneByNameOrEmail(username);
+		const user = await findOneByNameOrEmail(username, locals.db);
 		if (!user) {
 			return fail(400, { username, userNotFound: true });
 		}
 
-		const correct = await user.isPasswordCorrect(password);
+		const correct = await isPasswordCorrect(user, password);
 		if (!correct) {
 			return fail(400, { username, wrongPassword: true });
 		}
 
-		const sessionToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-		user.sessionToken = sessionToken;
-		await locals.em.persistAndFlush(user);
+		const sessionToken = generateRandomToken();
+		await locals.db
+			.update(accounts)
+			.set({ lastLogin: new Date().toISOString(), sessionToken })
+			.where(eq(accounts.id, user.id));
 
 		const expirationDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 21);
 		cookies.set('user', sessionToken, { path: '/', expires: expirationDate });

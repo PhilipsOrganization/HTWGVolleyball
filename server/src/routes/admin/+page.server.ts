@@ -1,12 +1,13 @@
-import { redirect, type Actions, error, fail } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
-import { Course, orderCourse } from '$lib/db/entities';
 import { Role } from '$lib/db/role';
-import { assign } from '@mikro-orm/core';
-import { User } from '$lib/db/entities';
-import { z } from 'zod';
-import { startOfYesterday } from 'date-fns';
+import { accounts, courseSpots, courses, type Account } from '$lib/db/schema';
+import { serializeUser } from '$lib/helpers/account';
+import { serializeCourse } from '$lib/helpers/course';
+import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { zonedTimeToUtc } from "date-fns-tz";
+import { desc, eq, gte, sql } from 'drizzle-orm';
+import { z } from 'zod';
+import type { PageServerLoad } from './$types';
+import { startOfYesterday } from 'date-fns';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -15,35 +16,42 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	// find all courses that take place in the future
 	const showArchived = url.searchParams.has('archived');
-	const courses = await locals.em.find(Course, showArchived ? {} : { date: { $gte: startOfYesterday() } }, { orderBy: { date: 'DESC', time: "ASC" } });
+	const dateQuery = showArchived ?
+		sql<boolean>`true` : // show all courses
+		gte(courses.publishOn, startOfYesterday().toISOString()); // show all courses that are not in the past
 
-	const dates: { [date: string]: Course[] } = {};
+	const result = await locals.db
+		.select({
+			courses,
+			accountsJson: sql<Account[] | [null]>`json_agg(accounts order by course_spots.created_at asc)`.as('accountsJson'),
+		})
+		.from(courseSpots)
+		.fullJoin(courses, eq(courseSpots.courseId, courses.id))
+		.fullJoin(accounts, eq(courseSpots.userId, accounts.id))
+		.groupBy(courses.id)
+		.where(dateQuery)
+		.orderBy(desc(courses.date), courses.time);
 
-	for (const course of courses) {
-		const date = course.date.toISOString().substr(0, 10);
-		if (!dates[date]) {
-			dates[date] = [];
+	const dates = new Map<string, typeof result>();
+
+	for (const course of result) {
+		if (!course.courses) {
+			continue;
 		}
-		await orderCourse(course, locals.em);
-		dates[date].push(course);
-	}
 
-	const users = await locals.em.find(User, {});
-	let course: Course | null = null;
+		const date = new Date(course.courses.date).toISOString().substring(0, 10);
 
-	if (url.searchParams.has('course')) {
-		const courseId = parseInt(url.searchParams.get('course') ?? '');
-		course = await locals.em.findOne(Course, { id: courseId });
+		const courses = dates.get(date) ?? [];
+		courses.push(course);
+		dates.set(date, courses);
 	}
 
 	return {
-		users: users.map((u: User) => u.toJSON()),
-		dates: Object.entries(dates).map(([date, courses]) => ({
+		dates: Array.from(dates).map(([date, courses]) => ({
 			date,
-			courses: courses.map((c) => c.toJSON(locals.user))
+			courses: courses.map((data) => serializeCourse(data, locals.user))
 		})),
-		user: locals.user.toJSON(),
-		course: course?.toJSON(locals.user)
+		user: serializeUser(locals.user),
 	};
 };
 
@@ -66,55 +74,32 @@ export const actions = {
 		}
 
 		const form = await request.formData();
-		let dto: z.infer<typeof courseValidation>;
-		try {
-			dto = courseValidation.parse(Object.fromEntries(form.entries()));
-		} catch (e) {
-			const error = e as z.ZodError;
+		const dto = courseValidation.safeParse(Object.fromEntries(form.entries()));
+
+		if (!dto.success) {
 			const obj: Record<string, string> = {};
 
-			for (const issue of error.issues) {
+			for (const issue of dto.error.issues) {
 				obj[issue.path.join('.')] = issue.message;
 			}
 
 			return fail(400, obj);
 		}
 
-		const publishOn = new Date(dto.publishOn);
-		const data = {
-			...dto,
-			date: new Date(dto.date),
-			publishOn: zonedTimeToUtc(publishOn, 'Europe/Berlin'),
-			maxParticipants: parseInt(dto.maxParticipants)
-		};
+		const course = dto.data;
+		const publishOn = new Date(course.publishOn);
 
-		const course = new Course();
-		assign(course, data);
+		await locals.db
+			.insert(courses)
+			.values({
+				...course,
+				date: new Date(course.date).toISOString(),
+				publishOn: publishOn.toISOString(),
+				maxParticipants: parseInt(course.maxParticipants),
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString()
+			} satisfies typeof courses.$inferInsert);
 
-		await locals.em.persistAndFlush(course);
-
-		return;
+		return redirect(303, '/admin');
 	},
-
-	'update-course': async ({ locals, request }) => {
-		if (!locals.user || locals.user.role === Role.USER) {
-			redirect(303, '/login');
-		}
-
-		const form = await request.formData();
-		const courseIdString = form.get('courseId') as string | undefined;
-		const name = form.get('title') as string | undefined;
-		if (!courseIdString || !name) {
-			error(400, 'No courseId or title provided');
-		}
-
-		const courseId = parseInt(courseIdString);
-		const course = await locals.em.findOne(Course, { id: courseId });
-		if (!course) {
-			error(400, 'Course not found');
-		}
-
-		assign(course, { name });
-		await locals.em.persistAndFlush(course);
-	}
 } satisfies Actions;

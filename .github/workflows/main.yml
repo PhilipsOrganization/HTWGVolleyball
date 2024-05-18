@@ -20,11 +20,7 @@ jobs:
           echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
           echo "VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}" >> .env.local
           echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env.local
-          echo "MIKRO_ORM_DB_NAME=volleyball" >> .env.local
-          echo "MIKRO_ORM_HOST=postgres" >> .env.local
-          echo "MIKRO_ORM_PASSWORD=password" >> .env.local
-          echo "MIKRO_ORM_PORT=5432" >> .env.local
-          echo "MIKRO_ORM_USER=postgres" >> .env.local
+          echo "POSTGRES_CONNECTION_STRING=postgresql://postgres:password@postgres:5432/volleyball" >> .env.local
           cat .env.local
           cp .env.local ./server/.env.local
 

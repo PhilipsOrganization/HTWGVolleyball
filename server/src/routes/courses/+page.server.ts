@@ -1,30 +1,46 @@
+import { accounts, courseSpots, courses, type Account } from '$lib/db/schema.js';
+import { serializeUser } from '$lib/helpers/account';
+import { serializeCourse } from '$lib/helpers/course';
 import { redirect } from '@sveltejs/kit';
+import { eq, sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
-import { Course, orderCourse } from '$lib/db/entities';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
 		redirect(303, '/login');
 	}
 
-	const courses = await locals.em.find(Course, { shouldPublish: true }, { orderBy: { date: 'ASC', time: "ASC" } });
-	const dates: { [date: string]: Course[] } = {};
+	const result = await locals.db
+		.select({
+			courses,
+			accountsJson: sql<Account[]>`json_agg(accounts order by course_spots.created_at asc)`.as('accountsJson'),
+		})
+		.from(courseSpots)
+		.leftJoin(courses, eq(courseSpots.courseId, courses.id))
+		.leftJoin(accounts, eq(courseSpots.userId, accounts.id))
+		.groupBy(courses.id)
+		.where(eq(sql<boolean>`(publish_on <= NOW() AND date >= (NOW() - INTERVAL '1 day'))`, true))
+		.orderBy(courses.date, courses.time);
 
-	for (const course of courses) {
-		const date = course.date.toISOString().substr(0, 10);
-		if (!dates[date]) {
-			dates[date] = [];
+	const dates = new Map<string, typeof result>();
+
+	for (const course of result) {
+		if (!course.courses) {
+			continue;
 		}
-		await orderCourse(course, locals.em);
-		dates[date].push(course);
+
+		const date = new Date(course.courses.date).toISOString().substring(0, 10);
+
+		const courses = dates.get(date) ?? [];
+		courses.push(course);
+		dates.set(date, courses);
 	}
 
 	return {
-		courses: locals.user.courses.getItems().map((c) => c.toJSON()),
-		dates: Object.entries(dates).map(([date, courses]) => ({
+		dates: Array.from(dates).map(([date, courses]) => ({
 			date,
-			courses: courses.map((c) => c.toJSON(locals.user))
+			courses: courses.map((data) => serializeCourse(data, locals.user))
 		})),
-		user: locals.user.toJSON()
+		user: serializeUser(locals.user)
 	};
 };

@@ -1,12 +1,20 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
 	import { page } from '$app/stores';
+
 	export let title = 'Error';
+
+	const error = $page.error;
+	const stack = dev && error ? error.stack : '';
 </script>
 
 <section>
 	<h1>{title}</h1>
-	{#if $page.error}
-		<p>Error: {$page.error?.message}</p>
+	{#if error}
+		<p>Error: {error.message}</p>
+		{#if dev}
+			<p>{stack}</p>
+		{/if}
 	{/if}
 	<slot />
 </section>
@@ -27,6 +35,8 @@
 	}
 
 	p {
+		display: flex;
 		font-size: 18px;
+		max-width: 90%;
 	}
 </style>

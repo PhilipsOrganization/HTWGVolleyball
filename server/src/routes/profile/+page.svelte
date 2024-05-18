@@ -134,13 +134,13 @@
 	<h3>Statistics</h3>
 	<p>Registered for {data.totalRegistrations} courses</p>
 	{#each data.stats as course}
-		<p>{course.courseName}: {course.count}</p>
+		<p>{course.name}: {course.count}</p>
 	{:else}
 		<p>No courses registered</p>
 	{/each}
 	{#if data.registrationStats}
-		<p>Average Registration time: {approximatelyFormatTime(data.registrationStats.averageTime)}</p>
-		<p>Fastest Registration time: {approximatelyFormatTime(data.registrationStats.minTime)}</p>
+		<p>Average Registration time: {approximatelyFormatTime(data.registrationStats.avg)}</p>
+		<p>Fastest Registration time: {approximatelyFormatTime(data.registrationStats.min)}</p>
 	{/if}
 
 	<!-- <div id="stats">
