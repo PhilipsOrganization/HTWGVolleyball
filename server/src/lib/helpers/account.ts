@@ -21,7 +21,7 @@ export function hashPassword(password: string) {
 
 
 export async function isPasswordCorrect(user: Account, password: string) {
-    if (password || !user.password) {
+    if (!password || !user.password) {
         return false;
     }
 
