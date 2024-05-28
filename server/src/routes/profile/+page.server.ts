@@ -16,21 +16,23 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.from(courseSpots)
 		.leftJoin(courses, eq(courseSpots.courseId, courses.id))
 		.where(eq(courseSpots.userId, locals.user.id))
-		.groupBy(courses.name, accounts.id)
+		.groupBy(courses.name)
 		.limit(10);
 
 	const timeDiff = sql`extract(epoch from ${courseSpots.createdAt}) - extract(epoch from ${courses.publishOn})`;
-	const [registrationStats] = await locals.db.select({
-		avg: sql<number>`avg(${timeDiff})`.as('avg'),
-		min: sql<number>`min(${timeDiff})`.as('min'),
-	})
+	const [registrationStats] = await locals.db
+		.select({
+			avg: sql<number>`avg(${timeDiff})`.as('avg'),
+			min: sql<number>`min(${timeDiff})`.as('min')
+		})
 		.from(courseSpots)
 		.leftJoin(courses, eq(courseSpots.courseId, courses.id))
 		.where(eq(courseSpots.userId, locals.user.id))
 		.groupBy(courseSpots.userId)
 		.limit(1);
 
-	const [totalRegistrations] = await locals.db.select({ count: count() })
+	const [totalRegistrations] = await locals.db
+		.select({ count: count() })
 		.from(courseSpots)
 		.where(eq(courseSpots.userId, locals.user.id))
 		.limit(1);
@@ -39,7 +41,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		user: serializeUser(locals.user),
 		stats,
 		registrationStats,
-		totalRegistrations: totalRegistrations.count,
+		totalRegistrations: totalRegistrations.count
 		// svg: getPath(totalRegistrations)
 	};
 };
@@ -52,10 +54,7 @@ export const actions = {
 		}
 
 		const token = generateRandomToken();
-		await locals.db
-			.update(accounts)
-			.set({ emailVerificationToken: token })
-			.where(eq(accounts.id, user.id));
+		await locals.db.update(accounts).set({ emailVerificationToken: token }).where(eq(accounts.id, user.id));
 
 		await sendEmail(ConfirmEmail, { user, subject: 'Confirm your Email', props: { user: locals.user, token } });
 	}
