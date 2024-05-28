@@ -59,3 +59,32 @@ export function isOnDate(d1: Date | string, d2: Date | string): boolean {
 export function sort(d1: any, d2: any) {
 	return compareAsc(new Date(d1.date), new Date(d2.date));
 }
+
+/**
+ * format time in seconds to human readable format
+ * @param time in seconds
+ * @returns 
+ */
+export function approximatelyFormatTime(time: number) {
+	const days = Math.floor(time / 60 / 60 / 24);
+	const hours = Math.floor(time / 60 / 60) - days * 24;
+	const minutes = Math.floor(time / 60) - hours * 60 - days * 24 * 60;
+	const seconds = Math.floor(time) - minutes * 60 - hours * 60 * 60 - days * 24 * 60 * 60;
+
+	let result = '';
+	if (days > 0) {
+		result += `${days} days `;
+	}
+
+	if (hours > 0) {
+		result += `${hours} hours `;
+	}
+
+	if (minutes > 0) {
+		result += `${minutes} minutes `;
+	}
+
+	result += `${seconds} seconds`;
+
+	return result;
+}

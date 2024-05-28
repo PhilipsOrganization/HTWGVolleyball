@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.groupBy(courses.name)
 		.limit(10);
 
-	const timeDiff = sql`extract(epoch from ${courseSpots.createdAt}) - extract(epoch from ${courses.publishOn})`;
+	const timeDiff = sql`least(extract(epoch from ${courseSpots.createdAt}) - extract(epoch from ${courses.publishOn}), 0)`;
 	const [registrationStats] = await locals.db
 		.select({
 			avg: sql<number>`avg(${timeDiff})`.as('avg'),

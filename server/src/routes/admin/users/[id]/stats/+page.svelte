@@ -1,7 +1,7 @@
 <script>
 	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
 	import { Role } from '$lib/db/role';
-	import { draw } from 'svelte/transition';
+	import { approximatelyFormatTime } from '$lib/helpers/date';
 
 	export let data;
 
@@ -74,6 +74,10 @@
 	{:else}
 		<p>No courses registered</p>
 	{/each}
+	{#if data.registrationStats}
+		<p>Average Registration time: {approximatelyFormatTime(data.registrationStats.avg)}</p>
+		<p>Fastest Registration time: {approximatelyFormatTime(data.registrationStats.min)}</p>
+	{/if}
 </section>
 
 <!-- <div class="center">
