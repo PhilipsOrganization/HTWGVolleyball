@@ -7,6 +7,7 @@ import { startOfYesterday } from 'date-fns';
 import { desc, eq, gte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { PageServerLoad } from './$types';
+import { zonedTimeToUtc } from "date-fns-tz"; 
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -90,7 +91,7 @@ export const actions = {
 			.values({
 				...course,
 				date: new Date(course.date).toISOString(),
-				publishOn: publishOn.toISOString(),
+				publishOn: zonedTimeToUtc(publishOn, 'Europe/Berlin').toISOString(),
 				maxParticipants: parseInt(course.maxParticipants),
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString()
