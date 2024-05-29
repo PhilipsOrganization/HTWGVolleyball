@@ -18,6 +18,16 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	}
 
 	const userId = parseInt(userIdString);
+	const [user] = await locals.db
+		.select()
+		.from(accounts)
+		.where(eq(accounts.id, userId))
+		.limit(1);
+
+	if (!user) {
+		error(400, 'User not found');
+	}
+
 	const stats = await locals.db
 		.select({ courseName: courses.name, count: count(courses.name) })
 		.from(courseSpots)
@@ -43,7 +53,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		.limit(1);
 
 	return {
-		user: serializeUser(locals.user),
+		user: serializeUser(user),
 		stats,
 		registrationStats,
 		totalRegistrations: totalRegistrations.count,
