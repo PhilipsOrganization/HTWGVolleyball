@@ -1,9 +1,12 @@
 <script>
+	import { enhance } from '$app/forms';
 	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
 	import { Role } from '$lib/db/role';
 	import { approximatelyFormatTime } from '$lib/helpers/date';
+	import { addToast } from '$lib/helpers/toast';
 
 	export let data;
+	export let form;
 
 	const user = data.user;
 
@@ -18,6 +21,25 @@
 			month: 'numeric',
 			day: 'numeric'
 		}).format(date);
+	}
+
+	/**
+	 * @param {{formElement: HTMLFormElement}} param0
+	 * @returns {(data: {result: any}) => void}
+	 */
+	function updateEmailStatus({ formElement }) {
+		return ({ result }) => {
+			if (result.type === 'success') {
+				addToast('success', 'Email sent successfully');
+				formElement.reset();
+			}
+
+			if (result.type === 'failure') {
+				addToast('error', 'Email failed to send');
+			}
+
+			form = result.data;
+		};
 	}
 </script>
 
@@ -78,6 +100,21 @@
 		<p>Average Registration time: {approximatelyFormatTime(data.registrationStats.avg)}</p>
 		<p>Fastest Registration time: {approximatelyFormatTime(data.registrationStats.min)}</p>
 	{/if}
+</section>
+<section>
+	<h2>Send {user.username} an email message:</h2>
+	<form action="?/sendEmail" method="post" id="email" use:enhance={updateEmailStatus}>
+		<label for="subject">Subject</label>
+		<input type="text" name="subject" autocomplete="off" value={form?.subject ?? ''} placeholder="Email Subject Line" id="subject" />
+		<label for="message">Message</label>
+		<textarea name="message" id="message" cols="30" rows="10" value={form?.body ?? ''} placeholder="Email Body" />
+		{#if form?.error}
+			<div id="error">
+				<p>Error: {form.error}!</p>
+			</div>
+		{/if}
+		<button>Send Email</button>
+	</form>
 </section>
 
 <!-- <div class="center">
@@ -147,5 +184,44 @@
 
 	.flex {
 		display: flex;
+	}
+
+	#email {
+		display: flex;
+		flex-direction: column;
+		width: min(800px, 90vw);
+		margin: 10px 5px;
+		font-size: 1.2rem;
+	}
+
+	#error {
+		color: #ffffff;
+		border: 1px solid #f95462;
+		padding: 10px;
+		margin: 0 10px;
+		border-radius: 5px;
+	}
+
+	#error p {
+		margin: 0;
+		text-align: center;
+		width: 100%;
+	}
+
+	label {
+		margin: 10px 0;
+		padding-left: 10px;
+	}
+
+	input,
+	textarea {
+		padding: 10px;
+		margin: 10px;
+		border-radius: 5px;
+		border: 1px solid #ccc;
+	}
+
+	label {
+		margin: 6px 0;
 	}
 </style>

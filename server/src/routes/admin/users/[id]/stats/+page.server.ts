@@ -3,9 +3,10 @@ import { accounts, courseSpots, courses } from '$lib/db/schema';
 import { sendEmail } from '$lib/email';
 import ResetPassword from '$lib/email/templates/reset-password.svelte';
 import { generateRandomToken, serializeUser } from '$lib/helpers/account';
-import { error, redirect, type Actions } from '@sveltejs/kit';
+import { error, fail, redirect, type Actions } from '@sveltejs/kit';
 import { count, eq, sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
+import AdminEmail from '$lib/email/templates/admin-email.svelte';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -220,5 +221,63 @@ export const actions = {
 			.where(eq(accounts.id, userId));
 
 		await sendEmail(ResetPassword, { user, subject: "Reset Password", props: { user, token } });
+	},
+	sendEmail: async ({ locals, params, request }) => {
+		if (!locals.user || locals.user.role === Role.USER) {
+			redirect(303, "/login");
+		}
+
+		const userIdString = params.id as string | undefined;
+		if (!userIdString) {
+			error(400, "No userId provided");
+		}
+
+		const userId = parseInt(userIdString);
+		const [user] = await locals.db
+			.select()
+			.from(accounts)
+			.where(eq(accounts.id, userId))
+			.limit(1);
+
+		if (!user) {
+			error(400, "User not found");
+		}
+
+		const form = await request.formData();
+		const subject = form.get('subject') as string | undefined;
+		const body = form.get('message') as string | undefined;
+
+		if (!subject || !body) {
+			return fail(400, { error: "Missing subject or body", body, subject });
+		}
+
+		if (subject.length > 100 || body.length > 1000) {
+			return fail(400, { error: "Subject or body too long", body, subject });
+		}
+
+		if (subject.includes('\n')) {
+			return fail(400, { error: "Subject contains newlines", body, subject });
+		}
+
+		if (subject.length < 5 || body.length < 5) {
+			return fail(400, { error: "Subject or body too short", body, subject });
+		}
+
+		const message = body
+			.replace(/\n/g, '<br>')
+			.replace(/\r/g, '')
+			.replace(/\t/g, '    ')
+			.replace(/ {2}/g, ' &nbsp;');
+
+		await sendEmail(AdminEmail, {
+			subject, user, props: {
+				user,
+				subject,
+				message,
+				trainer: locals.user,
+			}
+		});
+
+		return { body: "", subject: "" };
 	}
 } satisfies Actions;
