@@ -32,7 +32,7 @@
 
 	const paragraph = {
 		fontFamily,
-		fontSize: '18px',
+		fontSize: '16px',
 		lineHeight: '1.4',
 		color: '#484848'
 	};
@@ -61,8 +61,9 @@
 			<Text style={heading}>Hello, {user.username}!</Text>
 			<Text style={paragraph}>You have received the following message from your volleyball trainer {trainer.username}:</Text>
 			<Section style={box}>
-                <Text style={paragraph}>Subject: {subject}</Text>
-				<Text style={{ ...heading, fontSize: '22px' }}>{@html message}</Text>
+                <Text style={{...paragraph, fontWeight: '600'}}>{subject}</Text>
+                <Hr />
+				<Text style={paragraph}>{@html message}</Text>
 			</Section>
 		</Container>
 	</Section>
