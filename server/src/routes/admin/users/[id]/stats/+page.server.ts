@@ -251,7 +251,7 @@ export const actions = {
 			return fail(400, { error: "Missing subject or body", body, subject });
 		}
 
-		if (subject.length > 100 || body.length > 1000) {
+		if (subject.length > 200 || body.length > 4000) {
 			return fail(400, { error: "Subject or body too long", body, subject });
 		}
 
