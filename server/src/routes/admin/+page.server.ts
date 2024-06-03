@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	}
 
 	const showArchived = url.searchParams.has('archived');
-	const dateQuery = showArchived ? sql<boolean>`true` : gte(courses.publishOn, startOfYesterday().toISOString());
+	const dateQuery = showArchived ? sql<boolean>`true` : gte(courses.date, startOfYesterday().toISOString());
 
 	const result = await locals.db
 		.select({
