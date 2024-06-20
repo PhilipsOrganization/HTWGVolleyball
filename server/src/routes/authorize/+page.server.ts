@@ -88,7 +88,7 @@ export const load: PageServerLoad = async ({ url, cookies, locals, fetch }) => {
         .where(eq(accounts.id, user.id));
 
     const expirationDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 21);
-    cookies.set('user', sessionToken, { path: '/', expires: expirationDate });
+	cookies.set('user', sessionToken, { path: '/', expires: expirationDate, sameSite: 'strict' });
     redirect(303, '/courses');
 };
 
