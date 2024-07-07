@@ -63,7 +63,7 @@ export const actions = {
 		}
 
 		const expirationDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 21);
-		cookies.set('user', newUser.sessionToken, { path: '/', expires: expirationDate, sameSite: 'strict' });
+		cookies.set('user', newUser.sessionToken, { path: '/', expires: expirationDate, sameSite: 'lax' });
 
 		// token is used to verify the email
 		console.log('Creating new user', newUser);

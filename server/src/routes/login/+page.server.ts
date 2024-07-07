@@ -39,7 +39,7 @@ export const actions = {
 			.where(eq(accounts.id, user.id));
 
 		const expirationDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 21);
-		cookies.set('user', sessionToken, { path: '/', expires: expirationDate, sameSite: 'strict' });
+		cookies.set('user', sessionToken, { path: '/', expires: expirationDate, sameSite: 'lax' });
 
 		redirect(303, '/courses');
 	},
