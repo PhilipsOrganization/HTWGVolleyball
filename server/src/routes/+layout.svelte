@@ -52,6 +52,10 @@
 		text-decoration-thickness: 0px;
 	}
 
+	:global(*) {
+		box-sizing: border-box;
+	}
+
 	#toasts {
 		position: fixed;
 		display: flex;
