@@ -1,10 +1,15 @@
 <script>
 	import { fade } from 'svelte/transition';
 
-	/** @type {import('$lib/db/entities').CourseDTO} */
-	export let course;
-	export let isFirst = false;
-	export let admin = false;
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('$lib/db/entities').CourseDTO} course
+	 * @property {boolean} [isFirst]
+	 * @property {boolean} [admin]
+	 */
+
+	/** @type {Props} */
+	let { course, isFirst = false, admin = false } = $props();
 
 	const spot = course.spot + 1;
 	const waitlistSpot = spot - course.maxParticipants;

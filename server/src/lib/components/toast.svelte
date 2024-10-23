@@ -2,20 +2,20 @@
 	import { toasts } from '$lib/helpers/toast';
 	import { fly } from 'svelte/transition';
 
-	/**
-	 * @type {string}
-	 */
-	export let message;
+	
 
-	/**
-	 * @type {"error" | "success" | "info"}
-	 * */
-	export let type;
+	
 
+	
 	/**
-	 * @type {number}
+	 * @typedef {Object} Props
+	 * @property {string} message
+	 * @property {"error" | "success" | "info"} type
+	 * @property {number} id
 	 */
-	export let id;
+
+	/** @type {Props} */
+	let { message, type, id } = $props();
 
 	function dismiss() {
 		$toasts = $toasts.filter((toast) => toast.id !== id);
@@ -28,7 +28,7 @@
 	class:success={type === 'success'}
 	in:fly={{ x: 500 }}
 	out:fly={{ x: 500 }}
-    on:click={dismiss}
+    onclick={dismiss}
 >
 	<p>
 		{message}

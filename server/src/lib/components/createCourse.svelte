@@ -4,19 +4,19 @@
 
 	const difficulties = ['Beginner', 'Advanced', 'Actives', 'Beach Course', 'Actives - 5:1 System', 'Free Game', 'Christmas Special🎄'];
 
-	$: form = $page.form;
+	let form = $derived($page.form);
 
-	let name = 'Beginner';
+	let name = $state('Beginner');
 
 	/**
 	 * @type {HTMLDialogElement}
 	 */
-	let dialogEl;
+	let dialogEl = $state();
 
 	/**
 	 * @type {any[]}
 	 */
-	let courses = [];
+	let courses = $state([]);
 	reset();
 
 	function reset() {
@@ -83,7 +83,7 @@
 			}
 		];
 	}
-	$: defaults = courses.find((c) => c.name === name)?.settings;
+	let defaults = $derived(courses.find((c) => c.name === name)?.settings);
 
 	/**
 	 * @param {number} number
@@ -128,7 +128,7 @@
 	}
 </script>
 
-<button class="highlight" id="open" on:click={() => dialogEl.showModal()}>Create Course</button>
+<button class="highlight" id="open" onclick={() => dialogEl.showModal()}>Create Course</button>
 <dialog bind:this={dialogEl}>
 	<h1>New Course</h1>
 	<form method="POST" action="?/create-course">

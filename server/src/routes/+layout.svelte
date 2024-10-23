@@ -4,6 +4,13 @@
 	import InfoModal from '$lib/components/info-modal.svelte';
 	import Toast from '$lib/components/toast.svelte';
 	import { toasts } from '$lib/helpers/toast';
+	/**
+	 * @typedef {Object} Props
+	 * @property {import('svelte').Snippet} [children]
+	 */
+
+	/** @type {Props} */
+	let { children } = $props();
 
 	/**
 	 * @param {() => Promise<void>} callback
@@ -33,7 +40,7 @@
 </div>
 
 <InfoModal />
-<slot />
+{@render children?.()}
 
 <style>
 	:global(body) {

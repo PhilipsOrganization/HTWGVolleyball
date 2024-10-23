@@ -3,8 +3,8 @@
 	import { approximatelyFormatTime } from '$lib/helpers/date';
 	import { onMount } from 'svelte';
 
-	export let data;
-	let notificationsSupported = false;
+	let { data = $bindable() } = $props();
+	let notificationsSupported = $state(false);
 
 	onMount(() => {
 		notificationsSupported = 'serviceWorker' in navigator && 'PushManager' in window;
@@ -82,10 +82,14 @@
 	{:else}
 		<p class="red">Email not verified</p>
 		<ConfirmableForm message="Do you really want to resend the verification email?">
-			<form action="?/reverify" method="post" slot="confirm">
-				<button class="confirm">Resend verification email</button>
-			</form>
-			<button slot="button">Resend verification email</button>
+			{#snippet confirm()}
+						<form action="?/reverify" method="post" >
+					<button class="confirm">Resend verification email</button>
+				</form>
+					{/snippet}
+			{#snippet button()}
+						<button >Resend verification email</button>
+					{/snippet}
 		</ConfirmableForm>
 	{/if}
 
@@ -96,9 +100,9 @@
 			You can turn them off any time from your profile. If they are disabled, you'll get an email instead. However, emails are not instant.
 		</p>
 		{#if data.user.hasNotificationsEnabled}
-			<button on:click={disableNotification}>Disable notifications</button>
+			<button onclick={disableNotification}>Disable notifications</button>
 		{:else}
-			<button on:click={enableNotification}>Enable notifications</button>
+			<button onclick={enableNotification}>Enable notifications</button>
 		{/if}
 	{/if}
 

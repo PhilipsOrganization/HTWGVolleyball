@@ -5,7 +5,7 @@
 	import CreateCourse from '$lib/components/createCourse.svelte';
 	import { humanReadableDate } from '$lib/helpers/date';
 
-	export let data;
+	let { data } = $props();
 
 	/** @param {Event & {currentTarget: EventTarget & HTMLInputElement}} event  */
 	function toggleShowArchived(event) {
@@ -19,7 +19,7 @@
 <main>
 	<div>
 		<label for="archived">Show archived</label>
-		<input type="checkbox" id="archived" on:change={(e) => toggleShowArchived(e)} />
+		<input type="checkbox" id="archived" onchange={(e) => toggleShowArchived(e)} />
 	</div>
 
 	<div id="list">

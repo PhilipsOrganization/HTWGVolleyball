@@ -5,8 +5,7 @@
 	import { approximatelyFormatTime } from '$lib/helpers/date';
 	import { addToast } from '$lib/helpers/toast';
 
-	export let data;
-	export let form;
+	let { data, form = $bindable() } = $props();
 
 	const user = data.user;
 
@@ -49,17 +48,25 @@
 	<div>
 		{#if user.role === Role.ADMIN}
 			<ConfirmableForm message="Do you really want to demote the user to a normie?">
-				<form action="?/demote" method="post" slot="confirm">
-					<button>demote to user</button>
-				</form>
-				<button slot="button">demote to user</button>
+				{#snippet confirm()}
+								<form action="?/demote" method="post" >
+						<button>demote to user</button>
+					</form>
+							{/snippet}
+				{#snippet button()}
+								<button >demote to user</button>
+							{/snippet}
 			</ConfirmableForm>
 		{:else if user.role === Role.USER}
 			<ConfirmableForm message="Do you really want to promote the user to an admin?">
-				<form action="?/promote" method="post" slot="confirm">
-					<button>promote to admin</button>
-				</form>
-				<button slot="button">promote to admin</button>
+				{#snippet confirm()}
+										<form action="?/promote" method="post" >
+						<button>promote to admin</button>
+					</form>
+									{/snippet}
+				{#snippet button()}
+										<button >promote to admin</button>
+									{/snippet}
 			</ConfirmableForm>
 		{/if}
 		<form action="?/reset-pw" method="post">
@@ -67,10 +74,14 @@
 		</form>
 		{#if user.role === Role.USER}
 			<ConfirmableForm message="Do you really want to delete the user?">
-				<form action="?/delete" method="post" slot="confirm">
-					<button>Delete User</button>
-				</form>
-				<button slot="button">Delete User</button>
+				{#snippet confirm()}
+								<form action="?/delete" method="post" >
+						<button>Delete User</button>
+					</form>
+							{/snippet}
+				{#snippet button()}
+								<button >Delete User</button>
+							{/snippet}
 			</ConfirmableForm>
 		{/if}
 	</div>
@@ -107,7 +118,7 @@
 		<label for="subject">Subject</label>
 		<input type="text" name="subject" autocomplete="off" value={form?.subject ?? ''} placeholder="Email Subject Line" id="subject" />
 		<label for="message">Message</label>
-		<textarea name="message" id="message" cols="30" rows="10" value={form?.body ?? ''} placeholder="Email Body" />
+		<textarea name="message" id="message" cols="30" rows="10" value={form?.body ?? ''} placeholder="Email Body"></textarea>
 		{#if form?.error}
 			<div id="error">
 				<p>Error: {form.error}!</p>
@@ -126,7 +137,7 @@
 <div class="column">
 	<h2>Notes</h2>
 	<form class="flex" method="post" action="?/note">
-		<textarea name="notes" id="notes" cols="30" rows="10" value={user.notes} />
+		<textarea name="notes" id="notes" cols="30" rows="10" value={user.notes}></textarea>
 		<button>Save</button>
 	</form>
 </div>

@@ -4,7 +4,7 @@
 	import { addToast } from '$lib/helpers/toast';
 	import { onMount } from 'svelte';
 
-	export let data;
+	let { data } = $props();
 
 	onMount(() => {
 		if (!data.user.emailVerified) {
