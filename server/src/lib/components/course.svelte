@@ -32,15 +32,13 @@
 			<span>{course.signupCount}/{course.maxParticipants}</span>
 		{/if}
 
-		<a class="underline right" {href}>
-			<p>
-				{#if admin || course.isPast}
-					details
-				{:else}
-					{course.isEnrolled ? 'drop ' : 'enlist'}
-				{/if}
-			</p>
-		</a>
+		<p class="underline right">
+			{#if admin || course.isPast}
+				details
+			{:else}
+				{course.isEnrolled ? 'drop ' : 'enlist'}
+			{/if}
+		</p>
 	</div>
 </a>
 
