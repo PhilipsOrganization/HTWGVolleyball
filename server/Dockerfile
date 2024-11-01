@@ -1,16 +1,10 @@
-FROM node:20-slim
+FROM oven/bun:1
 WORKDIR /app
 
-# pnpm fetch does require only lockfile
-COPY pnpm-lock.yaml ./
+COPY . .
 
-RUN npm i -g pnpm && pnpm fetch
-
-ADD . ./
-RUN pnpm install -r --offline && pnpm run build
-
-RUN pwd && mkdir ./build/migrations && echo "{ \"type\": \"commonjs\" }" >> ./build/migrations/package.json && cat ./build/migrations/package.json
+RUN bun install && bun run build
 
 EXPOSE 3000
 
-CMD ["node", "build/index.js"]
+CMD ["bun", "build/index.js"]
