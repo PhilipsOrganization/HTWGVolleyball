@@ -2,8 +2,10 @@ FROM alpine
 
 RUN apk add --no-cache curl
 
-COPY ping.sh /ping.sh
+WORKDIR /app/ping
 
-RUN chmod +x /ping.sh
+COPY ping.sh .
 
-CMD ["/ping.sh"]
+RUN chmod +x ping.sh
+
+CMD ["/app/ping/ping.sh"]
