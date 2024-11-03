@@ -2,7 +2,16 @@
 	import { page } from '$app/stores';
 	import { addDays, nextMonday, nextSaturday, nextThursday, nextWednesday, setHours, setMinutes } from 'date-fns';
 
-	const difficulties = ['Beginner', 'Advanced', 'Actives', 'Beach Course', 'Actives - 5:1 System', 'Free Game', 'Christmas Special🎄'];
+	const difficulties = [
+		'Beginner',
+		'Advanced',
+		'Actives',
+		'Beach Course',
+		'Advanced Skills Training',
+		'Actives - 5:1 System',
+		'Free Game',
+		'Christmas Special🎄'
+	];
 
 	$: form = $page.form;
 
@@ -22,7 +31,7 @@
 	function reset() {
 		courses = [
 			{
-				name: difficulties[0],
+				name: difficulties[0], // Beginner
 				settings: {
 					name: difficulties[0],
 					location: 'Ellenrieder Sporthalle',
@@ -34,7 +43,7 @@
 				}
 			},
 			{
-				name: difficulties[1],
+				name: difficulties[1], // Advanced
 				settings: {
 					name: difficulties[1],
 					location: 'Ellenrieder Sporthalle',
@@ -46,7 +55,7 @@
 				}
 			},
 			{
-				name: difficulties[2],
+				name: difficulties[2], // Actives
 				settings: {
 					name: difficulties[2],
 					location: 'Ellenrieder Sporthalle',
@@ -58,9 +67,21 @@
 				}
 			},
 			{
-				name: difficulties[4],
+				name: difficulties[4], // Advanced skills training
 				settings: {
 					name: difficulties[4],
+					location: 'Ellenrieder Sporthalle',
+					maxParticipants: 18,
+					time: '19:00',
+					duration: 1.5,
+					date: nextWednesday(new Date()),
+					publishOn: setTo12(nextThursday(new Date()))
+				}
+			},
+			{
+				name: difficulties[5], // Actives - 5:1 System
+				settings: {
+					name: difficulties[5],
 					location: 'Ellenrieder Sporthalle',
 					maxParticipants: 18,
 					time: '20:30',
@@ -70,9 +91,9 @@
 				}
 			},
 			{
-				name: difficulties[5],
+				name: difficulties[6], // Free Game
 				settings: {
-					name: difficulties[5],
+					name: difficulties[6],
 					location: 'Petershausener Sporthalle',
 					maxParticipants: 36,
 					time: '12:00',
