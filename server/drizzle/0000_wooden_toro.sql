@@ -1,11 +1,5 @@
 -- Current sql file was generated after introspecting the database
 -- If you want to run this migration please uncomment this code before executing migrations
-/*
-CREATE TABLE IF NOT EXISTS "mikro_orm_migrations" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"name" varchar(255),
-	"executed_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
-);
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "courses" (
 	"id" serial PRIMARY KEY NOT NULL,
@@ -64,4 +58,3 @@ CREATE INDEX IF NOT EXISTS "courses_name_date_index" ON "courses" ("name","date"
 CREATE INDEX IF NOT EXISTS "accounts_session_token_index" ON "accounts" ("session_token");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "accounts_email_index" ON "accounts" ("email");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "accounts_username_index" ON "accounts" ("username");
-*/

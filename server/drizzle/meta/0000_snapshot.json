@@ -1,390 +1,347 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "tables": {
-    "public.mikro_orm_migrations": {
-      "name": "mikro_orm_migrations",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "executed_at": {
-          "name": "executed_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "CURRENT_TIMESTAMP"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
-    },
-    "public.courses": {
-      "name": "courses",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "date": {
-          "name": "date",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "publish_on": {
-          "name": "publish_on",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "max_participants": {
-          "name": "max_participants",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "location": {
-          "name": "location",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "time": {
-          "name": "time",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp(0) with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp(0) with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "notification_sent": {
-          "name": "notification_sent",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        }
-      },
-      "indexes": {
-        "courses_name_date_index": {
-          "columns": [
-            {
-              "expression": "name",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "date",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "with": {},
-          "name": "courses_name_date_index",
-          "isUnique": false,
-          "method": "btree",
-          "concurrently": false
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
-    },
-    "public.accounts": {
-      "name": "accounts",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "username": {
-          "name": "username",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "session_token": {
-          "name": "session_token",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "role": {
-          "name": "role",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'user'::character varying"
-        },
-        "strikes": {
-          "name": "strikes",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "notes": {
-          "name": "notes",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "subscription_endpoint": {
-          "name": "subscription_endpoint",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "subscription_expiration_time": {
-          "name": "subscription_expiration_time",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "subscription_p256dh": {
-          "name": "subscription_p256dh",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "subscription_auth": {
-          "name": "subscription_auth",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp(0) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "reset_token": {
-          "name": "reset_token",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reset_token_expires": {
-          "name": "reset_token_expires",
-          "type": "timestamp(0) with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "last_login": {
-          "name": "last_login",
-          "type": "timestamp(0) with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "email_verification_token": {
-          "name": "email_verification_token",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "email_verified": {
-          "name": "email_verified",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        }
-      },
-      "indexes": {
-        "accounts_session_token_index": {
-          "columns": [
-            {
-              "expression": "session_token",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "with": {},
-          "name": "accounts_session_token_index",
-          "isUnique": false,
-          "method": "btree",
-          "concurrently": false
-        },
-        "accounts_email_index": {
-          "columns": [
-            {
-              "expression": "email",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "with": {},
-          "name": "accounts_email_index",
-          "isUnique": false,
-          "method": "btree",
-          "concurrently": false
-        },
-        "accounts_username_index": {
-          "columns": [
-            {
-              "expression": "username",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "with": {},
-          "name": "accounts_username_index",
-          "isUnique": false,
-          "method": "btree",
-          "concurrently": false
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
-    },
-    "public.course_spots": {
-      "name": "course_spots",
-      "schema": "",
-      "columns": {
-        "course_id": {
-          "name": "course_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp(0) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "course_spots_course_id_foreign": {
-          "name": "course_spots_course_id_foreign",
-          "tableFrom": "course_spots",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "tableTo": "courses",
-          "schemaTo": "public",
-          "columnsTo": [
-            "id"
-          ],
-          "onUpdate": "cascade",
-          "onDelete": "no action"
-        },
-        "course_spots_user_id_foreign": {
-          "name": "course_spots_user_id_foreign",
-          "tableFrom": "course_spots",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "tableTo": "accounts",
-          "schemaTo": "public",
-          "columnsTo": [
-            "id"
-          ],
-          "onUpdate": "cascade",
-          "onDelete": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "course_spots_pkey": {
-          "name": "course_spots_pkey",
-          "columns": [
-            "course_id",
-            "user_id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false,
-      "checkConstraints": {}
-    }
-  },
-  "enums": {},
-  "schemas": {},
-  "_meta": {
-    "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "internal": {
-    "tables": {}
-  },
-  "id": "00000000-0000-0000-0000-000000000000",
-  "prevId": "",
-  "sequences": {},
-  "policies": {},
-  "views": {},
-  "roles": {}
+	"version": "7",
+	"dialect": "postgresql",
+	"tables": {
+		"public.courses": {
+			"name": "courses",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"date": {
+					"name": "date",
+					"type": "timestamp(3) with time zone",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"publish_on": {
+					"name": "publish_on",
+					"type": "timestamp(3) with time zone",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"max_participants": {
+					"name": "max_participants",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"location": {
+					"name": "location",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"time": {
+					"name": "time",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp(0) with time zone",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp(0) with time zone",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"notification_sent": {
+					"name": "notification_sent",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				}
+			},
+			"indexes": {
+				"courses_name_date_index": {
+					"columns": [
+						{
+							"expression": "name",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "date",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"with": {},
+					"name": "courses_name_date_index",
+					"isUnique": false,
+					"method": "btree",
+					"concurrently": false
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"isRLSEnabled": false,
+			"checkConstraints": {}
+		},
+		"public.accounts": {
+			"name": "accounts",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"username": {
+					"name": "username",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"email": {
+					"name": "email",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"password": {
+					"name": "password",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"session_token": {
+					"name": "session_token",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"role": {
+					"name": "role",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "'user'::character varying"
+				},
+				"strikes": {
+					"name": "strikes",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0
+				},
+				"notes": {
+					"name": "notes",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"subscription_endpoint": {
+					"name": "subscription_endpoint",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"subscription_expiration_time": {
+					"name": "subscription_expiration_time",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"subscription_p256dh": {
+					"name": "subscription_p256dh",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"subscription_auth": {
+					"name": "subscription_auth",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp(0) with time zone",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "CURRENT_TIMESTAMP"
+				},
+				"reset_token": {
+					"name": "reset_token",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"reset_token_expires": {
+					"name": "reset_token_expires",
+					"type": "timestamp(0) with time zone",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"last_login": {
+					"name": "last_login",
+					"type": "timestamp(0) with time zone",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"email_verification_token": {
+					"name": "email_verification_token",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"email_verified": {
+					"name": "email_verified",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				}
+			},
+			"indexes": {
+				"accounts_session_token_index": {
+					"columns": [
+						{
+							"expression": "session_token",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"with": {},
+					"name": "accounts_session_token_index",
+					"isUnique": false,
+					"method": "btree",
+					"concurrently": false
+				},
+				"accounts_email_index": {
+					"columns": [
+						{
+							"expression": "email",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"with": {},
+					"name": "accounts_email_index",
+					"isUnique": false,
+					"method": "btree",
+					"concurrently": false
+				},
+				"accounts_username_index": {
+					"columns": [
+						{
+							"expression": "username",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"with": {},
+					"name": "accounts_username_index",
+					"isUnique": false,
+					"method": "btree",
+					"concurrently": false
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"isRLSEnabled": false,
+			"checkConstraints": {}
+		},
+		"public.course_spots": {
+			"name": "course_spots",
+			"schema": "",
+			"columns": {
+				"course_id": {
+					"name": "course_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp(0) with time zone",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"course_spots_course_id_foreign": {
+					"name": "course_spots_course_id_foreign",
+					"tableFrom": "course_spots",
+					"columnsFrom": ["course_id"],
+					"tableTo": "courses",
+					"schemaTo": "public",
+					"columnsTo": ["id"],
+					"onUpdate": "cascade",
+					"onDelete": "no action"
+				},
+				"course_spots_user_id_foreign": {
+					"name": "course_spots_user_id_foreign",
+					"tableFrom": "course_spots",
+					"columnsFrom": ["user_id"],
+					"tableTo": "accounts",
+					"schemaTo": "public",
+					"columnsTo": ["id"],
+					"onUpdate": "cascade",
+					"onDelete": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"course_spots_pkey": {
+					"name": "course_spots_pkey",
+					"columns": ["course_id", "user_id"]
+				}
+			},
+			"uniqueConstraints": {},
+			"policies": {},
+			"isRLSEnabled": false,
+			"checkConstraints": {}
+		}
+	},
+	"enums": {},
+	"schemas": {},
+	"_meta": {
+		"schemas": {},
+		"tables": {},
+		"columns": {}
+	},
+	"internal": {
+		"tables": {}
+	},
+	"id": "00000000-0000-0000-0000-000000000000",
+	"prevId": "",
+	"sequences": {},
+	"policies": {},
+	"views": {},
+	"roles": {}
 }
