@@ -8,6 +8,13 @@
       "when": 1715271443693,
       "tag": "0000_wooden_toro",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1730670676441,
+      "tag": "0001_clever_omega_sentinel",
+      "breakpoints": true
     }
   ]
 }
