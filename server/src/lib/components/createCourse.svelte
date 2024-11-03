@@ -173,6 +173,13 @@
 			<small class="error">{form?.publishOn ?? ''}</small>
 		</field>
 
+		<field>
+			<label class="center">
+				Allow Users to Book Multiple Courses
+				<input type="checkbox" name="allowDoubleBookings" switch />
+			</label>
+		</field>
+
 		<button id="submit">Submit</button>
 	</form>
 </dialog>
@@ -259,5 +266,11 @@
 		color: #000;
 		padding: 1rem 2rem;
 		text-align: center;
+	}
+
+	.center {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 </style>

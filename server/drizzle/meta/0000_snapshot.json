@@ -1,7 +1,5 @@
 {
-  "id": "00000000-0000-0000-0000-000000000000",
-  "prevId": "",
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "tables": {
     "public.mikro_orm_migrations": {
@@ -31,7 +29,10 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
     "public.courses": {
       "name": "courses",
@@ -101,17 +102,33 @@
       },
       "indexes": {
         "courses_name_date_index": {
-          "name": "courses_name_date_index",
           "columns": [
-            "name",
-            "date"
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "courses_name_date_index",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
     "public.accounts": {
       "name": "accounts",
@@ -232,30 +249,57 @@
       },
       "indexes": {
         "accounts_session_token_index": {
-          "name": "accounts_session_token_index",
           "columns": [
-            "session_token"
+            {
+              "expression": "session_token",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "accounts_session_token_index",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "accounts_email_index": {
-          "name": "accounts_email_index",
           "columns": [
-            "email"
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "accounts_email_index",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         },
         "accounts_username_index": {
-          "name": "accounts_username_index",
           "columns": [
-            "username"
+            {
+              "expression": "username",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "with": {},
+          "name": "accounts_username_index",
+          "isUnique": false,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
     "public.course_spots": {
       "name": "course_spots",
@@ -286,30 +330,30 @@
         "course_spots_course_id_foreign": {
           "name": "course_spots_course_id_foreign",
           "tableFrom": "course_spots",
-          "tableTo": "courses",
-          "schemaTo": "public",
           "columnsFrom": [
             "course_id"
           ],
+          "tableTo": "courses",
+          "schemaTo": "public",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "cascade"
+          "onUpdate": "cascade",
+          "onDelete": "no action"
         },
         "course_spots_user_id_foreign": {
           "name": "course_spots_user_id_foreign",
           "tableFrom": "course_spots",
-          "tableTo": "accounts",
-          "schemaTo": "public",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "accounts",
+          "schemaTo": "public",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "cascade"
+          "onUpdate": "cascade",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -321,7 +365,10 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     }
   },
   "enums": {},
@@ -333,5 +380,11 @@
   },
   "internal": {
     "tables": {}
-  }
+  },
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "sequences": {},
+  "policies": {},
+  "views": {},
+  "roles": {}
 }

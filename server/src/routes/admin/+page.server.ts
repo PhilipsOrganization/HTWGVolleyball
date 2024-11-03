@@ -7,7 +7,7 @@ import { startOfYesterday } from 'date-fns';
 import { desc, eq, gte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { PageServerLoad } from './$types';
-import { zonedTimeToUtc } from "date-fns-tz"; 
+import { zonedTimeToUtc } from 'date-fns-tz';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -20,7 +20,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const result = await locals.db
 		.select({
 			courses,
-			accountsJson: sql<Account[] | [null]>`json_agg(accounts order by ${courseSpots.createdAt} asc)`.as('accountsJson'),
+			accountsJson: sql<Account[] | [null]>`json_agg(accounts order by ${courseSpots.createdAt} asc)`.as('accountsJson')
 		})
 		.from(courseSpots)
 		.fullJoin(courses, eq(courseSpots.courseId, courses.id))
@@ -48,7 +48,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			date,
 			courses: courses.map((data) => serializeCourse(data, locals.user))
 		})),
-		user: serializeUser(locals.user),
+		user: serializeUser(locals.user)
 	};
 };
 
@@ -61,7 +61,11 @@ const courseValidation = z.object({
 		.length('HH:MM'.length)
 		.regex(/^\d\d:\d\d$/),
 	maxParticipants: z.string().min(1).max(3).regex(/^\d+$/),
-	publishOn: z.string().length('YYYY-MM-DDTHH:MM'.length)
+	publishOn: z.string().length('YYYY-MM-DDTHH:MM'.length),
+	allowDoubleBookings: z.coerce
+		.string()
+		.default('off')
+		.transform((v) => v === 'on')
 });
 
 export const actions = {
@@ -86,17 +90,15 @@ export const actions = {
 		const course = dto.data;
 		const publishOn = new Date(course.publishOn);
 
-		await locals.db
-			.insert(courses)
-			.values({
-				...course,
-				date: new Date(course.date).toISOString(),
-				publishOn: zonedTimeToUtc(publishOn, 'Europe/Berlin').toISOString(),
-				maxParticipants: parseInt(course.maxParticipants),
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString()
-			} satisfies typeof courses.$inferInsert);
+		await locals.db.insert(courses).values({
+			...course,
+			date: new Date(course.date).toISOString(),
+			publishOn: zonedTimeToUtc(publishOn, 'Europe/Berlin').toISOString(),
+			maxParticipants: parseInt(course.maxParticipants),
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString()
+		} satisfies typeof courses.$inferInsert);
 
 		return redirect(303, '/admin');
-	},
+	}
 } satisfies Actions;
