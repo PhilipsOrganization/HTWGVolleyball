@@ -102,6 +102,19 @@
 	{/if}
 </section>
 <section>
+	<h2>Groups</h2>
+	<form action="?/update-groups" method="POST" class="column" use:enhance>
+		<label for="groups"> Select the groups the user should be a member of: </label>
+		<select name="groups" multiple id="groups">
+			{#each data.groups as group}
+				<option value={group.id} selected={!!group.isMember}>{group.name}</option>
+			{/each}
+		</select>
+
+		<button type="submit">Update Groups</button>
+	</form>
+</section>
+<section>
 	<h2>Send {user.username} an email message:</h2>
 	<form action="?/sendEmail" method="post" id="email" use:enhance={updateEmailStatus}>
 		<label for="subject">Subject</label>
@@ -156,7 +169,7 @@
 		height: 200px;
 	}
 
-	div.column {
+	.column {
 		flex-direction: column;
 		align-items: flex-start;
 	}

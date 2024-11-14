@@ -1,5 +1,5 @@
 import { Role } from '$lib/db/role';
-import { accounts, courseSpots, courses, type Course, type DB } from '$lib/db/schema.js';
+import { accounts, courseSpots, courses, groupMembers, groups, type Course, type DB } from '$lib/db/schema.js';
 import { sendEmail } from '$lib/email';
 import OpenSpot from '$lib/email/templates/open-spot.svelte';
 import RecievedStrike from '$lib/email/templates/recieved-strike.svelte';
@@ -26,9 +26,27 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		error(400, 'Course not jet published');
 	}
 
+	let group = null;
+	if (course.courses.groupId) {
+		[group] = await locals.db.select().from(groups).where(eq(groups.id, course.courses.groupId)).limit(1);
+	}
+
+	if (group && locals.user.role === Role.USER) {
+		const [isMember] = await locals.db
+			.select()
+			.from(groupMembers)
+			.where(and(eq(groupMembers.userId, locals.user.id), eq(groupMembers.groupId, group.id)))
+			.limit(1);
+
+		if (!isMember) {
+			error(400, 'You are not a member of this group');
+		}
+	}
+
 	return {
 		course: serializeCourse(course, locals.user),
-		user: serializeUser(locals.user)
+		user: serializeUser(locals.user),
+		group: group
 	};
 };
 

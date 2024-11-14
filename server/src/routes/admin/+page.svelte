@@ -15,12 +15,13 @@
 	}
 </script>
 
-<CreateCourse />
+<CreateCourse groups={data.groups} />
 <main>
 	<div>
 		<label for="archived">Show archived</label>
 		<input type="checkbox" id="archived" on:change={(e) => toggleShowArchived(e)} />
 	</div>
+	<a href="/admin/groups"> Groups </a>
 
 	<div id="list">
 		{#each data.dates ?? [] as block}

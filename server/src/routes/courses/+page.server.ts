@@ -1,11 +1,37 @@
-import { accounts, courseSpots, courses, type Account } from '$lib/db/schema.js';
+import { accounts, courseSpots, courses, groupMembers, groups, type Account } from '$lib/db/schema.js';
 import { serializeUser } from '$lib/helpers/account';
 import { serializeCourse } from '$lib/helpers/course';
-import { and, eq, gte, lte, sql } from 'drizzle-orm';
+import { and, eq, gte, inArray, isNull, lte, or, sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
+import { redirect } from '@sveltejs/kit';
+import { Role } from '$lib/db/role';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const result = await locals.db
+	if (!locals.user) {
+		redirect(303, '/login');
+	}
+
+	const { db } = locals;
+
+	let memberships: { id: number | null }[] = [];
+
+	if (locals.user.role === Role.USER) {
+		memberships = await db
+			.select({
+				id: groups.id
+			})
+			.from(groupMembers)
+			.where(eq(groupMembers.userId, locals.user.id))
+			.leftJoin(groups, eq(groupMembers.groupId, groups.id));
+	} else {
+		memberships = await db
+			.select({
+				id: groups.id
+			})
+			.from(groups);
+	}
+
+	const result = await db
 		.select({
 			courses,
 			accountsJson: sql<Account[]>`json_agg(accounts order by ${courseSpots.createdAt} asc)`.as('accountsJson')
@@ -17,7 +43,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.where(
 			and(
 				lte(courses.publishOn, sql`NOW()`), // Only show courses that have been published
-				gte(courses.date, sql`NOW() - INTERVAL '1 day'`) // Only show courses that are 24 hours in the past
+				gte(courses.date, sql`NOW() - INTERVAL '1 day'`), // Only show courses that are 24 hours in the past
+				or(
+					isNull(courses.groupId), // Show courses that are not in a group
+					inArray(
+						// Show courses that are in a group that the user is a member of
+						courses.groupId,
+						memberships.map((m) => m.id).filter((id) => id !== null)
+					)
+				)
 			)
 		)
 		.orderBy(courses.date, courses.time);

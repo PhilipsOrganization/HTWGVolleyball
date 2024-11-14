@@ -16,7 +16,8 @@ export const courses = pgTable(
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
 		updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).notNull(),
 		notificationSent: boolean('notification_sent').default(false).notNull(),
-		allowDoubleBookings: boolean('allow_double_bookings').default(true).notNull()
+		allowDoubleBookings: boolean('allow_double_bookings').default(true).notNull(),
+		groupId: integer('group_id').references(() => groups.id, { onUpdate: 'cascade' })
 	},
 	(table) => {
 		return {
@@ -73,6 +74,38 @@ export const courseSpots = pgTable(
 	(table) => {
 		return {
 			courseSpotsPkey: primaryKey({ columns: [table.courseId, table.userId], name: 'course_spots_pkey' })
+		};
+	}
+);
+
+export const groups = pgTable(
+	'groups',
+	{
+		id: serial('id').primaryKey().notNull(),
+		name: varchar('name', { length: 255 }).notNull()
+	},
+	(table) => {
+		return {
+			groupNameIdx: index().on(table.name)
+		};
+	}
+);
+export type Group = typeof groups.$inferSelect;
+
+export const groupMembers = pgTable(
+	'group_members',
+	{
+		groupId: integer('group_id')
+			.notNull()
+			.references(() => groups.id, { onUpdate: 'cascade' }),
+		userId: integer('user_id')
+			.notNull()
+			.references(() => accounts.id, { onUpdate: 'cascade' }),
+		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull()
+	},
+	(table) => {
+		return {
+			groupMembersPkey: primaryKey({ columns: [table.groupId, table.userId], name: 'group_members_pkey' })
 		};
 	}
 );

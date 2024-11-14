@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
 	import { addToast } from '$lib/helpers/toast';
+	import da from 'date-fns/locale/da';
 
 	export let data;
 	let course = data.course;
@@ -92,6 +93,11 @@
 				minute: 'numeric'
 			})}
 			<p>Is published on: {intlAdmin.format(new Date(course.publishOn))}</p>
+			{#if data.group}
+				<p>
+					<a href="/admin/groups/{data.group.id}">Group: {data.group.name}</a>
+				</p>
+			{/if}
 		{/if}
 		<p class:waitList>
 			{course.signupCount}/{course.maxParticipants} Registrations

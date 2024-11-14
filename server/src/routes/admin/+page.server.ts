@@ -1,5 +1,5 @@
 import { Role } from '$lib/db/role';
-import { accounts, courseSpots, courses, type Account } from '$lib/db/schema';
+import { accounts, courseSpots, courses, groups, type Account } from '$lib/db/schema';
 import { serializeUser } from '$lib/helpers/account';
 import { serializeCourse } from '$lib/helpers/course';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
@@ -43,12 +43,15 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		dates.set(date, courses);
 	}
 
+	const g = await locals.db.select().from(groups).orderBy(groups.name);
+
 	return {
 		dates: Array.from(dates).map(([date, courses]) => ({
 			date,
 			courses: courses.map((data) => serializeCourse(data, locals.user))
 		})),
-		user: serializeUser(locals.user)
+		user: serializeUser(locals.user),
+		groups: g
 	};
 };
 
@@ -65,7 +68,8 @@ const courseValidation = z.object({
 	allowDoubleBookings: z.coerce
 		.string()
 		.default('off')
-		.transform((v) => v === 'on')
+		.transform((v) => v === 'on'),
+	groupId: z.coerce.number().optional()
 });
 
 export const actions = {
@@ -89,6 +93,14 @@ export const actions = {
 
 		const course = dto.data;
 		const publishOn = new Date(course.publishOn);
+
+		if (course.groupId) {
+			const [g] = await locals.db.select().from(groups).where(eq(groups.id, course.groupId)).limit(1);
+
+			if (!g) {
+				return fail(400, { groupId: 'Group not found' });
+			}
+		}
 
 		await locals.db.insert(courses).values({
 			...course,

@@ -2,6 +2,11 @@
 	import { page } from '$app/stores';
 	import { addDays, nextMonday, nextSaturday, nextThursday, nextWednesday, setHours, setMinutes } from 'date-fns';
 
+	/**
+	 * @type {{id: number, name: string}[]}
+	 */
+	export let groups = [];
+
 	const difficulties = [
 		'Beginner',
 		'Advanced',
@@ -201,6 +206,18 @@
 			</label>
 		</field>
 
+		<field>
+			<label for="group">
+				Select a user group the course should be visible to:
+				<select name="groupId" id="group" class="	pad">
+					<option value="" disabled selected>Show to all Users</option>
+					{#each groups as group}
+						<option value={group.id}>{group.name}</option>
+					{/each}
+				</select>
+			</label>
+		</field>
+
 		<button id="submit">Submit</button>
 	</form>
 </dialog>
@@ -293,5 +310,11 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+	}
+
+	select.pad {
+		padding: 0.5rem;
+		display: inline-block;
+		margin: 0.4rem 0;
 	}
 </style>
