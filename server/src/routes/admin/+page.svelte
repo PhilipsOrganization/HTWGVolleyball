@@ -17,11 +17,13 @@
 
 <CreateCourse groups={data.groups} />
 <main>
-	<div>
-		<label for="archived">Show archived</label>
-		<input type="checkbox" id="archived" on:change={(e) => toggleShowArchived(e)} />
+	<div class="row">
+		<a href="/admin/groups"> Groups </a>
+		<div>
+			<label for="archived">Show archived</label>
+			<input type="checkbox" id="archived" on:change={(e) => toggleShowArchived(e)} />
+		</div>
 	</div>
-	<a href="/admin/groups"> Groups </a>
 
 	<div id="list">
 		{#each data.dates ?? [] as block}
@@ -44,6 +46,11 @@
 		width: 90vw;
 		max-width: 700px;
 		box-sizing: border-box;
+	}
+
+	.row {
+		display: flex;
+		justify-content: space-between;
 	}
 
 	#list {
