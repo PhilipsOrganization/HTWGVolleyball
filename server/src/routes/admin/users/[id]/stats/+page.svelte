@@ -108,7 +108,7 @@
 			<label for="groups"> Select the groups the user should be a member of: </label>
 			<select name="groups" multiple id="groups" value={data.groups.map(({ id }) => id)}>
 				{#each data.groups as group}
-					<option value={group.id}>{group.name}</option>
+					<option value={group.id} class:isMember={group.isMember}>{group.name}</option>
 				{/each}
 			</select>
 
@@ -249,8 +249,8 @@
 		padding: 10px;
 	}
 
-	option::selection,
-	option:checked {
+	option.isMember::selection,
+	option.isMember:checked {
 		background: #9ccfa8;
 		color: black;
 		display: flex;
@@ -258,7 +258,8 @@
 		align-items: center;
 	}
 
-	option:checked::after {
+	option.isMember::selection,
+	option.isMember:checked::after {
 		content: '✔';
 	}
 
