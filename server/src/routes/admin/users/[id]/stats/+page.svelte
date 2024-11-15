@@ -259,5 +259,7 @@
 		border-radius: 5px;
 		border: 1px solid #ccc;
 		width: min(90%, 370px);
+		background: 0;
+		overflow: auto;
 	}
 </style>
