@@ -104,14 +104,11 @@
 <section>
 	<h2>Groups</h2>
 	{#if user.role === Role.USER}
-		<form action="?/update-groups" method="POST" class="column flex">
+		<form action="?/update-groups" method="POST" class="column flex" use:enhance>
 			<label for="groups"> Select the groups the user should be a member of: </label>
-			<select name="groups" multiple id="groups">
+			<select name="groups" multiple id="groups" value={data.groups.map(({ id }) => id)}>
 				{#each data.groups as group}
-					<option value={group.id} selected={!!group.isMember}
-						>{group.name}
-						{JSON.stringify(group)}
-					</option>
+					<option value={group.id}>{group.name}</option>
 				{/each}
 			</select>
 
