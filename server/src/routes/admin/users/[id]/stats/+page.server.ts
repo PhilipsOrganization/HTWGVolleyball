@@ -289,10 +289,10 @@ export const actions = {
 		}
 
 		const form = await request.formData();
-		const groups = form.get('groups') as string[] | string | undefined;
+		let groups = form.get('groups') as string[] | string | undefined;
 
 		if (!groups) {
-			error(400, 'No groups provided');
+			groups = [];
 		}
 
 		const groupIds = Array.isArray(groups) ? groups.map((g) => parseInt(g)) : [parseInt(groups)];
