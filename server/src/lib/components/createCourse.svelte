@@ -15,7 +15,8 @@
 		'Advanced Skills Training',
 		'Actives - 5:1 System',
 		'Free Game',
-		'Christmas Special🎄'
+		'Christmas Special🎄',
+		...groups.map((group) => group.name)
 	];
 
 	$: form = $page.form;
@@ -106,7 +107,20 @@
 					date: nextSaturday(addDays(new Date(), 7)),
 					publishOn: setTo12(nextThursday(new Date()))
 				}
-			}
+			},
+			...groups.map((group) => ({
+				name: group.name,
+				settings: {
+					name: group.name,
+					location: '',
+					maxParticipants: 18,
+					time: '',
+					duration: 1.5,
+					date: nextMonday(new Date()),
+					publishOn: new Date(),
+					groupId: group.id
+				}
+			}))
 		];
 	}
 	$: defaults = courses.find((c) => c.name === name)?.settings;
@@ -209,7 +223,7 @@
 		<field>
 			<label for="group">
 				Select a user group the course should be visible to:
-				<select name="groupId" id="group" class="	pad">
+				<select name="groupId" id="group" class="pad" value={defaults?.groupId ?? ''}>
 					<option value="" disabled selected>Show to all Users</option>
 					{#each groups as group}
 						<option value={group.id}>{group.name}</option>
