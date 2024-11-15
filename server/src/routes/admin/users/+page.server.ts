@@ -12,6 +12,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const users = await locals.db.select().from(accounts).orderBy(accounts.role, accounts.username);
 	return {
 		users: users.map((u) => sanitizeUser(u)),
-		user: serializeUser(locals.user)
+		globalUser: serializeUser(locals.user)
 	};
 };

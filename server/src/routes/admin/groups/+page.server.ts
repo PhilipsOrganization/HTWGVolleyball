@@ -3,6 +3,7 @@ import { groupMembers, groups } from '$lib/db/schema';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
+import { serializeUser } from '$lib/helpers/account';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -21,6 +22,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.orderBy(groups.name);
 
 	return {
+		globalUser: serializeUser(locals.user),
 		groups: g
 	};
 };

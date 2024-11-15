@@ -7,7 +7,7 @@
 	export let data;
 
 	onMount(() => {
-		if (!data.user?.emailVerified) {
+		if (!data.globalUser?.emailVerified) {
 			addToast('info', 'An email has been sent to your email address. Please verify your email address to enable notifications.');
 		}
 	});
@@ -24,9 +24,9 @@
 			</div>
 		{:else}
 			<p>No courses are found.</p>
-			{#if data.user?.hasNotificationsEnabled}
+			{#if data.globalUser?.hasNotificationsEnabled}
 				<p>Notifications for updates are enabled.</p>
-			{:else if data.user}
+			{:else if data.globalUser}
 				<p>you can enable notifications in your <a href="/profile">Profile</a> for updates.</p>
 			{/if}
 		{/each}

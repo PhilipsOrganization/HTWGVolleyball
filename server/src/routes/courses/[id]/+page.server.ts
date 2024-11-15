@@ -45,7 +45,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	return {
 		course: serializeCourse(course, locals.user),
-		user: serializeUser(locals.user),
+		globalUser: serializeUser(locals.user),
 		group: group
 	};
 };

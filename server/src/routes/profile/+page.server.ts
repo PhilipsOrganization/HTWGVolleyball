@@ -38,7 +38,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.limit(1);
 
 	return {
-		user: serializeUser(locals.user),
+		globalUser: serializeUser(locals.user),
 		stats,
 		registrationStats,
 		totalRegistrations: totalRegistrations.count

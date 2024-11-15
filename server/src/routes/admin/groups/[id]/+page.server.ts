@@ -3,6 +3,7 @@ import { accounts, groupMembers, groups } from '$lib/db/schema';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
+import { serializeUser } from '$lib/helpers/account';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -31,5 +32,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		.innerJoin(groupMembers, eq(accounts.id, groupMembers.userId))
 		.where(eq(groupMembers.groupId, groupId));
 
-	return { members, group: g };
+	return {
+		members, group: g,
+		globalUser: serializeUser(locals.user),
+	};
 };

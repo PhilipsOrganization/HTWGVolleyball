@@ -36,8 +36,8 @@
 			return alert('subscription failed');
 		}
 
-		const user = await request.json();
-		data = { ...data, user };
+		const globalUser = await request.json();
+		data = { ...data, globalUser };
 	}
 
 	/**
@@ -65,8 +65,8 @@
 			return alert('subscription failed');
 		}
 
-		const user = await request.json();
-		data = { ...data, user };
+		const globalUser = await request.json();
+		data = { ...data, globalUser };
 	}
 
 	
@@ -76,7 +76,7 @@
 	<h1>Profile</h1>
 
 	<h3>Email</h3>
-	{#if data.user.emailVerified}
+	{#if data.globalUser.emailVerified}
 		<!-- TODO: disable email notifications -->
 		<p>Email verified</p>
 	{:else}
@@ -95,7 +95,7 @@
 			Notifications make it easier to keep up to date. You'll get a notification when something happens that you might want to know about.
 			You can turn them off any time from your profile. If they are disabled, you'll get an email instead. However, emails are not instant.
 		</p>
-		{#if data.user.hasNotificationsEnabled}
+		{#if data.globalUser.hasNotificationsEnabled}
 			<button on:click={disableNotification}>Disable notifications</button>
 		{:else}
 			<button on:click={enableNotification}>Enable notifications</button>
@@ -103,7 +103,7 @@
 	{/if}
 
 	<h3>Strikes</h3>
-	<p class="red">Number of Strikes: {data.user.strikes}</p>
+	<p class="red">Number of Strikes: {data.globalUser.strikes}</p>
 	<p class="red">A strike is given when you don't show up for a course you registered for.</p>
 
 	<h3>Statistics</h3>

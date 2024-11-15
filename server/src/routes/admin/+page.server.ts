@@ -50,7 +50,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			date,
 			courses: courses.map((data) => serializeCourse(data, locals.user))
 		})),
-		user: serializeUser(locals.user),
+		globalUser: serializeUser(locals.user),
 		groups: g
 	};
 };

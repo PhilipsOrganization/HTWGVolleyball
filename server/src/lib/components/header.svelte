@@ -5,9 +5,9 @@
 
 <header>
 	<nav>
-		{#if $page.data.user}
+		{#if $page.data.globalUser}
 			<a href="/profile">Profile</a>
-			{#if $page.data.user.role !== Role.USER}
+			{#if $page.data.globalUser.role !== Role.USER}
 				<a href="/admin">Admin</a>
 				<a href="/admin/users">Users</a>
 			{/if}

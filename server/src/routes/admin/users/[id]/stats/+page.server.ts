@@ -74,6 +74,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	return {
 		user: serializeUser(user),
+		globalUser: serializeUser(locals.user),
 		stats,
 		registrationStats,
 		totalRegistrations: totalRegistrations.count,
