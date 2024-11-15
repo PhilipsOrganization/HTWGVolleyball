@@ -63,7 +63,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 					eq(groupMembers.userId, userId),
 					eq(groupMembers.groupId, groups.id)
 				)
-			);
+			).as('membership');
 
 		allGroups = await locals.db
 			.select({
@@ -71,7 +71,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 				name: groups.name,
 				isMember: exists(membership)
 			})
-			.from(groups);
+			.from(groups)
+			.leftJoin(membership, eq(groups.id, membership.groupId))
 	}
 
 	return {
