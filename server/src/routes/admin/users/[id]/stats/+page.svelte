@@ -249,6 +249,7 @@
 		padding: 10px;
 	}
 
+	option:checked::selection ,
 	option:checked {
 		background: #9ccfa8;
 		color: black;
