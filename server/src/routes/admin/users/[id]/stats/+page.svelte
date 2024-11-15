@@ -103,16 +103,20 @@
 </section>
 <section>
 	<h2>Groups</h2>
-	<form action="?/update-groups" method="POST" class="column" use:enhance>
-		<label for="groups"> Select the groups the user should be a member of: </label>
-		<select name="groups" multiple id="groups">
-			{#each data.groups as group}
-				<option value={group.id} selected={!!group.isMember}>{group.name}</option>
-			{/each}
-		</select>
+	{#if user.role === Role.USER}
+		<form action="?/update-groups" method="POST" class="column" use:enhance>
+			<label for="groups"> Select the groups the user should be a member of: </label>
+			<select name="groups" multiple id="groups">
+				{#each data.groups as group}
+					<option value={group.id} selected={!!group.isMember}>{group.name}</option>
+				{/each}
+			</select>
 
-		<button type="submit">Update Groups</button>
-	</form>
+			<button type="submit">Update Groups</button>
+		</form>
+	{:else}
+		<p>User is an admin and is automatically in all groups.</p>
+	{/if}
 </section>
 <section>
 	<h2>Send {user.username} an email message:</h2>
