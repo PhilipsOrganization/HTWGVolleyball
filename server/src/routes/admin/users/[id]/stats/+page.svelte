@@ -249,8 +249,12 @@
 		padding: 10px;
 	}
 
-	option[selected] {
+	option:checked {
 		background: #9ccfa8;
+	}
+
+	option:checked::after {
+		content: '✔';
 	}
 
 	select {
