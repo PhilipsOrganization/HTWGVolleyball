@@ -23,17 +23,21 @@
 <style>
 	form {
 		display: flex;
-		flex-direction: column;
 		border: 1px solid gray;
 		padding: 1rem;
 		gap: 1rem;
-		max-width: 50%;
+		max-width: max-content;
 		flex-flow: row wrap;
-		margin: auto;
+		margin: 4rem 2rem;
 	}
 
 	h2 {
 		flex: 1;
+	}
+
+	input {
+		flex: 2 1 50%;
+		padding: 0.8rem;
 	}
 
 	button {
@@ -42,5 +46,7 @@
 		border: none;
 		padding: 0.5rem 1rem;
 		cursor: pointer;
+		flex: 1 1;
+		text-align: center;
 	}
 </style>
