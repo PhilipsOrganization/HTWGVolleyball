@@ -7,6 +7,7 @@ import { generateRandomToken, serializeUser } from '$lib/helpers/account';
 import { error, fail, redirect, type Actions } from '@sveltejs/kit';
 import { and, count, eq, exists, sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
+import { id } from 'date-fns/locale';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -55,24 +56,27 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	// Only show groups if user is not an admin, admins can see all groups
 	if (user.role === Role.USER) {
-		const membership = locals.db
-			.select()
-			.from(groupMembers)
-			.where(
-				and(
-					eq(groupMembers.userId, userId),
-					eq(groupMembers.groupId, groups.id)
-				)
-			).as('membership');
+
+		// 	SELECT 
+		// 		g.id AS group_id,
+		// 		g.name AS group_name,
+		// 		ug.user_id IS NOT NULL AS is_member
+		// 	FROM 
+		// 		groups g
+		// 	LEFT JOIN 
+		// 		groupMembers ug ON g.id = ug.group_id AND ug.user_id = X
+		// 	ORDER BY 
+		// 		g.name;`
 
 		allGroups = await locals.db
 			.select({
 				id: groups.id,
 				name: groups.name,
-				isMember: exists(membership)
+				isMember: sql<boolean>`${groupMembers.userId} IS NOT NULL`.as('is_member')
 			})
 			.from(groups)
-			.leftJoin(membership, eq(groups.id, membership.groupId))
+			.leftJoin(groupMembers, and(eq(groups.id, groupMembers.groupId), eq(groupMembers.userId, userId)))
+			.orderBy(groups.name);
 	}
 
 	return {
