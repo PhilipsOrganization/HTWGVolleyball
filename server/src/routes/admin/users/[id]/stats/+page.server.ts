@@ -5,7 +5,7 @@ import AdminEmail from '$lib/email/templates/admin-email.svelte';
 import ResetPassword from '$lib/email/templates/reset-password.svelte';
 import { generateRandomToken, serializeUser } from '$lib/helpers/account';
 import { error, fail, redirect, type Actions } from '@sveltejs/kit';
-import { count, eq, exists, sql } from 'drizzle-orm';
+import { and, count, eq, exists, sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
@@ -56,12 +56,14 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	// Only show groups if user is not an admin, admins can see all groups
 	if (user.role === Role.USER) {
 		const membership = locals.db
-			.select({
-				id: groups.id
-			})
+			.select()
 			.from(groupMembers)
-			.where(eq(groupMembers.userId, userId))
-			.leftJoin(groups, eq(groupMembers.groupId, groups.id));
+			.where(
+				and(
+					eq(groupMembers.userId, userId),
+					eq(groupMembers.groupId, groups.id)
+				)
+			);
 
 		allGroups = await locals.db
 			.select({

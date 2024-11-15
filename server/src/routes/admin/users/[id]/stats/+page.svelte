@@ -241,4 +241,15 @@
 	label {
 		margin: 6px 0;
 	}
+
+	option[selected] {
+		background: #9ccfa8;
+	}
+
+	select {
+		padding: 10px;
+		margin: 10px;
+		border-radius: 5px;
+		border: 1px solid #ccc;
+	}
 </style>
