@@ -251,6 +251,10 @@
 
 	option:checked {
 		background: #9ccfa8;
+		color: black;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 
 	option:checked::after {
