@@ -15,9 +15,7 @@
 </ul>
 
 <form action="?/create" method="POST">
-	<h2>
-		Create a new group:
-	</h2>
+	<h2>Create a new group:</h2>
 	<input type="text" name="name" placeholder="Name" required />
 	<button type="submit">Create</button>
 </form>
@@ -29,6 +27,13 @@
 		border: 1px solid gray;
 		padding: 1rem;
 		gap: 1rem;
+		max-width: 50%;
+		flex-flow: row wrap;
+		margin: auto;
+	}
+
+	h2 {
+		flex: 1;
 	}
 
 	button {
