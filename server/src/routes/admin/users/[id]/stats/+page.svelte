@@ -50,16 +50,16 @@
 		{#if user.role === Role.ADMIN}
 			<ConfirmableForm message="Do you really want to demote the user to a normie?">
 				<form action="?/demote" method="post" slot="confirm">
-					<button>demote to user</button>
+					<button>Demote to User</button>
 				</form>
-				<button slot="button">demote to user</button>
+				<button slot="button">Demote to User</button>
 			</ConfirmableForm>
 		{:else if user.role === Role.USER}
 			<ConfirmableForm message="Do you really want to promote the user to an admin?">
 				<form action="?/promote" method="post" slot="confirm">
-					<button>promote to admin</button>
+					<button>Promote to Admin</button>
 				</form>
-				<button slot="button">promote to admin</button>
+				<button slot="button">Promote to Admin</button>
 			</ConfirmableForm>
 		{/if}
 		<form action="?/reset-pw" method="post">
