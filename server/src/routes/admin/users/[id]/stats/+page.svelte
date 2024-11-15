@@ -108,7 +108,10 @@
 			<label for="groups"> Select the groups the user should be a member of: </label>
 			<select name="groups" multiple id="groups">
 				{#each data.groups as group}
-					<option value={group.id} selected={!!group.isMember}>{group.name}</option>
+					<option value={group.id} selected={!!group.isMember}
+						>{group.name}
+						{JSON.stringify(group)}
+					</option>
 				{/each}
 			</select>
 
@@ -249,7 +252,7 @@
 		padding: 10px;
 	}
 
-	option::selection ,
+	option::selection,
 	option:checked {
 		background: #9ccfa8;
 		color: black;
