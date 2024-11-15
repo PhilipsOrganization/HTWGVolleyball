@@ -104,7 +104,7 @@
 <section>
 	<h2>Groups</h2>
 	{#if user.role === Role.USER}
-		<form action="?/update-groups" method="POST" class="column flex" use:enhance>
+		<form action="?/update-groups" method="POST" class="column flex">
 			<label for="groups"> Select the groups the user should be a member of: </label>
 			<select name="groups" multiple id="groups">
 				{#each data.groups as group}
