@@ -37,36 +37,11 @@ self.addEventListener('activate', (event) => {
 	);
 });
 
-self.addEventListener('notificationclick', function (event) {
-	if (!event.action) {
-		// Was a normal notification click
-		console.log('Notification Click.');
-		return;
-	}
-
-	switch (event.action) {
-		case 'coffee-action':
-			console.log('User ❤️️\'s coffee.');
-			break;
-		case 'doughnut-action':
-			console.log('User ❤️️\'s doughnuts.');
-			break;
-		case 'gramophone-action':
-			console.log('User ❤️️\'s music.');
-			break;
-		case 'atom-action':
-			console.log('User ❤️️\'s science.');
-			break;
-		default:
-			console.log(`Unknown action clicked: '${event.action}'`);
-			break;
-	}
-});
-
 self.addEventListener('push', (ev) => {
 	const data = ev.data?.json();
 	self.registration.showNotification(data.title, {
 		icon: 'https://volleyball.oesterlin.dev/Volleyball_icon.png',
+		// @ts-expect-error - actions are not yet part of the standard
 		actions: data.actions ?? [],
 		data
 	});
@@ -77,7 +52,7 @@ self.addEventListener('notificationclick', function (event) {
 		return;
 	}
 
-	const data = event.notification.data
+	const data = event.notification.data;
 	if (!data || !data.actions || !Array.isArray(data.actions)) {
 		return;
 	}
@@ -89,15 +64,15 @@ self.addEventListener('notificationclick', function (event) {
 async function openUrl(url: string) {
 	const urlToOpen = new URL(url, self.location.origin).href;
 
-	const windowClients = await clients.matchAll({
+	const windowClients = await self.clients.matchAll({
 		type: 'window',
 		includeUncontrolled: true
-	})
+	});
 
-	let matchingClient = null;
+	let matchingClient: WindowClient | null = null;
 
-	for (let i = 0; i < windowClients.length; i++) {
-		const windowClient = windowClients[i];
+	for (const element of windowClients) {
+		const windowClient = element;
 		if (windowClient.url === urlToOpen) {
 			matchingClient = windowClient;
 			break;
@@ -107,7 +82,7 @@ async function openUrl(url: string) {
 	if (matchingClient) {
 		return matchingClient.focus();
 	} else {
-		return clients.openWindow(urlToOpen);
+		return self.clients.openWindow(urlToOpen);
 	}
 }
 
