@@ -12,7 +12,7 @@ import type { Actions, PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user) {
-		redirect(303, '/login');
+		redirect(302, '/login');
 	}
 
 	const id = parseInt(params.id);
