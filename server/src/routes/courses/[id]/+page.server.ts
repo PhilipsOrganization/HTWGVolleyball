@@ -8,7 +8,7 @@ import { getCourse, getCourseUsers, isCourseInThePast, serializeCourse } from '$
 import { DropCourseAction, OpenCourseAction, OpenProfileAction, sendNotification } from '$lib/helpers/notification';
 import { error, redirect } from '@sveltejs/kit';
 import { and, eq, getTableColumns, gte, isNull, lte, sql } from 'drizzle-orm';
-import type { PageServerLoad } from './$types.js';
+import type { Actions, PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user) {
@@ -261,7 +261,13 @@ export const actions = {
 		}
 
 		const userId = parseInt(userIdString);
-		await locals.db.delete(courseSpots).where(and(eq(courseSpots.userId, userId), eq(courseSpots.courseId, courseId)));
+		// await locals.db.delete(courseSpots).where(and(eq(courseSpots.userId, userId), eq(courseSpots.courseId, courseId)));
+		await locals.db
+			.update(courseSpots)
+			.set({
+				deletedAt: sql`NOW()`
+			})
+			.where(and(eq(courseSpots.userId, userId), eq(courseSpots.courseId, courseId)));
 
 		notifyNextUser(course, locals.db);
 		const accounts = await getCourseUsers(locals.db, courseId);
@@ -306,4 +312,4 @@ export const actions = {
 			});
 		}
 	}
-};
+} satisfies Actions;

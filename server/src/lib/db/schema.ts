@@ -58,7 +58,7 @@ export const accounts = pgTable(
 	}
 );
 
-export type Account = typeof accounts.$inferSelect & { canceledAt?: Date };
+export type Account = typeof accounts.$inferSelect & { canceledAt?: Date | null };
 
 export const courseSpots = pgTable(
 	'course_spots',

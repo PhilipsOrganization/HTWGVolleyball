@@ -55,9 +55,9 @@ export async function getCourseUsers(db: DB, id: number) {
 			canceledAt: courseSpots.deletedAt
 		})
 		.from(courseSpots)
+		.where(eq(courseSpots.courseId, id))
 		.rightJoin(accounts, eq(courseSpots.userId, accounts.id))
-		.orderBy(courseSpots.createdAt)
-		.where(eq(courseSpots.courseId, id));
+		.orderBy(courseSpots.createdAt);
 
 	return res;
 }
