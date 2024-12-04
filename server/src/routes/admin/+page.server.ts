@@ -1,16 +1,13 @@
 import { Role } from '$lib/db/role';
-import { accounts, courseSpots, courses, groups, type Account } from '$lib/db/schema';
+import { accounts, courseSpots, courses, groups, type Account, type Course } from '$lib/db/schema';
 import { serializeUser } from '$lib/helpers/account';
 import { serializeCourse } from '$lib/helpers/course';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { startOfYesterday } from 'date-fns';
+import { zonedTimeToUtc } from 'date-fns-tz';
 import { desc, eq, gte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { PageServerLoad } from './$types';
-import { zonedTimeToUtc } from 'date-fns-tz';
-import { and } from 'drizzle-orm';
-import { isNull } from 'drizzle-orm';
-import type Course from '$lib/components/course.svelte';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -59,8 +56,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		dates: Array.from(dates).map(([date, courses]) => ({
 			date,
 			courses: courses
-			.filter((data) => Boolean(data.courses))
-			.map((data) => serializeCourse(data.courses as Course, data.accountsJson, locals.user))
+				.filter((data) => Boolean(data.courses))
+				.map((data) => serializeCourse(data.courses as Course, data.accountsJson, locals.user))
 		})),
 		globalUser: serializeUser(locals.user),
 		groups: g

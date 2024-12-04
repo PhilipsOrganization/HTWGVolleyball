@@ -1,11 +1,10 @@
-import { accounts, courseSpots, courses, groupMembers, groups, type Account } from '$lib/db/schema.js';
+import { accounts, courseSpots, courses, groupMembers, groups, type Account, type Course } from '$lib/db/schema.js';
 import { serializeUser } from '$lib/helpers/account';
 import { serializeCourse } from '$lib/helpers/course';
 import { and, eq, gte, inArray, isNull, lte, or, sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { Role } from '$lib/db/role';
-import type Course from '$lib/components/course.svelte';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {

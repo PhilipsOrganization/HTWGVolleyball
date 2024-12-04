@@ -148,9 +148,9 @@
 					<span>
 						<b class="ellipsis" class:canceled={participant.canceledAt}>{participant.username}</b>
 						{#if participant.canceledAt}
-							{@const canceledToday = isToday(participant.canceledAt) && false}
+							{@const canceledToday = isToday(participant.canceledAt)}
 							{@const dateFormat = canceledToday ? 'HH:mm' : 'dd.MM. HH:mm'}
-							<em>canceled at  {format(participant.canceledAt, dateFormat)} </em>
+							<em>canceled at {format(participant.canceledAt, dateFormat)} </em>
 						{/if}
 					</span>
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
@@ -302,5 +302,4 @@
 		text-decoration: line-through;
 		color: #eb714f;
 	}
-
 </style>

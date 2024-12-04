@@ -10,7 +10,11 @@ export function serializeCourse(course: Course, accounts: Account[], user?: Acco
 	}
 
 	accounts = accounts.filter((a) => a !== null);
-	const signupCount = accounts.filter((a) => !a.canceledAt).length;
+	const signupCount = accounts.filter((a) => a.canceledAt === null).length;
+
+	if (course.id === 255) {
+		console.log('accounts', accounts, signupCount, course);
+	}
 
 	const serialized = {
 		...course,
@@ -52,6 +56,7 @@ export async function getCourseUsers(db: DB, id: number) {
 		})
 		.from(courseSpots)
 		.rightJoin(accounts, eq(courseSpots.userId, accounts.id))
+		.orderBy(courseSpots.createdAt)
 		.where(eq(courseSpots.courseId, id));
 
 	return res;
