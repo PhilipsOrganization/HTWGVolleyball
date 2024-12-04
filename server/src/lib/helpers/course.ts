@@ -13,10 +13,6 @@ export function serializeCourse(course: Course, accounts: Account[], user?: Acco
 	const onlyActive = accounts.filter((a) => a.canceledAt === null);
 	const signupCount = onlyActive.length;
 
-	if (course.id === 255) {
-		console.log('accounts', accounts, signupCount, course);
-	}
-
 	const serialized = {
 		...course,
 		signupCount,
@@ -36,8 +32,7 @@ export function serializeCourse(course: Course, accounts: Account[], user?: Acco
 		serialized.participants = accounts.map(sanitizeUser);
 	}
 
-	const enrollment = accounts.find((a) => a.id === user.id);
-	const isEnrolled = !!enrollment && !enrollment.canceledAt;
+	const isEnrolled = onlyActive.some((a) => a.id === user.id);
 	const spot = onlyActive.findIndex((a) => a.id === user.id);
 	const isOnWaitlist = spot >= course.maxParticipants;
 
