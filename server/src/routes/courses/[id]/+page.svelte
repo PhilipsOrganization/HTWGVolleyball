@@ -145,14 +145,7 @@
 
 			{#each course.participants ?? [] as participant, index}
 				<div class="user" class:waitList={index >= course.maxParticipants}>
-					<span>
-						<b class="ellipsis" class:canceled={participant.canceledAt}>{participant.username}</b>
-						{#if participant.canceledAt}
-							{@const canceledToday = isToday(participant.canceledAt)}
-							{@const dateFormat = canceledToday ? 'HH:mm' : 'dd.MM. HH:mm'}
-							<em>canceled at {format(participant.canceledAt, dateFormat)} </em>
-						{/if}
-					</span>
+					<b class="ellipsis">{participant.username}</b>
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
 					<ConfirmableForm message="Do you really want to strike this user?">
 						<form action="?/strike" method="post" use:enhance={updateCourse} slot="confirm">
@@ -161,13 +154,19 @@
 						</form>
 						<button type="submit" class="underline" slot="button">strike</button>
 					</ConfirmableForm>
-					<ConfirmableForm message="Do you really want to cancel this user?">
-						<form action="?/cancel" method="post" use:enhance={updateCourse} slot="confirm">
-							<input type="hidden" name="userId" value={participant.id} />
-							<button type="submit" class="underline">cancel</button>
-						</form>
-						<button type="submit" class="underline" slot="button">cancel</button>
-					</ConfirmableForm>
+					{#if participant.canceledAt}
+						{@const canceledToday = isToday(participant.canceledAt) && false}
+						{@const dateFormat = canceledToday ? 'HH:mm' : 'dd.MM. HH:mm'}
+						<span class:canceled={participant.canceledAt}>canceled at {format(participant.canceledAt, dateFormat)} </span>
+					{:else}
+						<ConfirmableForm message="Do you really want to cancel this user?">
+							<form action="?/cancel" method="post" use:enhance={updateCourse} slot="confirm">
+								<input type="hidden" name="userId" value={participant.id} />
+								<button type="submit" class="underline">cancel</button>
+							</form>
+							<button type="submit" class="underline" slot="button">cancel</button>
+						</ConfirmableForm>
+					{/if}
 				</div>
 			{:else}
 				<p>There are currently no participants. ☹</p>
@@ -264,12 +263,12 @@
 		display: flex;
 		flex-direction: column;
 		margin: 0 auto 6rem;
-		width: min(90%, 1150px);
+		width: min(90%, 9000px);
 	}
 
 	.user {
 		display: grid;
-		grid-template-columns: 2fr repeat(3, 1fr);
+		grid-template-columns: 2fr repeat(2, 1fr) 2fr;
 		justify-items: center;
 		align-items: center;
 		flex-direction: row;
@@ -299,7 +298,7 @@
 	}
 
 	.canceled {
-		text-decoration: line-through;
-		color: #eb714f;
+		color: #e65932;
+		justify-self: end;
 	}
 </style>
