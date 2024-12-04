@@ -9,7 +9,7 @@ export function serializeCourse(course: Course, accounts: Account[], user?: Acco
 		error(404, 'Course not found');
 	}
 
-	accounts = accounts.filter((a) => a !== null);
+	accounts = accounts.filter((a) => a?.id);
 	const onlyActive = accounts.filter((a) => a.canceledAt === null);
 	const signupCount = onlyActive.length;
 
@@ -52,7 +52,7 @@ export async function getCourseUsers(db: DB, id: number) {
 		})
 		.from(courseSpots)
 		.where(eq(courseSpots.courseId, id))
-		.rightJoin(accounts, eq(courseSpots.userId, accounts.id))
+		.leftJoin(accounts, eq(courseSpots.userId, accounts.id))
 		.orderBy(courseSpots.createdAt);
 
 	return res;
