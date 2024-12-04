@@ -42,7 +42,7 @@
 	main {
 		display: flex;
 		flex-direction: column;
-		margin: 0 auto 15dvh;
+		margin: 0 auto 15svh;
 		width: 90vw;
 		max-width: 700px;
 		box-sizing: border-box;

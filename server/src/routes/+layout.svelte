@@ -44,7 +44,7 @@
 		color: #e0e0e0;
 		font-family: 'Roboto Mono', monospace;
 		font-weight: 100;
-		min-height: 100dvh;
+		min-height: 100svh;
 		font-size: 16px;
 		display: flex;
 		flex-direction: column;
