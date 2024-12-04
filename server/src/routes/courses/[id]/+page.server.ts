@@ -4,10 +4,10 @@ import { sendEmail } from '$lib/email';
 import OpenSpot from '$lib/email/templates/open-spot.svelte';
 import RecievedStrike from '$lib/email/templates/recieved-strike.svelte';
 import { serializeUser } from '$lib/helpers/account.js';
-import { getCourseWithUsers, isCourseInThePast, serializeCourse } from '$lib/helpers/course.js';
+import { getCourse, getCourseUsers, isCourseInThePast, serializeCourse } from '$lib/helpers/course.js';
 import { DropCourseAction, OpenCourseAction, OpenProfileAction, sendNotification } from '$lib/helpers/notification';
 import { error, redirect } from '@sveltejs/kit';
-import { and, eq, gte, lte, not, sql } from 'drizzle-orm';
+import { and, eq, getTableColumns, gte, isNull, lte, sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
@@ -16,9 +16,9 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	}
 
 	const id = parseInt(params.id);
-	const course = await getCourseWithUsers(locals.db, id);
+	const course = await getCourse(locals.db, id);
 
-	if (!course || !course.courses) {
+	if (!course) {
 		error(400, 'Course not found');
 	}
 
@@ -27,8 +27,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	}
 
 	let group = null;
-	if (course.courses.groupId) {
-		[group] = await locals.db.select().from(groups).where(eq(groups.id, course.courses.groupId)).limit(1);
+	if (course.groupId) {
+		[group] = await locals.db.select().from(groups).where(eq(groups.id, course.groupId)).limit(1);
 	}
 
 	if (group && locals.user.role === Role.USER) {
@@ -43,8 +43,10 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		}
 	}
 
+	const accounts = await getCourseUsers(locals.db, id);
+
 	return {
-		course: serializeCourse(course, locals.user),
+		course: serializeCourse(course, accounts, locals.user),
 		globalUser: serializeUser(locals.user),
 		group: group
 	};
@@ -57,7 +59,7 @@ async function notifyNextUser(course: Course, db: DB) {
 		.select()
 		.from(courseSpots)
 		.leftJoin(accounts, eq(courseSpots.userId, accounts.id))
-		.where(eq(courseSpots.courseId, course.id))
+		.where(and(eq(courseSpots.courseId, course.id), isNull(courseSpots.deletedAt)))
 		.orderBy(courseSpots.createdAt);
 
 	// If there are no users on the waitlist, return
@@ -105,7 +107,7 @@ export const actions = {
 
 		const [course] = await locals.db
 			.select({
-				courses,
+				...getTableColumns(courses),
 				shouldPublish: sql<boolean>`(${courses.publishOn} <= NOW() AND ${courses.date} >= (NOW() - INTERVAL '1 day'))`.as('shouldPublish')
 			})
 			.from(courses)
@@ -116,7 +118,7 @@ export const actions = {
 			error(400, 'Course not found');
 		}
 
-		if (isCourseInThePast(course.courses)) {
+		if (isCourseInThePast(course)) {
 			error(400, 'Course is in the past');
 		}
 
@@ -130,12 +132,14 @@ export const actions = {
 			.where(and(eq(courseSpots.userId, locals.user.id), eq(courseSpots.courseId, courseId)))
 			.limit(1);
 
+		// If the user already had a spot, potentially a deleted one, remove it and add a new one
 		if (isEnrolled) {
-			error(400, 'Already enrolled');
+			console.log('was already enrolled, deleting');
+			await locals.db.delete(courseSpots).where(and(eq(courseSpots.userId, locals.user.id), eq(courseSpots.courseId, courseId)));
 		}
 
-		if (!course.courses.allowDoubleBookings) {
-			const date = new Date(course.courses.date);
+		if (!course.allowDoubleBookings) {
+			const date = new Date(course.date);
 			const dateWithoutTime = date.toISOString().split('T')[0];
 			const nextDayWithoutTime = new Date(date.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
@@ -149,7 +153,8 @@ export const actions = {
 						eq(courseSpots.userId, locals.user.id),
 						// find all courses that are on the same day
 						gte(courses.date, dateWithoutTime),
-						lte(courses.date, nextDayWithoutTime)
+						lte(courses.date, nextDayWithoutTime),
+						isNull(courseSpots.deletedAt)
 					)
 				)
 				.limit(1);
@@ -166,10 +171,10 @@ export const actions = {
 			courseId: courseId
 		});
 
-		const updated = await getCourseWithUsers(locals.db, courseId);
+		const accounts = await getCourseUsers(locals.db, courseId);
 
 		return {
-			course: serializeCourse(updated, locals.user)
+			course: serializeCourse(course, accounts, locals.user)
 		};
 	},
 	drop: async ({ locals, params }) => {
@@ -183,7 +188,7 @@ export const actions = {
 		}
 
 		const courseId = parseInt(courseIdString);
-		const [course] = await locals.db.select().from(courses).where(eq(courses.id, courseId)).limit(1);
+		const course = await getCourse(locals.db, courseId);
 		if (!course) {
 			error(400, 'Course not found');
 		}
@@ -195,23 +200,26 @@ export const actions = {
 		const [isEnrolled] = await locals.db
 			.select()
 			.from(courseSpots)
-			.where(and(eq(courseSpots.userId, locals.user.id), eq(courseSpots.courseId, courseId)))
+			.where(and(eq(courseSpots.userId, locals.user.id), eq(courseSpots.courseId, courseId), isNull(courseSpots.deletedAt)))
 			.limit(1);
 
 		if (!isEnrolled) {
 			error(400, 'Not enrolled');
 		}
 
-		await locals.db.delete(courseSpots).where(and(eq(courseSpots.userId, locals.user.id), eq(courseSpots.courseId, courseId)));
+		await locals.db
+			.update(courseSpots)
+			.set({
+				deletedAt: sql`NOW()`
+			})
+			.where(and(eq(courseSpots.userId, locals.user.id), eq(courseSpots.courseId, courseId)));
 
-		const updated = await getCourseWithUsers(locals.db, courseId);
+		notifyNextUser(course, locals.db);
 
-		if (updated.courses) {
-			notifyNextUser(updated.courses, locals.db);
-		}
+		const accounts = await getCourseUsers(locals.db, courseId);
 
 		return {
-			course: serializeCourse(updated, locals.user)
+			course: serializeCourse(course, accounts, locals.user)
 		};
 	},
 	'delete-course': async ({ locals, params }) => {
@@ -245,7 +253,7 @@ export const actions = {
 
 		const form = await request.formData();
 		const courseId = parseInt(params.id as string);
-		const [course] = await locals.db.select().from(courses).where(eq(courses.id, courseId)).limit(1);
+		const course = await getCourse(locals.db, courseId);
 
 		const userIdString = form.get('userId') as string | undefined;
 		if (!userIdString) {
@@ -256,10 +264,10 @@ export const actions = {
 		await locals.db.delete(courseSpots).where(and(eq(courseSpots.userId, userId), eq(courseSpots.courseId, courseId)));
 
 		notifyNextUser(course, locals.db);
+		const accounts = await getCourseUsers(locals.db, courseId);
 
-		const updated = await getCourseWithUsers(locals.db, courseId);
 		return {
-			course: serializeCourse(updated, locals.user)
+			course: serializeCourse(course, accounts, locals.user)
 		};
 	},
 	strike: async ({ locals, request, params }) => {

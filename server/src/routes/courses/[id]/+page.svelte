@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
 	import { addToast } from '$lib/helpers/toast';
+	import { format, isToday } from 'date-fns';
 	import da from 'date-fns/locale/da';
 
 	export let data;
@@ -144,7 +145,14 @@
 
 			{#each course.participants ?? [] as participant, index}
 				<div class="user" class:waitList={index >= course.maxParticipants}>
-					<span class="ellipsis">{participant.username}</span>
+					<span>
+						<b class="ellipsis" class:canceled={participant.canceledAt}>{participant.username}</b>
+						{#if participant.canceledAt}
+							{@const canceledToday = isToday(participant.canceledAt) && false}
+							{@const dateFormat = canceledToday ? 'HH:mm' : 'dd.MM. HH:mm'}
+							<em>canceled at  {format(participant.canceledAt, dateFormat)} </em>
+						{/if}
+					</span>
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
 					<ConfirmableForm message="Do you really want to strike this user?">
 						<form action="?/strike" method="post" use:enhance={updateCourse} slot="confirm">
@@ -256,7 +264,7 @@
 		display: flex;
 		flex-direction: column;
 		margin: 0 auto 6rem;
-		width: min(90%, 650px);
+		width: min(90%, 1150px);
 	}
 
 	.user {
@@ -289,4 +297,10 @@
 	.underline {
 		text-decoration: underline;
 	}
+
+	.canceled {
+		text-decoration: line-through;
+		color: #eb714f;
+	}
+
 </style>

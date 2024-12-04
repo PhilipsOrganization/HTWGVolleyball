@@ -44,16 +44,18 @@ export function serializeUser(user: Account) {
         lastLogin: new Date(user.lastLogin ?? user.createdAt),
         notes: user.notes,
         hasNotificationsEnabled: user.subscriptionAuth !== null && user.subscriptionAuth !== undefined,
+        canceledAt: user.canceledAt,
     };
 }
 
-export type SanitizedAccount = Pick<Account, 'id' | 'username' | 'role'>;
+export type SanitizedAccount = Pick<Account, 'id' | 'username' | 'role' | 'canceledAt'>;
 
 export function sanitizeUser(account: Account): SanitizedAccount {
     const user = {
         id: account.id,
         username: account.username,
         role: account.role,
+        canceledAt: account.canceledAt,
     };
 
     return user;

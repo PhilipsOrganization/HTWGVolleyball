@@ -8,6 +8,7 @@ import { error, fail, redirect, type Actions } from '@sveltejs/kit';
 import { and, count, eq, exists, sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { id } from 'date-fns/locale';
+import { isNull } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -30,7 +31,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		.select({ courseName: courses.name, count: count(courses.name) })
 		.from(courseSpots)
 		.innerJoin(courses, eq(courseSpots.courseId, courses.id))
-		.where(eq(courseSpots.userId, userId))
+		.where(and(eq(courseSpots.userId, userId), isNull(courseSpots.deletedAt)))
 		.groupBy(courses.name)
 		.limit(10);
 
@@ -42,11 +43,15 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		})
 		.from(courseSpots)
 		.leftJoin(courses, eq(courseSpots.courseId, courses.id))
-		.where(eq(courseSpots.userId, userId))
+		.where(and(eq(courseSpots.userId, userId), isNull(courseSpots.deletedAt)))
 		.groupBy(courseSpots.userId)
 		.limit(1);
 
-	const [totalRegistrations] = await locals.db.select({ count: count() }).from(courseSpots).where(eq(courseSpots.userId, userId)).limit(1);
+	const [totalRegistrations] = await locals.db
+		.select({ count: count() })
+		.from(courseSpots)
+		.where(and(eq(courseSpots.userId, userId), isNull(courseSpots.deletedAt)))
+		.limit(1);
 
 	let allGroups: {
 		id: number;
@@ -56,16 +61,15 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	// Only show groups if user is not an admin, admins can see all groups
 	if (user.role === Role.USER) {
-
-		// 	SELECT 
+		// 	SELECT
 		// 		g.id AS group_id,
 		// 		g.name AS group_name,
 		// 		ug.user_id IS NOT NULL AS is_member
-		// 	FROM 
+		// 	FROM
 		// 		groups g
-		// 	LEFT JOIN 
+		// 	LEFT JOIN
 		// 		groupMembers ug ON g.id = ug.group_id AND ug.user_id = X
-		// 	ORDER BY 
+		// 	ORDER BY
 		// 		g.name;`
 
 		allGroups = await locals.db

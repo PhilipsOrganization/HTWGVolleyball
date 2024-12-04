@@ -58,7 +58,7 @@ export const accounts = pgTable(
 	}
 );
 
-export type Account = typeof accounts.$inferSelect;
+export type Account = typeof accounts.$inferSelect & { canceledAt?: Date };
 
 export const courseSpots = pgTable(
 	'course_spots',
@@ -69,7 +69,8 @@ export const courseSpots = pgTable(
 		userId: integer('user_id')
 			.notNull()
 			.references(() => accounts.id, { onUpdate: 'cascade' }),
-		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull()
+		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow().notNull(),
+		deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'date' })
 	},
 	(table) => {
 		return {

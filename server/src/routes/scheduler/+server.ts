@@ -1,83 +1,91 @@
-import { dev } from "$app/environment";
-import { accounts, courseSpots, courses } from "$lib/db/schema.js";
-import { sendEmail } from "$lib/email/index.js";
-import CourseNotification from "$lib/email/templates/course-notification.svelte";
-import { OpenCourseAction, sendNotification } from "$lib/helpers/notification.js";
+import { dev } from '$app/environment';
+import { accounts, courseSpots, courses } from '$lib/db/schema.js';
+import { sendEmail } from '$lib/email/index.js';
+import CourseNotification from '$lib/email/templates/course-notification.svelte';
+import { OpenCourseAction, sendNotification } from '$lib/helpers/notification.js';
 import * as Sentry from '@sentry/sveltekit';
-import type { RequestHandler } from "@sveltejs/kit";
-import { differenceInHours, isToday } from "date-fns";
-import { and, eq, gte, lte, sql } from "drizzle-orm";
+import type { RequestHandler } from '@sveltejs/kit';
+import { differenceInHours, isToday } from 'date-fns';
+import { isNull } from 'drizzle-orm';
+import { and, eq, gte, lte, sql } from 'drizzle-orm';
 
 export const GET: RequestHandler = async ({ locals }) => {
-    const checkInId = Sentry.captureCheckIn({
-        monitorSlug: "notification-cron",
-        status: "in_progress",
-    });
+	const checkInId = Sentry.captureCheckIn({
+		monitorSlug: 'notification-cron',
+		status: 'in_progress'
+	});
 
-    try {
-        const db = locals.db;
-        const result = await db.select().from(courses).where(
-            and(
-                eq(courses.notificationSent, false),
-                lte(courses.publishOn, sql`NOW()`),	// Only show courses that have been published
-                gte(courses.date, sql`NOW() - INTERVAL '1 day'`), // Only show courses that are 24 hours in the future
-            )
-        );
+	try {
+		const db = locals.db;
+		const result = await db
+			.select()
+			.from(courses)
+			.where(
+				and(
+					eq(courses.notificationSent, false),
+					lte(courses.publishOn, sql`NOW()`), // Only show courses that have been published
+					gte(courses.date, sql`NOW() - INTERVAL '1 day'`) // Only show courses that are 24 hours in the future
+				)
+			);
 
-        console.log(`Found ${result.length} courses to send notifications for`);
+		console.log(`Found ${result.length} courses to send notifications for`);
 
-        for (const course of result) {
-            const [hours, minutes] = course.time.split(":").map(Number);
-            const date = new Date(course.date);
-            date.setHours(hours, minutes, 0, 0);
-            const hoursToCourse = differenceInHours(date, new Date())
-            if (!isToday(date) || hoursToCourse > 6) {
-                continue;
-            }
+		for (const course of result) {
+			const [hours, minutes] = course.time.split(':').map(Number);
+			const date = new Date(course.date);
+			date.setHours(hours, minutes, 0, 0);
+			const hoursToCourse = differenceInHours(date, new Date());
+			if (!isToday(date) || hoursToCourse > 6) {
+				continue;
+			}
 
-            if (!dev && course.notificationSent) {
-                continue;
-            }
+			if (!dev && course.notificationSent) {
+				continue;
+			}
 
-            await db.update(courses).set({ notificationSent: true }).where(eq(courses.id, course.id));
+			await db.update(courses).set({ notificationSent: true }).where(eq(courses.id, course.id));
 
-            console.log(`Sending notifications for course ${course.id}`);
-            const usersInCourse = await db.select().from(courseSpots)
-                .leftJoin(accounts, eq(courseSpots.userId, accounts.id))
-                .where(eq(courseSpots.courseId, course.id));
+			console.log(`Sending notifications for course ${course.id}`);
+			const usersInCourse = await db
+				.select()
+				.from(courseSpots)
+				.leftJoin(accounts, eq(courseSpots.userId, accounts.id))
+				.where(and(eq(courseSpots.courseId, course.id), isNull(courseSpots.deletedAt)));
 
-            for (const user of usersInCourse) {
-                if (user.accounts?.subscriptionAuth) {
-                    try {
-                        await sendNotification(user.accounts, `You have a course today: ${course.name}`, [new OpenCourseAction(course.id)]);
-                    } catch (e) {
-                        await db.update(accounts).set({ subscriptionAuth: null, subscriptionEndpoint: null, subscriptionExpirationTime: null, subscriptionP256Dh: null }).where(eq(accounts.id, user.accounts.id));
-                    }
-                }
+			for (const user of usersInCourse) {
+				if (user.accounts?.subscriptionAuth) {
+					try {
+						await sendNotification(user.accounts, `You have a course today: ${course.name}`, [new OpenCourseAction(course.id)]);
+					} catch (e) {
+						await db
+							.update(accounts)
+							.set({ subscriptionAuth: null, subscriptionEndpoint: null, subscriptionExpirationTime: null, subscriptionP256Dh: null })
+							.where(eq(accounts.id, user.accounts.id));
+					}
+				}
 
-                if (user.accounts && (!user.accounts.subscriptionAuth || dev)) {
-                    await sendEmail(CourseNotification, {
-                        user: user.accounts,
-                        subject: `You have a course today: ${course.name}`,
-                        props: { course, user }
-                    });
-                }
-            }
+				if (user.accounts && (!user.accounts.subscriptionAuth || dev)) {
+					await sendEmail(CourseNotification, {
+						user: user.accounts,
+						subject: `You have a course today: ${course.name}`,
+						props: { course, user }
+					});
+				}
+			}
+		}
 
-        }
+		Sentry.captureCheckIn({
+			checkInId,
+			monitorSlug: 'notification-cron',
+			status: 'ok'
+		});
+	} catch (e) {
+		Sentry.captureCheckIn({
+			checkInId,
+			monitorSlug: 'notification-cron',
+			status: 'error'
+		});
+	}
 
-        Sentry.captureCheckIn({
-            checkInId,
-            monitorSlug: 'notification-cron',
-            status: 'ok',
-        });
-    } catch (e) {
-        Sentry.captureCheckIn({
-            checkInId,
-            monitorSlug: "notification-cron",
-            status: "error",
-        });
-    }
-
-    return new Response(JSON.stringify({ message: "ok" }));
-}
+	return new Response(JSON.stringify({ message: 'ok' }));
+};

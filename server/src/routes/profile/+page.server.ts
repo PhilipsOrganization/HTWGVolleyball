@@ -5,6 +5,8 @@ import { generateRandomToken, serializeUser } from '$lib/helpers/account.js';
 import { redirect, type Actions } from '@sveltejs/kit';
 import { count, eq, sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types.js';
+import { and } from 'drizzle-orm';
+import { isNull } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
@@ -27,14 +29,14 @@ export const load: PageServerLoad = async ({ locals }) => {
 		})
 		.from(courseSpots)
 		.leftJoin(courses, eq(courseSpots.courseId, courses.id))
-		.where(eq(courseSpots.userId, locals.user.id))
+		.where(and(eq(courseSpots.userId, locals.user.id), isNull(courseSpots.deletedAt)))
 		.groupBy(courseSpots.userId)
 		.limit(1);
 
 	const [totalRegistrations] = await locals.db
 		.select({ count: count() })
 		.from(courseSpots)
-		.where(eq(courseSpots.userId, locals.user.id))
+		.where(and(eq(courseSpots.userId, locals.user.id), isNull(courseSpots.deletedAt)))
 		.limit(1);
 
 	return {

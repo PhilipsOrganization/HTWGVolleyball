@@ -8,6 +8,9 @@ import { desc, eq, gte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { PageServerLoad } from './$types';
 import { zonedTimeToUtc } from 'date-fns-tz';
+import { and } from 'drizzle-orm';
+import { isNull } from 'drizzle-orm';
+import type Course from '$lib/components/course.svelte';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
@@ -20,7 +23,14 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	const result = await locals.db
 		.select({
 			courses,
-			accountsJson: sql<Account[] | [null]>`json_agg(accounts order by ${courseSpots.createdAt} asc)`.as('accountsJson')
+			accountsJson: sql<Account[]>`json_agg(
+				json_build_object(
+					'id', ${accounts.id},
+					'username', ${accounts.username},
+					'role', ${accounts.role},
+					'canceledAt', ${courseSpots.deletedAt}
+				)
+			 order by ${courseSpots.createdAt} asc)`.as('accountsJson')
 		})
 		.from(courseSpots)
 		.fullJoin(courses, eq(courseSpots.courseId, courses.id))
@@ -48,7 +58,9 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	return {
 		dates: Array.from(dates).map(([date, courses]) => ({
 			date,
-			courses: courses.map((data) => serializeCourse(data, locals.user))
+			courses: courses
+			.filter((data) => Boolean(data.courses))
+			.map((data) => serializeCourse(data.courses as Course, data.accountsJson, locals.user))
 		})),
 		globalUser: serializeUser(locals.user),
 		groups: g
