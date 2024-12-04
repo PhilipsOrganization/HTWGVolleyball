@@ -46,7 +46,7 @@
 		flex-direction: column;
 		margin-bottom: 3rem;
 		border-radius: 12px 12px 0 0;
-		background: #2a2a2a;
+		background: #23262a;
 		padding-top: 1rem;
 	}
 
