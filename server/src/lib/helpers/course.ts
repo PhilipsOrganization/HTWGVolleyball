@@ -52,7 +52,7 @@ export async function getCourseUsers(db: DB, id: number) {
 		})
 		.from(courseSpots)
 		.where(eq(courseSpots.courseId, id))
-		.leftJoin(accounts, eq(courseSpots.userId, accounts.id))
+		.rightJoin(accounts, eq(courseSpots.userId, accounts.id))
 		.orderBy(courseSpots.createdAt);
 
 	return res;

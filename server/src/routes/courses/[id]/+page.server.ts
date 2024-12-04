@@ -69,7 +69,7 @@ async function notifyNextUser(course: Course, db: DB) {
 
 	// Get the user on the waitlist that is next in line
 	const userOnWaitlist = users.at(spots - 1);
-	if (!userOnWaitlist || !userOnWaitlist.accounts) {
+	if (!userOnWaitlist?.accounts) {
 		return;
 	}
 
@@ -159,9 +159,7 @@ export const actions = {
 				)
 				.limit(1);
 
-			console.log('isBooked', isBooked);
-
-			if (isBooked) {
+			if (isBooked && locals.user.role === Role.USER) {
 				error(400, 'You have already booked a course on this day.');
 			}
 		}
@@ -252,7 +250,7 @@ export const actions = {
 		}
 
 		const form = await request.formData();
-		const courseId = parseInt(params.id as string);
+		const courseId = parseInt(params.id);
 		const course = await getCourse(locals.db, courseId);
 
 		const userIdString = form.get('userId') as string | undefined;
@@ -261,7 +259,6 @@ export const actions = {
 		}
 
 		const userId = parseInt(userIdString);
-		// await locals.db.delete(courseSpots).where(and(eq(courseSpots.userId, userId), eq(courseSpots.courseId, courseId)));
 		await locals.db
 			.update(courseSpots)
 			.set({
@@ -282,7 +279,7 @@ export const actions = {
 		}
 
 		const form = await request.formData();
-		const courseId = parseInt(params.id as string);
+		const courseId = parseInt(params.id);
 		const [course] = await locals.db.select().from(courses).where(eq(courses.id, courseId)).limit(1);
 
 		const userIdString = form.get('userId') as string | undefined;
@@ -291,7 +288,6 @@ export const actions = {
 		}
 
 		const userId = parseInt(userIdString);
-		// const user = await locals.db.select().from(accounts).where(eq(accounts.id, userId)).limit(1);
 
 		await locals.db
 			.update(accounts)
