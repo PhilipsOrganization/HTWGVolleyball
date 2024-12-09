@@ -51,15 +51,16 @@
 	const waitList = Math.min(course.signupCount, course.spot < 0 ? Infinity : course.spot) > course.maxParticipants;
 
 	function copyUsers() {
-		const enlisted = course.participants
+const filtered = course.participants.filter(p=> !p.canceledAt);
+		const enlisted = filtered
 			.slice(0, course.maxParticipants)
 			.map((r) => r.username)
 			.sort((a, b) => a.localeCompare(b));
 
 		let registrations = `*${course.name}:*\n${enlisted.join(',\n')}`;
 
-		if (course.participants.length > course.maxParticipants) {
-			const waitList = course.participants.slice(course.maxParticipants).map((r, i) => `#${i + 1}: ${r.username}`);
+		if (filtered.length > course.maxParticipants) {
+			const waitList = filtered.slice(course.maxParticipants).map((r, i) => `#${i + 1}: ${r.username}`);
 			registrations += `\n_Warteliste:_\n${waitList.join(',\n')}`;
 		}
 
@@ -144,7 +145,9 @@
 			</div>
 
 			{#each course.participants ?? [] as participant, index}
-				<div class="user" class:waitList={index >= course.maxParticipants}>
+{@const idx = course.participants.filter(p=> !p.canceledAt).findIndex(p => p.id === participant.id)}
+{@const isOnWaitList = idx >= course.maxParticipants}
+				<div class="user" class:waitList={isOnWaitList}>
 					<b class="ellipsis">{participant.username}</b>
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
 					<ConfirmableForm message="Do you really want to strike this user?">
