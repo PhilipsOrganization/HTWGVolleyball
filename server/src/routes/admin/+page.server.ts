@@ -1,21 +1,23 @@
 import { Role } from '$lib/db/role';
-import { accounts, courseSpots, courses, groups, type Account, type Course } from '$lib/db/schema';
+import { accounts, courseSpots, courseTemplateTable, courses, groups, type Account, type Course } from '$lib/db/schema';
 import { serializeUser } from '$lib/helpers/account';
 import { serializeCourse } from '$lib/helpers/course';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { startOfYesterday } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
-import { desc, eq, gte, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, is, isNull, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { PageServerLoad } from './$types';
+import { hydrateCourseTemplate } from '$lib/helpers/courseTemplate';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user || locals.user.role === Role.USER) {
 		redirect(303, '/courses');
 	}
 
+	const baseQuery = isNull(courses.deletedAt);
 	const showArchived = url.searchParams.has('archived');
-	const dateQuery = showArchived ? sql<boolean>`true` : gte(courses.date, startOfYesterday().toISOString());
+	const dateQuery = showArchived ? baseQuery : and(baseQuery, gte(courses.date, startOfYesterday()));
 
 	const result = await locals.db
 		.select({
@@ -52,6 +54,13 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	const g = await locals.db.select().from(groups).orderBy(groups.name);
 
+	const courseTemplates = await locals.db
+		.select()
+		.from(courseTemplateTable)
+		.leftJoin(groups, eq(courseTemplateTable.groupId, groups.id))
+		.leftJoin(accounts, eq(courseTemplateTable.trainer, accounts.id))
+		.orderBy(courseTemplateTable.day, courseTemplateTable.time);
+
 	return {
 		dates: Array.from(dates).map(([date, courses]) => ({
 			date,
@@ -60,7 +69,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 				.map((data) => serializeCourse(data.courses as Course, data.accountsJson, locals.user))
 		})),
 		globalUser: serializeUser(locals.user),
-		groups: g
+		groups: g,
+		courseTemplates: courseTemplates.map(({ course_template, groups, accounts }) =>
+			hydrateCourseTemplate(course_template, groups, accounts)
+		)
 	};
 };
 
@@ -78,7 +90,8 @@ const courseValidation = z.object({
 		.string()
 		.default('off')
 		.transform((v) => v === 'on'),
-	groupId: z.coerce.number().optional()
+	groupId: z.coerce.number().optional(),
+	maxStrikes: z.number().int().min(0).max(100).default(0)
 });
 
 export const actions = {
@@ -113,8 +126,8 @@ export const actions = {
 
 		await locals.db.insert(courses).values({
 			...course,
-			date: new Date(course.date).toISOString(),
-			publishOn: zonedTimeToUtc(publishOn, 'Europe/Berlin').toISOString(),
+			date: new Date(course.date),
+			publishOn: zonedTimeToUtc(publishOn, 'Europe/Berlin'),
 			maxParticipants: parseInt(course.maxParticipants),
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString()

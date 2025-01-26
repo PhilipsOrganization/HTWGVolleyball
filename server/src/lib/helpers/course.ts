@@ -2,7 +2,7 @@ import { accounts, courseSpots, courses, type Account, type Course, type DB } fr
 import { error } from '@sveltejs/kit';
 import { sanitizeUser, type SanitizedAccount } from './account';
 import { Role } from '$lib/db/role';
-import { eq, getTableColumns, sql } from 'drizzle-orm';
+import { and, eq, getTableColumns, isNull, sql } from 'drizzle-orm';
 
 export function serializeCourse(course: Course, accounts: Account[], user?: Account) {
 	if (!course) {
@@ -65,7 +65,7 @@ export async function getCourse(db: DB, id: number) {
 			shouldPublish: sql<boolean>`(${courses.publishOn} <= NOW() AND ${courses.date} >= (NOW() - INTERVAL '1 day'))`.as('shouldPublish')
 		})
 		.from(courses)
-		.where(eq(courses.id, id))
+		.where(and(isNull(courses.deletedAt), eq(courses.id, id)))
 		.limit(1);
 
 	return course;

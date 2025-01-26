@@ -1,31 +1,8 @@
+import { sql } from 'drizzle-orm';
 import { pgTable, serial, varchar, timestamp, index, integer, boolean, primaryKey } from 'drizzle-orm/pg-core';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 export type DB = PostgresJsDatabase<Record<string, never>>;
-
-export const courses = pgTable(
-	'courses',
-	{
-		id: serial('id').primaryKey().notNull(),
-		name: varchar('name', { length: 255 }).notNull(),
-		date: timestamp('date', { precision: 3, withTimezone: true, mode: 'string' }).notNull(),
-		publishOn: timestamp('publish_on', { precision: 3, withTimezone: true, mode: 'string' }).notNull(),
-		maxParticipants: integer('max_participants').notNull(),
-		location: varchar('location', { length: 255 }).notNull(),
-		time: varchar('time', { length: 255 }).notNull(),
-		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
-		updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).notNull(),
-		notificationSent: boolean('notification_sent').default(false).notNull(),
-		allowDoubleBookings: boolean('allow_double_bookings').default(true).notNull(),
-		groupId: integer('group_id').references(() => groups.id, { onUpdate: 'cascade' })
-	},
-	(table) => {
-		return {
-			nameDateIdx: index().on(table.name, table.date)
-		};
-	}
-);
-export type Course = typeof courses.$inferSelect;
 
 export const accounts = pgTable(
 	'accounts',
@@ -59,6 +36,65 @@ export const accounts = pgTable(
 );
 
 export type Account = typeof accounts.$inferSelect & { canceledAt?: Date | null };
+
+export const courseTemplateTable = pgTable(
+	'course_template',
+	{
+		id: serial('id').primaryKey().notNull(),
+		name: varchar('name', { length: 255 }).notNull(),
+		maxParticipants: integer('max_participants').notNull(),
+		location: varchar('location', { length: 255 }).notNull(),
+		time: varchar('time', { length: 255 }).notNull(),
+		groupId: integer('group_id').references(() => groups.id, { onUpdate: 'cascade' }),
+		// monday is 0, tuesday is 1, ...
+		day: integer('day').notNull(),
+		publishDay: integer('publish_day').notNull(),
+		publishHour: integer('publish_hour').notNull(),
+		allowDoubleBookings: boolean('allow_double_bookings').default(false).notNull(),
+		autoCreate: boolean('auto_create').default(false).notNull(),
+		maxStrikes: integer('max_strikes').default(0).notNull(),
+		trainer: integer('trainer').references(() => accounts.id, { onUpdate: 'cascade' })
+	},
+	(table) => {
+		return {
+			nameIdx: index().on(table.name)
+		};
+	}
+);
+
+export type CourseTemplate = typeof courseTemplateTable.$inferSelect & {
+	date?: Date;
+	publishOn?: Date;
+	group?: Group;
+	trainerName?: string;
+};
+
+export const courses = pgTable(
+	'courses',
+	{
+		id: serial('id').primaryKey().notNull(),
+		name: varchar('name', { length: 255 }).notNull(),
+		date: timestamp('date', { precision: 3, withTimezone: true, mode: 'date' }).notNull(),
+		publishOn: timestamp('publish_on', { precision: 3, withTimezone: true, mode: 'date' }).notNull(),
+		maxParticipants: integer('max_participants').notNull(),
+		location: varchar('location', { length: 255 }).notNull(),
+		time: varchar('time', { length: 255 }).notNull(),
+		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
+		updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).notNull(),
+		notificationSent: boolean('notification_sent').default(false).notNull(),
+		allowDoubleBookings: boolean('allow_double_bookings').default(true).notNull(),
+		groupId: integer('group_id').references(() => groups.id, { onUpdate: 'cascade' }),
+		maxStrikes: integer('max_strikes').default(10).notNull(),
+		deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+		fromTemplate: integer('from_template').references(() => courseTemplateTable.id, { onUpdate: 'cascade', onDelete: 'set null' })
+	},
+	(table) => {
+		return {
+			nameDateIdx: index().on(table.name, table.date)
+		};
+	}
+);
+export type Course = typeof courses.$inferSelect;
 
 export const courseSpots = pgTable(
 	'course_spots',

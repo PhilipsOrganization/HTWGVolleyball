@@ -1,13 +1,14 @@
 import { dev } from '$app/environment';
-import { accounts, courseSpots, courses } from '$lib/db/schema.js';
+import { accounts, courseSpots, courseTemplateTable, courses, type CourseTemplate, type DB } from '$lib/db/schema.js';
 import { sendEmail } from '$lib/email/index.js';
 import CourseNotification from '$lib/email/templates/course-notification.svelte';
+import AutoCreatedNotification from '$lib/email/templates/auto-created.svelte';
+import { hydrateCourseTemplate } from '$lib/helpers/courseTemplate';
 import { OpenCourseAction, sendNotification } from '$lib/helpers/notification.js';
 import * as Sentry from '@sentry/sveltekit';
 import type { RequestHandler } from '@sveltejs/kit';
-import { differenceInHours, isToday } from 'date-fns';
-import { isNull } from 'drizzle-orm';
-import { and, eq, gte, lte, sql } from 'drizzle-orm';
+import { differenceInHours, endOfWeek, isToday, startOfWeek } from 'date-fns';
+import { and, eq, gt, gte, isNull, lt, lte, sql } from 'drizzle-orm';
 
 export const GET: RequestHandler = async ({ locals }) => {
 	const checkInId = Sentry.captureCheckIn({
@@ -15,8 +16,9 @@ export const GET: RequestHandler = async ({ locals }) => {
 		status: 'in_progress'
 	});
 
+	const db = locals.db;
+
 	try {
-		const db = locals.db;
 		const result = await db
 			.select()
 			.from(courses)
@@ -87,5 +89,67 @@ export const GET: RequestHandler = async ({ locals }) => {
 		});
 	}
 
+	const templates = await db.select().from(courseTemplateTable).where(eq(courseTemplateTable.autoCreate, true));
+	for (const template of templates) {
+		try {
+			await autoCreateCourseTemplate(db, template);
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
 	return new Response(JSON.stringify({ message: 'ok' }));
 };
+
+async function autoCreateCourseTemplate(db: DB, template: CourseTemplate) {
+	const now = new Date();
+	const start = startOfWeek(now);
+	const end = endOfWeek(now);
+
+	const [c] = await db
+		.select()
+		.from(courses)
+		.where(and(lt(courses.publishOn, end), gt(courses.publishOn, start), eq(courses.fromTemplate, template.id)));
+
+	// If a course already exists for this week, return
+	if (c) {
+		return;
+	}
+
+	const hydrated = hydrateCourseTemplate(template, null, null);
+
+	// create course from template
+	const [course] = await db
+		.insert(courses)
+		.values({
+			...template,
+			date: hydrated.date!,
+			publishOn: hydrated.publishOn!,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+			fromTemplate: template.id
+		} satisfies typeof courses.$inferInsert)
+		.returning();
+
+	// auto assign trainer
+	if (template.trainer) {
+		const [trainer] = await db.select().from(accounts).where(eq(accounts.id, template.trainer)).limit(1);
+
+		if (!trainer) {
+			return;
+		}
+
+		await db.insert(courseSpots).values({
+			courseId: course.id,
+			userId: template.trainer,
+			createdAt: new Date(),
+			deletedAt: null
+		});
+
+		await sendEmail(AutoCreatedNotification, {
+			user: trainer,
+			subject: `Your course has been created`,
+			props: { course, user: trainer }
+		});
+	}
+}

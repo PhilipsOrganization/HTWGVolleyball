@@ -68,8 +68,6 @@
 		const globalUser = await request.json();
 		data = { ...data, globalUser };
 	}
-
-	
 </script>
 
 <section>
@@ -104,8 +102,10 @@
 
 	<h3>Strikes</h3>
 	<p class="red">Number of Strikes: {data.globalUser.strikes}</p>
-	<p class="red">A strike is given when you don't show up for a course you registered for.</p>
-
+	<p class="red">
+		A strike is given when you don't show up for a course you registered for or if you cancel a course too late. If you get too many
+		strikes, you might not be able to register for courses anymore.
+	</p>
 	<h3>Statistics</h3>
 	<p>Registered for {data.totalRegistrations} courses</p>
 	{#each data.stats as course}

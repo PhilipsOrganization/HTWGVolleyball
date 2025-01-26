@@ -2,13 +2,14 @@ import { Role } from '$lib/db/role';
 import { accounts, courseSpots, courses, groupMembers, groups, type Course, type DB } from '$lib/db/schema.js';
 import { sendEmail } from '$lib/email';
 import OpenSpot from '$lib/email/templates/open-spot.svelte';
-import RecievedStrike from '$lib/email/templates/recieved-strike.svelte';
+import ReceivedStrike from '$lib/email/templates/recieved-strike.svelte';
 import { serializeUser } from '$lib/helpers/account.js';
 import { getCourse, getCourseUsers, isCourseInThePast, serializeCourse } from '$lib/helpers/course.js';
 import { DropCourseAction, OpenCourseAction, OpenProfileAction, sendNotification } from '$lib/helpers/notification';
 import { error, redirect } from '@sveltejs/kit';
 import { and, eq, getTableColumns, gte, isNull, lte, sql } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types.js';
+import { addDays, startOfDay } from 'date-fns';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user) {
@@ -111,10 +112,10 @@ export const actions = {
 				shouldPublish: sql<boolean>`(${courses.publishOn} <= NOW() AND ${courses.date} >= (NOW() - INTERVAL '1 day'))`.as('shouldPublish')
 			})
 			.from(courses)
-			.where(eq(courses.id, courseId))
+			.where(and(isNull(courseSpots.deletedAt), eq(courses.id, courseId)))
 			.limit(1);
 
-		if (!course) {
+		if (!course || course.deletedAt) {
 			error(400, 'Course not found');
 		}
 
@@ -124,6 +125,13 @@ export const actions = {
 
 		if (locals.user.role === Role.USER && !course.shouldPublish) {
 			error(400, 'Course not jet published');
+		}
+
+		if (course.maxStrikes && locals.user.strikes >= course.maxStrikes) {
+			error(
+				400,
+				`You have too many strikes to book this course, the limit is ${course.maxStrikes}, you have ${locals.user.strikes} strikes.`
+			);
 		}
 
 		const [isEnrolled] = await locals.db
@@ -139,9 +147,9 @@ export const actions = {
 		}
 
 		if (!course.allowDoubleBookings) {
-			const date = new Date(course.date);
-			const dateWithoutTime = date.toISOString().split('T')[0];
-			const nextDayWithoutTime = new Date(date.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+			const date = course.date;
+			const dateWithoutTime = startOfDay(date);
+			const nextDayWithoutTime = addDays(dateWithoutTime, 1);
 
 			const [isBooked] = await locals.db
 				.select()
@@ -237,10 +245,12 @@ export const actions = {
 			error(400, 'Course not found');
 		}
 
-		await locals.db.transaction(async (db) => {
-			await db.delete(courseSpots).where(eq(courseSpots.courseId, courseId));
-			await db.delete(courses).where(eq(courses.id, courseId));
-		});
+		await locals.db
+			.update(courses)
+			.set({
+				deletedAt: sql`NOW()` // Soft delete
+			})
+			.where(eq(courses.id, courseId));
 
 		redirect(303, `/admin`);
 	},
@@ -301,7 +311,7 @@ export const actions = {
 				new OpenProfileAction()
 			]);
 		} else {
-			sendEmail(RecievedStrike, {
+			sendEmail(ReceivedStrike, {
 				user: user,
 				subject: `You have been striked for Course "${course.name}" by ${locals.user.username}`,
 				props: { course, user: user, admin: locals.user }
