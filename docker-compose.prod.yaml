@@ -5,9 +5,8 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    restart: always
-    networks:
-      - traefik_web
+    ports:
+      - 3000:3000
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.volleyball.rule=Host(`volleyball.homelab`, `volleyball.oesterlin.dev`)'
@@ -17,7 +16,7 @@ services:
       - "traefik.http.middlewares.volleyball.plugin.httpCache.memory.limit=500Mi"
       - "traefik.http.middlewares.volleyball.plugin.httpCache.excludedResponseCodes=300-599"
     env_file:
-      - .env.local
+      - ./server/.env.local
     environment:
       - MIKRO_ORM_DB_NAME=volleyball
       - MIKRO_ORM_HOST=postgres
@@ -25,14 +24,18 @@ services:
       - MIKRO_ORM_PORT=5432
       - MIKRO_ORM_USER=postgres
     
-  scheduler: 
-    build:
-      context: ./scheduler
-      dockerfile: Dockerfile
+  postgres:
+    image: postgres:latest
     restart: always
-    networks:
-      - traefik_web
+    volumes:
+      - data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: volleyball
+  
 
-networks:
-  traefik_web:
-    external: true
+volumes:
+  data:

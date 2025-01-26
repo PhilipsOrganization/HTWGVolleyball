@@ -1,129 +1,26 @@
 <script>
 	import { page } from '$app/stores';
-	import { addDays, nextMonday, nextSaturday, nextThursday, nextWednesday, setHours, setMinutes } from 'date-fns';
 
 	/**
-	 * @type {{id: number, name: string}[]}
+	 * @type {import('$lib/db/schema').CourseTemplate[]}
+	 */
+	export let templates = [];
+	/**
+	 * @type {import('$lib/db/schema').Group[]}
 	 */
 	export let groups = [];
-
-	const difficulties = [
-		'Beginner',
-		'Advanced',
-		'Actives',
-		'Beach Course',
-		'Advanced Skills Training',
-		'Actives - 5:1 System',
-		'Free Game',
-		'Christmas Special🎄',
-		...groups.map((group) => group.name)
-	];
-
 	$: form = $page.form;
 
-	let name = 'Beginner';
+	/**
+	 * @type {number}
+	 */
+	let templateId = templates[0]?.id;
+	$: template = templates.find((t) => t.id === templateId);
 
 	/**
 	 * @type {HTMLDialogElement}
 	 */
 	let dialogEl;
-
-	/**
-	 * @type {any[]}
-	 */
-	let courses = [];
-	reset();
-
-	function reset() {
-		courses = [
-			{
-				name: difficulties[0], // Beginner
-				settings: {
-					name: difficulties[0],
-					location: 'Ellenrieder Sporthalle',
-					maxParticipants: 18,
-					time: '17:30',
-					duration: 1.5,
-					date: nextMonday(new Date()),
-					publishOn: setTo12(nextThursday(new Date()))
-				}
-			},
-			{
-				name: difficulties[1], // Advanced
-				settings: {
-					name: difficulties[1],
-					location: 'Ellenrieder Sporthalle',
-					maxParticipants: 18,
-					time: '19:00',
-					duration: 1.5,
-					date: nextMonday(new Date()),
-					publishOn: setTo12(nextThursday(new Date()))
-				}
-			},
-			{
-				name: difficulties[2], // Actives
-				settings: {
-					name: difficulties[2],
-					location: 'Ellenrieder Sporthalle',
-					maxParticipants: 18,
-					time: '20:30',
-					duration: 1.5,
-					date: nextMonday(new Date()),
-					publishOn: setTo12(nextThursday(new Date()))
-				}
-			},
-			{
-				name: difficulties[4], // Advanced skills training
-				settings: {
-					name: difficulties[4],
-					location: 'Ellenrieder Sporthalle',
-					maxParticipants: 18,
-					time: '19:00',
-					duration: 1.5,
-					date: nextWednesday(new Date()),
-					publishOn: setTo12(nextThursday(new Date()))
-				}
-			},
-			{
-				name: difficulties[5], // Actives - 5:1 System
-				settings: {
-					name: difficulties[5],
-					location: 'Ellenrieder Sporthalle',
-					maxParticipants: 18,
-					time: '20:30',
-					duration: 1.5,
-					date: nextWednesday(new Date()),
-					publishOn: setTo12(nextThursday(new Date()))
-				}
-			},
-			{
-				name: difficulties[6], // Free Game
-				settings: {
-					name: difficulties[6],
-					location: 'Petershausener Sporthalle',
-					maxParticipants: 36,
-					time: '12:00',
-					duration: 1.5,
-					date: nextSaturday(addDays(new Date(), 7)),
-					publishOn: setTo12(nextThursday(new Date()))
-				}
-			},
-			...groups.map((group) => ({
-				name: group.name,
-				settings: {
-					name: group.name,
-					location: '',
-					maxParticipants: 18,
-					time: '',
-					duration: 1.5,
-					date: nextMonday(new Date()),
-					publishOn: new Date(),
-					groupId: group.id
-				}
-			}))
-		];
-	}
-	$: defaults = courses.find((c) => c.name === name)?.settings;
 
 	/**
 	 * @param {number} number
@@ -159,13 +56,6 @@
 
 		return components.join('');
 	}
-
-	/**
-	 * @param {Date} date
-	 */
-	function setTo12(date) {
-		return setMinutes(setHours(date, 12), 0);
-	}
 </script>
 
 <button class="highlight" id="open" on:click={() => dialogEl.showModal()}>Create Course</button>
@@ -175,9 +65,9 @@
 		<button id="close" value="cancel" formmethod="dialog">x</button>
 		<field>
 			<label for="name">Name</label>
-			<select bind:value={name} name="name">
-				{#each difficulties as difficulty}
-					<option value={difficulty}>{difficulty}</option>
+			<select bind:value={templateId} name="name">
+				{#each templates as t}
+					<option value={t.id}>{t.name}</option>
 				{/each}
 			</select>
 			<small class="error">{form?.name ?? ''}</small>
@@ -185,31 +75,31 @@
 
 		<field>
 			<label for="location">Location</label>
-			<input value={defaults?.location ?? ''} type="text" name="location" placeholder="Location" />
+			<input value={template?.location ?? ''} type="text" name="location" placeholder="Location" />
 			<small class="error">{form?.location ?? ''}</small>
 		</field>
 
 		<field>
 			<label for="date">Date</label>
-			<input value={dateTimeToDateString(defaults?.date)} type="date" name="date" placeholder="Date" />
+			<input value={dateTimeToDateString(template?.date)} type="date" name="date" placeholder="Date" />
 			<small class="error">{form?.date ?? ''}</small>
 		</field>
 
 		<field>
 			<label for="time">Time</label>
-			<input value={defaults?.time ?? ''} type="time" name="time" placeholder="Time" />
+			<input value={template?.time ?? ''} type="time" name="time" placeholder="Time" />
 			<small class="error">{form?.time ?? ''}</small>
 		</field>
 
 		<field>
 			<label for="maxParticipants">Max Participants</label>
-			<input value={defaults?.maxParticipants ?? ''} type="number" name="maxParticipants" placeholder="Max Participants" />
+			<input value={template?.maxParticipants ?? ''} type="number" name="maxParticipants" placeholder="Max Participants" />
 			<small class="error">{form?.maxParticipants ?? ''}</small>
 		</field>
 
 		<field>
 			<label for="publishOn">Publish On</label>
-			<input value={dateTimeToString(defaults?.publishOn)} type="datetime-local" name="publishOn" placeholder="Publish On" />
+			<input value={dateTimeToString(template?.publishOn)} type="datetime-local" name="publishOn" placeholder="Publish On" />
 			<small class="error">{form?.publishOn ?? ''}</small>
 		</field>
 
@@ -223,8 +113,8 @@
 		<field>
 			<label for="group">
 				Select a user group the course should be visible to:
-				<select name="groupId" id="group" class="pad" value={defaults?.groupId ?? ''}>
-					<option value="" disabled selected>Show to all Users</option>
+				<select name="groupId" id="group" class="pad" value={template?.groupId ?? ''}>
+					<option value="" selected>Show to all Users</option>
 					{#each groups as group}
 						<option value={group.id}>{group.name}</option>
 					{/each}

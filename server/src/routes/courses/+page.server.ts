@@ -49,6 +49,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.groupBy(courses.id)
 		.where(
 			and(
+				isNull(courses.deletedAt),
 				lte(courses.publishOn, sql`NOW()`), // Only show courses that have been published
 				gte(courses.date, sql`NOW() - INTERVAL '1 day'`), // Only show courses that are 24 hours in the past
 				or(
@@ -66,7 +67,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const dates = new Map<string, typeof result>();
 
 	for (const course of result) {
-		if (!course.courses) {
+		if (!course.courses || course.courses.deletedAt) {
 			continue;
 		}
 

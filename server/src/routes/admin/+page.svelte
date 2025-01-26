@@ -15,10 +15,11 @@
 	}
 </script>
 
-<CreateCourse groups={data.groups} />
+<CreateCourse templates={data.courseTemplates} groups={data.groups} />
 <main>
 	<div class="row">
 		<a href="/admin/groups"> Groups </a>
+		<a href="/admin/templates"> Course Templates </a>
 		<div>
 			<label for="archived">Show archived</label>
 			<input type="checkbox" id="archived" on:change={(e) => toggleShowArchived(e)} />
