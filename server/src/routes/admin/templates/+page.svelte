@@ -182,11 +182,10 @@
 	}
 
 	details {
-		margin: 1rem;
+		margin: 1rem auto;
 		border: 1px solid #5d5d5d;
 		width: min(95%, 500px);
-		margin: auto;
-		padding: 2rem;
+		padding: 2rem 0;
 		border-radius: 0.25rem;
 	}
 
@@ -196,7 +195,7 @@
 		font-weight: 900;
 		text-transform: uppercase;
 		letter-spacing: 1.1px;
-		padding: 1rem;
+		padding: 1rem 0;
 		cursor: pointer;
 	}
 
@@ -207,6 +206,7 @@
 	form {
 		display: flex;
 		flex-direction: column;
+		padding: 1rem;
 	}
 
 	form field {
@@ -271,6 +271,7 @@
 		padding: 1rem;
 		border-radius: 0.25rem;
 		border: 1px solid #5d5d5d;
+		max-width: calc(100vw - 7rem);
 	}
 
 	button.delete {
