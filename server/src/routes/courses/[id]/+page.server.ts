@@ -112,7 +112,7 @@ export const actions = {
 				shouldPublish: sql<boolean>`(${courses.publishOn} <= NOW() AND ${courses.date} >= (NOW() - INTERVAL '1 day'))`.as('shouldPublish')
 			})
 			.from(courses)
-			.where(and(isNull(courseSpots.deletedAt), eq(courses.id, courseId)))
+			.where(and(isNull(courses.deletedAt), eq(courses.id, courseId)))
 			.limit(1);
 
 		if (!course || course.deletedAt) {
