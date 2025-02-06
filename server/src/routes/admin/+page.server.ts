@@ -101,7 +101,7 @@ export const actions = {
 		}
 
 		const form = await request.formData();
-		const dto = courseValidation.safeParse(Object.fromEntries(form.entries()));
+		const dto = courseValidation.safeParse(Object.fromEntries(form));
 
 		if (!dto.success) {
 			const obj: Record<string, string> = {};
@@ -122,6 +122,8 @@ export const actions = {
 			if (!g) {
 				return fail(400, { groupId: 'Group not found' });
 			}
+		} else {
+			course.groupId = undefined;
 		}
 
 		await locals.db.insert(courses).values({
@@ -132,7 +134,5 @@ export const actions = {
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString()
 		} satisfies typeof courses.$inferInsert);
-
-		return redirect(303, '/admin');
 	}
 } satisfies Actions;

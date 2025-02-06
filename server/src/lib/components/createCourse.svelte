@@ -12,10 +12,10 @@
 	$: form = $page.form;
 
 	/**
-	 * @type {number}
+	 * @type {string}
 	 */
-	let templateId = templates[0]?.id;
-	$: template = templates.find((t) => t.id === templateId);
+	let templateName = templates[0]?.name;
+	$: template = templates.find((t) => t.name === templateName);
 
 	/**
 	 * @type {HTMLDialogElement}
@@ -65,9 +65,9 @@
 		<button id="close" value="cancel" formmethod="dialog">x</button>
 		<field>
 			<label for="name">Name</label>
-			<select bind:value={templateId} name="name">
+			<select bind:value={templateName} name="name">
 				{#each templates as t}
-					<option value={t.id}>{t.name}</option>
+					<option value={t.name}>{t.name}</option>
 				{/each}
 			</select>
 			<small class="error">{form?.name ?? ''}</small>
