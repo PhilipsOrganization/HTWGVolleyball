@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { fade, scale } from 'svelte/transition';
     
-	let open = false;
+	let open = $state(false);
 	const id = 'info-modal';
 
 	onMount(() => {
@@ -25,7 +25,7 @@
 		<a href="register">Register Account</a>
 	</dialog>
 
-	<div class="background" on:click={() => (open = false)} transition:fade={{ duration: 200 }} />
+	<div class="background" onclick={() => (open = false)} transition:fade={{ duration: 200 }}></div>
 {/if}
 
 <style>

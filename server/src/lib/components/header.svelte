@@ -2,7 +2,7 @@
 	import { Role } from '$lib/db/role';
 	import { page } from '$app/stores';
 
-	$: isAdmin = $page.route.id?.includes('/admin') || $page.url.searchParams.has('admin');
+	let isAdmin = $derived($page.route.id?.includes('/admin') || $page.url.searchParams.has('admin'));
 </script>
 
 <header class:compact={isAdmin}>

@@ -1,27 +1,27 @@
 <script>
-	import { page } from '$app/stores';
-	import { fade, scale } from 'svelte/transition';
+	import { page } from '$app/state';
+	import { scale } from 'svelte/transition';
 
 	/**
-	 * @type {import('$lib/db/schema').CourseTemplate[]}
+	 * @typedef {Object} Props
+	 * @property {import('$lib/db/schema').CourseTemplate[]} [templates]
+	 * @property {import('$lib/db/schema').Group[]} [groups]
 	 */
-	export let templates = [];
-	/**
-	 * @type {import('$lib/db/schema').Group[]}
-	 */
-	export let groups = [];
-	$: form = $page.form;
+
+	/** @type {Props} */
+	let { templates = [], groups = [] } = $props();
+	let form = $derived(page.form);
 
 	/**
 	 * @type {string}
 	 */
-	let templateName = templates[0]?.name;
-	$: template = templates.find((t) => t.name === templateName);
+	let templateName = $state(templates[0]?.name);
+	let template = $derived(templates.find((t) => t.name === templateName));
 
 	/**
-	 * @type {HTMLDialogElement}
+	 * @type {HTMLDialogElement | undefined}
 	 */
-	let dialogEl;
+	let dialogEl = $state();
 
 	/**
 	 * @param {number} number
@@ -55,20 +55,20 @@
 	}
 
 	function closeDialog() {
-		dialogEl.close();
+		dialogEl?.close();
 	}
 </script>
 
-<button class="fab-btn" on:click={() => dialogEl.showModal()}>
+<button class="fab-btn" onclick={() => dialogEl?.showModal()}>
 	<span class="plus-icon">+</span>
 	<span class="btn-text">Create Course</span>
 </button>
 
-<dialog bind:this={dialogEl} on:click|self={closeDialog}>
+<dialog bind:this={dialogEl} onclick={closeDialog}>
 	<div class="dialog-content" in:scale={{ duration: 200, start: 0.95 }}>
 		<header>
 			<h1>New Course</h1>
-			<button class="close-btn" on:click={closeDialog} aria-label="Close dialog">×</button>
+			<button class="close-btn" onclick={closeDialog} aria-label="Close dialog">×</button>
 		</header>
 
 		<form method="POST" action="?/create-course">
@@ -138,14 +138,14 @@
 				<div class="field full checkbox-field">
 					<label class="switch-label">
 						<input type="checkbox" name="allowDoubleBookings" />
-						<span class="switch" />
+						<span class="switch"></span>
 						<span class="label-text">Allow users to book multiple courses</span>
 					</label>
 				</div>
 			</div>
 
 			<footer class="form-footer">
-				<button type="button" class="cancel-btn" on:click={closeDialog}>Cancel</button>
+				<button type="button" class="cancel-btn" onclick={closeDialog}>Cancel</button>
 				<button type="submit" class="submit-btn">Create Course</button>
 			</footer>
 		</form>

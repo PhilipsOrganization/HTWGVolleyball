@@ -2,7 +2,12 @@
 	import { dev } from '$app/environment';
 	import { page } from '$app/stores';
 
-	export let title = 'Error';
+	interface Props {
+		title?: string;
+		children?: import('svelte').Snippet;
+	}
+
+	let { title = 'Error', children }: Props = $props();
 
 	const error = $page.error;
 	const stack = dev && error ? error.stack : '';
@@ -16,7 +21,7 @@
 			<p>{stack}</p>
 		{/if}
 	{/if}
-	<slot />
+	{@render children?.()}
 </section>
 
 <style>

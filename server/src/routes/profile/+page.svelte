@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
 	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
 	import { approximatelyFormatTime } from '$lib/helpers/date';
 	import { onMount } from 'svelte';
 
-	export let data;
-	let notificationsSupported = false;
-	let loading = false;
+	let { data = $bindable() } = $props();
+	let notificationsSupported = $state(false);
+	let loading = $state(false);
 
 	onMount(() => {
 		notificationsSupported = 'serviceWorker' in navigator && 'PushManager' in window;
@@ -110,10 +110,14 @@
 				{:else}
 					<p class="status-msg warning">Email not verified</p>
 					<ConfirmableForm message="Do you really want to resend the verification email?">
-						<form action="?/reverify" method="post" slot="confirm">
-							<button class="action-btn outline" type="submit">Resend verification email</button>
-						</form>
-						<button slot="button" class="action-btn outline" type="button">Resend verification email</button>
+						{#snippet confirm()}
+												<form action="?/reverify" method="post" >
+								<button class="action-btn outline" type="submit">Resend verification email</button>
+							</form>
+											{/snippet}
+						{#snippet button()}
+												<button  class="action-btn outline" type="button">Resend verification email</button>
+											{/snippet}
 					</ConfirmableForm>
 				{/if}
 			</div>
@@ -131,7 +135,7 @@
 						{#if data.globalUser.hasNotificationsEnabled}
 							<button 
 								class="action-btn enabled" 
-								on:click={disableNotification} 
+								onclick={disableNotification} 
 								disabled={loading}
 								type="button"
 							>
@@ -140,7 +144,7 @@
 						{:else}
 							<button 
 								class="action-btn accent" 
-								on:click={enableNotification} 
+								onclick={enableNotification} 
 								disabled={loading}
 								type="button"
 							>

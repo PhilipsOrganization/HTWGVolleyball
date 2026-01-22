@@ -1,14 +1,24 @@
 <script>
-	/** * @type {string}  */
-	export let message;
+	import { self } from 'svelte/legacy';
+
+	
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} message
+	 * @property {import('svelte').Snippet} [confirm]
+	 * @property {import('svelte').Snippet} [button]
+	 */
+
+	/** @type {Props} */
+	let { message, confirm, button } = $props();
 
 	/** @type {HTMLDialogElement} */
-	let dialogEl;
+	let dialogEl = $state();
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<dialog bind:this={dialogEl} on:click|self={() => dialogEl.close()}>
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<dialog bind:this={dialogEl} onclick={self(() => dialogEl.close())}>
 	<h1>Confirmation</h1>
 	<p>{message}</p>
 	<div id="actions">
@@ -16,13 +26,13 @@
 			<button>Abort</button>
 		</form>
 		<div class="form-slot">
-			<slot name="confirm" />
+			{@render confirm?.()}
 		</div>
 	</div>
 </dialog>
 
-<form on:submit={() => dialogEl.showModal()}>
-	<slot name="button" />
+<form onsubmit={() => dialogEl.showModal()}>
+	{@render button?.()}
 </form>
 
 <style>
