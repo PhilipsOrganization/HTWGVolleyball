@@ -1,0 +1,35 @@
+<script lang="ts">
+	import { styleToString } from '../utils';
+
+	export let style: Record<string, string | number> = {};
+	let className: string | undefined = undefined;
+	export { className as class };
+
+	const styleDefaultTable = {
+		width: '100%',
+		...style
+	};
+
+	const styleDefaultTr = {
+		display: 'grid',
+		gridAutoColumns: 'minmax(0, 1fr)',
+		gridAutoFlow: 'column'
+	};
+</script>
+
+<table
+	style={styleToString(styleDefaultTable)}
+	align="center"
+	border={0}
+	cellPadding={0}
+	cellSpacing={0}
+	role="presentation"
+	{...$$restProps}
+	class={className}
+>
+	<tbody>
+		<tr style={styleToString(styleDefaultTr)}>
+			<slot />
+		</tr>
+	</tbody>
+</table>
