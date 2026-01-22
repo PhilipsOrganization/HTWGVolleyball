@@ -10,12 +10,13 @@
 
 	/**
 	 * @param {string} href
+	 * @param {{url: URL}} url
 	 */
-	function isActive(href) {
+	function isActive(href, { url }) {
 		if (href === '/admin') {
-			return $page.url.pathname === '/admin';
+			return url.pathname === '/admin';
 		}
-		return $page.url.pathname.startsWith(href);
+		return url.pathname.startsWith(href);
 	}
 </script>
 
@@ -23,7 +24,7 @@
 	<aside class="admin-nav">
 		<nav>
 			{#each navItems as item}
-				<a href={item.href} class:active={isActive(item.href)}>
+				<a href={item.href} class:active={isActive(item.href, $page)}>
 					<span class="icon">{item.icon}</span>
 					<span class="label">{item.label}</span>
 				</a>
