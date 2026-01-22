@@ -1,14 +1,11 @@
-<script lang="ts">
+<script>
 	import { onNavigate } from '$app/navigation';
 	import Header from '$lib/components/header.svelte';
 	import InfoModal from '$lib/components/info-modal.svelte';
 	import Toast from '$lib/components/toast.svelte';
 	import { toasts } from '$lib/helpers/toast';
-	interface Props {
-		children?: import('svelte').Snippet;
-	}
 
-	let { children }: Props = $props();
+	let { children } = $props();
 
 	/**
 	 * @param {() => Promise<void>} callback

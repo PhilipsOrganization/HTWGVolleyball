@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	import { enhance } from '$app/forms';
 	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
 	import { Role } from '$lib/db/role';
