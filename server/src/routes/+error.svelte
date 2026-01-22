@@ -1,11 +1,9 @@
-<script lang="ts">
+<script>
+	import { page } from '$app/state';
 	import ErrorPage from '$lib/components/error-page.svelte';
-	import { page } from '$app/stores';
-
-	const error = $page.error;
 </script>
 
-<ErrorPage title="An Error Occurred :(">
+<ErrorPage title={page.error?.message ?? 'An Error Occurred :('}>
 	<a href="/">Go back</a>
 </ErrorPage>
 

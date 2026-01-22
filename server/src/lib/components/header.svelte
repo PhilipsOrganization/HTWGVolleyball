@@ -1,15 +1,15 @@
 <script>
 	import { Role } from '$lib/db/role';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
-	let isAdmin = $derived($page.route.id?.includes('/admin') || $page.url.searchParams.has('admin'));
+	let isAdmin = $derived(page.route.id?.includes('/admin') || page.url.searchParams.has('admin'));
 </script>
 
 <header class:compact={isAdmin}>
 	<nav>
-		{#if $page.data.globalUser}
+		{#if page.data.globalUser}
 			<a href="/profile">Profile</a>
-			{#if $page.data.globalUser.role !== Role.USER}
+			{#if page.data.globalUser.role !== Role.USER}
 				<a href="/admin">Admin</a>
 			{/if}
 			<a href="/logout">Logout</a>

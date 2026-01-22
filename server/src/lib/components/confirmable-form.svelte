@@ -1,7 +1,4 @@
 <script>
-	import { self } from 'svelte/legacy';
-
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {string} message
@@ -12,13 +9,13 @@
 	/** @type {Props} */
 	let { message, confirm, button } = $props();
 
-	/** @type {HTMLDialogElement} */
+	/** @type {HTMLDialogElement | undefined} */
 	let dialogEl = $state();
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<dialog bind:this={dialogEl} onclick={self(() => dialogEl.close())}>
+<dialog bind:this={dialogEl} onclick={() => dialogEl?.close()}>
 	<h1>Confirmation</h1>
 	<p>{message}</p>
 	<div id="actions">
@@ -31,7 +28,7 @@
 	</div>
 </dialog>
 
-<form onsubmit={() => dialogEl.showModal()}>
+<form onsubmit={() => dialogEl?.showModal()}>
 	{@render button?.()}
 </form>
 
