@@ -4,7 +4,7 @@ import { serializeUser } from '$lib/helpers/account';
 import { serializeCourse } from '$lib/helpers/course';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { startOfYesterday } from 'date-fns';
-import { zonedTimeToUtc } from 'date-fns-tz';
+import { fromZonedTime } from 'date-fns-tz';
 import { and, desc, eq, gte, is, isNull, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { PageServerLoad } from './$types';
@@ -148,7 +148,7 @@ export const actions = {
 		await locals.db.insert(courses).values({
 			...course,
 			date: new Date(course.date),
-			publishOn: zonedTimeToUtc(publishOn, 'Europe/Berlin'),
+			publishOn: fromZonedTime(publishOn, 'Europe/Berlin'),
 			maxParticipants: parseInt(course.maxParticipants),
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString()

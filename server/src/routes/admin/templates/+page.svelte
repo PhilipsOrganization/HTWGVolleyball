@@ -1,8 +1,7 @@
-<script>
+<script lang="ts">
 	import { enhance } from '$app/forms';
 
-	export let data;
-	export let form;
+	let { data, form } = $props();
 
 	/**
 	 * @param {number} day

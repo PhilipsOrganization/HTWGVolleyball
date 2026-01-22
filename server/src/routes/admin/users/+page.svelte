@@ -3,9 +3,9 @@
 	import { page } from '$app/stores';
 	import { Role } from '$lib/db/role';
 
-	export let data;
+	let { data } = $props();
 
-	let searchInput = data.filters.search;
+	let searchInput = $state(data.filters.search);
 	let searchTimeout = /** @type {ReturnType<typeof setTimeout> | null} */ (null);
 
 	/**
@@ -56,9 +56,9 @@
 
 	<div class="filters">
 		<div class="search-box">
-			<input type="text" placeholder="Search users..." bind:value={searchInput} on:input={handleSearch} />
+			<input type="text" placeholder="Search users..." bind:value={searchInput} oninput={handleSearch} />
 		</div>
-		<select value={data.filters.role} on:change={(e) => updateFilter('role', e.currentTarget.value)}>
+		<select value={data.filters.role} onchange={(e) => updateFilter('role', e.currentTarget.value)}>
 			<option value="">All roles</option>
 			<option value={Role.SUPER_ADMIN}>Super Admin</option>
 			<option value={Role.ADMIN}>Admin</option>
@@ -83,14 +83,14 @@
 
 		{#if data.pagination.totalPages > 1}
 			<div class="pagination">
-				<button class="page-btn" disabled={data.pagination.page <= 1} on:click={() => goToPage(data.pagination.page - 1)}>
+				<button class="page-btn" disabled={data.pagination.page <= 1} onclick={() => goToPage(data.pagination.page - 1)}>
 					← Prev
 				</button>
 				<div class="page-info">
 					<span class="current">Page {data.pagination.page}</span>
 					<span class="total">of {data.pagination.totalPages}</span>
 				</div>
-				<button class="page-btn" disabled={data.pagination.page >= data.pagination.totalPages} on:click={() => goToPage(data.pagination.page + 1)}>
+				<button class="page-btn" disabled={data.pagination.page >= data.pagination.totalPages} onclick={() => goToPage(data.pagination.page + 1)}>
 					Next →
 				</button>
 			</div>

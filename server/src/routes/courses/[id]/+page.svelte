@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
@@ -6,9 +6,9 @@
 	import { format, isToday } from 'date-fns';
 	import da from 'date-fns/locale/da';
 
-	export let data;
-	let course = data.course;
-	let justSignedUp = false;
+	let { data } = $props();
+	let course = $state(data.course);
+	let justSignedUp = $state(false);
 
 	/**
 	 * @returns {(data: {result: any}) => void}
@@ -116,18 +116,26 @@ const filtered = course.participants.filter(p=> !p.canceledAt);
 		<a href={admin ? '/admin' : '/courses'}>back</a>
 		{#if admin}
 			<ConfirmableForm message="Do you really want to delete this course?">
-				<form class="waitlist" action="?/delete-course" method="post" slot="confirm">
-					<button type="submit">delete</button>
-				</form>
-				<button type="submit" slot="button">delete</button>
+				{#snippet confirm()}
+								<form class="waitlist" action="?/delete-course" method="post" >
+						<button type="submit">delete</button>
+					</form>
+							{/snippet}
+				{#snippet button()}
+								<button type="submit" >delete</button>
+							{/snippet}
 			</ConfirmableForm>
 		{/if}
 		{#if course.isEnrolled}
 			<ConfirmableForm message="Do you really want to drop this course?">
-				<form action={`?/drop${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse} slot="confirm">
-					<button type="submit"> Drop </button>
-				</form>
-				<button type="submit" disabled={course.isPast} slot="button"> drop </button>
+				{#snippet confirm()}
+								<form action={`?/drop${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse} >
+						<button type="submit"> Drop </button>
+					</form>
+							{/snippet}
+				{#snippet button()}
+								<button type="submit" disabled={course.isPast} > drop </button>
+							{/snippet}
 			</ConfirmableForm>
 		{:else}
 			<form action={`?/enlist${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
@@ -140,7 +148,7 @@ const filtered = course.participants.filter(p=> !p.canceledAt);
 			<div class="header">
 				<h2>Participants</h2>
 				{#if course.participants.length}
-					<button class="underline" on:click={copyUsers}>Copy for WhatsApp</button>
+					<button class="underline" onclick={copyUsers}>Copy for WhatsApp</button>
 				{/if}
 			</div>
 
@@ -151,11 +159,15 @@ const filtered = course.participants.filter(p=> !p.canceledAt);
 					<b class="ellipsis">{participant.username}</b>
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
 					<ConfirmableForm message="Do you really want to strike this user?">
-						<form action="?/strike" method="post" use:enhance={updateCourse} slot="confirm">
-							<input type="hidden" name="userId" value={participant.id} />
-							<button type="submit" class="underline">strike</button>
-						</form>
-						<button type="submit" class="underline" slot="button">strike</button>
+						{#snippet confirm()}
+												<form action="?/strike" method="post" use:enhance={updateCourse} >
+								<input type="hidden" name="userId" value={participant.id} />
+								<button type="submit" class="underline">strike</button>
+							</form>
+											{/snippet}
+						{#snippet button()}
+												<button type="submit" class="underline" >strike</button>
+											{/snippet}
 					</ConfirmableForm>
 					{#if participant.canceledAt}
 						{@const canceledToday = isToday(participant.canceledAt) && false}
@@ -163,11 +175,15 @@ const filtered = course.participants.filter(p=> !p.canceledAt);
 						<span class:canceled={participant.canceledAt}>canceled at {format(participant.canceledAt, dateFormat)} </span>
 					{:else}
 						<ConfirmableForm message="Do you really want to cancel this user?">
-							<form action="?/cancel" method="post" use:enhance={updateCourse} slot="confirm">
-								<input type="hidden" name="userId" value={participant.id} />
-								<button type="submit" class="underline">cancel</button>
-							</form>
-							<button type="submit" class="underline" slot="button">cancel</button>
+							{#snippet confirm()}
+														<form action="?/cancel" method="post" use:enhance={updateCourse} >
+									<input type="hidden" name="userId" value={participant.id} />
+									<button type="submit" class="underline">cancel</button>
+								</form>
+													{/snippet}
+							{#snippet button()}
+														<button type="submit" class="underline" >cancel</button>
+													{/snippet}
 						</ConfirmableForm>
 					{/if}
 				</div>

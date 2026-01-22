@@ -1,10 +1,10 @@
-<script>
+<script lang="ts">
 	import Course from '$lib/components/course.svelte';
 	import { humanReadableDate } from '$lib/helpers/date';
 	import { addToast } from '$lib/helpers/toast';
 	import { onMount } from 'svelte';
 
-	export let data;
+	let { data } = $props();
 
 	onMount(() => {
 		if (!data.globalUser?.emailVerified) {

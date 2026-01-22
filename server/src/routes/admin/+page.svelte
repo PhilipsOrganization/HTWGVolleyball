@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Course from '$lib/components/course.svelte';
 	import CreateCourse from '$lib/components/createCourse.svelte';
 	import { humanReadableDate } from '$lib/helpers/date';
 
-	export let data;
+	let { data } = $props();
 
 	/** @param {Event & {currentTarget: EventTarget & HTMLInputElement}} event  */
 	function toggleShowArchived(event) {
@@ -37,7 +37,7 @@
 		<div class="header-actions">
 			<span class="total-count">{data.pagination.totalItems} courses</span>
 			<label class="toggle">
-				<input type="checkbox" id="archived" checked={$page.url.searchParams.has('archived')} on:change={(e) => toggleShowArchived(e)} />
+				<input type="checkbox" id="archived" checked={$page.url.searchParams.has('archived')} onchange={(e) => toggleShowArchived(e)} />
 				<span>Show archived</span>
 			</label>
 		</div>
@@ -77,14 +77,14 @@
 
 	{#if data.pagination.totalPages > 1}
 		<div class="pagination">
-			<button class="page-btn" disabled={data.pagination.page <= 1} on:click={() => goToPage(data.pagination.page - 1)}>
+			<button class="page-btn" disabled={data.pagination.page <= 1} onclick={() => goToPage(data.pagination.page - 1)}>
 				← Prev
 			</button>
 			<div class="page-info">
 				<span class="current">Page {data.pagination.page}</span>
 				<span class="total">of {data.pagination.totalPages}</span>
 			</div>
-			<button class="page-btn" disabled={data.pagination.page >= data.pagination.totalPages} on:click={() => goToPage(data.pagination.page + 1)}>
+			<button class="page-btn" disabled={data.pagination.page >= data.pagination.totalPages} onclick={() => goToPage(data.pagination.page + 1)}>
 				Next →
 			</button>
 		</div>
