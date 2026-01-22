@@ -15,9 +15,20 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		redirect(303, '/courses');
 	}
 
+	const page = parseInt(url.searchParams.get('page') ?? '1');
+	const pageSize = 50;
+
 	const baseQuery = isNull(courses.deletedAt);
 	const showArchived = url.searchParams.has('archived');
 	const dateQuery = showArchived ? baseQuery : and(baseQuery, gte(courses.date, startOfYesterday()));
+
+	const [countResult] = await locals.db
+		.select({ count: sql<number>`count(distinct ${courses.id})` })
+		.from(courses)
+		.where(dateQuery);
+
+	const totalItems = Number(countResult?.count ?? 0);
+	const totalPages = Math.ceil(totalItems / pageSize);
 
 	const result = await locals.db
 		.select({
@@ -36,7 +47,9 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		.fullJoin(accounts, eq(courseSpots.userId, accounts.id))
 		.groupBy(courses.id)
 		.where(dateQuery)
-		.orderBy(desc(courses.date), courses.time);
+		.orderBy(desc(courses.date), courses.time)
+		.limit(pageSize)
+		.offset((page - 1) * pageSize);
 
 	const dates = new Map<string, typeof result>();
 
@@ -68,6 +81,12 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 				.filter((data) => Boolean(data.courses))
 				.map((data) => serializeCourse(data.courses as Course, data.accountsJson, locals.user))
 		})),
+		pagination: {
+			page,
+			pageSize,
+			totalItems,
+			totalPages
+		},
 		globalUser: serializeUser(locals.user),
 		groups: g,
 		courseTemplates: courseTemplates.map(({ course_template, groups, accounts }) =>
