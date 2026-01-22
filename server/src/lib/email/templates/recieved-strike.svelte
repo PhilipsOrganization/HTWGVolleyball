@@ -1,5 +1,5 @@
 <script>
-	import { Column, Container, Head, Html, Link, Preview, Section, Text } from 'svelte-email';
+	import { Column, Container, Head, Html, Link, Preview, Section, Text } from '../components/index.js';
 
 	
 
