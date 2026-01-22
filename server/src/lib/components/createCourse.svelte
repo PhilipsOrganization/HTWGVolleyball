@@ -268,6 +268,9 @@
 		font-family: inherit;
 		transition: border-color 0.15s ease;
 	}
+	input[type='checkbox'] {
+		width: auto;
+	}
 	input:focus,
 	select:focus {
 		outline: none;
