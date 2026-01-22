@@ -1,15 +1,16 @@
 <script>
 	import { Role } from '$lib/db/role';
 	import { page } from '$app/stores';
+
+	$: isAdmin = $page.route.id?.includes('/admin') || $page.url.searchParams.has('admin');
 </script>
 
-<header>
+<header class:compact={isAdmin}>
 	<nav>
 		{#if $page.data.globalUser}
 			<a href="/profile">Profile</a>
 			{#if $page.data.globalUser.role !== Role.USER}
 				<a href="/admin">Admin</a>
-				<a href="/admin/users">Users</a>
 			{/if}
 			<a href="/logout">Logout</a>
 		{:else}
@@ -19,14 +20,15 @@
 	<a href="/courses">
 		<h1>
 			Volleyball HTWG
-
-			{#if $page.route.id?.includes('/admin') || $page.url.searchParams.has('admin')}
-				- Admin
+			{#if isAdmin}
+				<span class="admin-badge">Admin</span>
 			{/if}
 		</h1>
 	</a>
 
-	<img src="/Volleyball_icon.svg" alt="Volleyball" />
+	{#if !isAdmin}
+		<img src="/Volleyball_icon.svg" alt="Volleyball" />
+	{/if}
 </header>
 
 <style>
@@ -37,22 +39,44 @@
 		justify-content: space-between;
 		padding: 0 1rem;
 		background-color: #9cc1cf;
-		height: min(30vh, 300px);
+		height: min(30dvh, 300px);
 		border-bottom-left-radius: 16px;
 		border-bottom-right-radius: 16px;
 		overflow: hidden;
 		box-sizing: border-box;
 	}
 
+	header.compact {
+		height: min(20dvh, 180px);
+		border-bottom-left-radius: 12px;
+		border-bottom-right-radius: 12px;
+	}
+
 	h1 {
-		display: block;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
 		position: relative;
-		max-width: 60%;
+		max-width: 80%;
 		z-index: 1;
 		padding: 0;
 		font-size: 3rem;
 		font-weight: 100;
 		color: #000;
+	}
+
+	header.compact h1 {
+		font-size: 2rem;
+	}
+
+	.admin-badge {
+		font-size: 0.75rem;
+		padding: 0.25rem 0.6rem;
+		background: rgba(0, 0, 0, 0.15);
+		border-radius: 4px;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		font-weight: 400;
 	}
 
 	nav {
