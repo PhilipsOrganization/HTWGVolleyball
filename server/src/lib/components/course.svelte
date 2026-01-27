@@ -49,12 +49,12 @@
 
 	div {
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-columns: 2fr 1fr 2fr;
 		align-items: center;
-
-		padding: 1rem 2rem;
+		padding: 1.4rem 2rem;
 		border-bottom: 1px solid #5d5d5d;
 		view-transition-name: var(--course-transition);
+		gap: 1rem;
 	}
 
 	div.first {
@@ -73,6 +73,7 @@
 		display: flex;
 		justify-content: flex-end;
 		border: 0;
+		padding: 0;
 		p {
 			text-decoration: underline;
 		}
