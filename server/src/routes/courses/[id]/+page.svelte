@@ -4,6 +4,7 @@
 	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
 	import { addToast } from '$lib/helpers/toast';
 	import { format, isToday } from 'date-fns';
+	import { char } from 'drizzle-orm/mysql-core';
 
 	let { data } = $props();
 	let course = $derived(data.course);
@@ -114,28 +115,22 @@
 	>
 		<a href={admin ? '/admin' : '/courses'}>back</a>
 		{#if admin}
-			<ConfirmableForm message="Do you really want to delete this course?">
-				{#snippet confirm()}
-					<form class="waitlist" action="?/delete-course" method="post">
-						<button type="submit">delete</button>
-					</form>
-				{/snippet}
-				{#snippet button()}
-					<button type="submit">delete</button>
-				{/snippet}
-			</ConfirmableForm>
+			<form class="waitlist" action="?/delete-course" method="post" use:enhance>
+				<ConfirmableForm message="Do you really want to delete this course?">
+					{#snippet children(onclick, type)}
+						<button {type} {onclick}>delete</button>
+					{/snippet}
+				</ConfirmableForm>
+			</form>
 		{/if}
 		{#if course.isEnrolled}
-			<ConfirmableForm message="Do you really want to drop this course?">
-				{#snippet confirm()}
-					<form action={`?/drop${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
-						<button type="submit"> Drop </button>
-					</form>
-				{/snippet}
-				{#snippet button()}
-					<button type="submit" disabled={course.isPast}> drop </button>
-				{/snippet}
-			</ConfirmableForm>
+			<form action={`?/drop${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
+				<ConfirmableForm message="Do you really want to drop this course?">
+					{#snippet children(onclick, type)}
+						<button {type} {onclick}> drop </button>
+					{/snippet}
+				</ConfirmableForm>
+			</form>
 		{:else}
 			<form action={`?/enlist${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
 				<button type="submit" disabled={course.isPast}> enlist </button>
@@ -157,33 +152,27 @@
 				<div class="user" class:waitList={isOnWaitList}>
 					<b class="ellipsis">{participant.username}</b>
 					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
-					<ConfirmableForm message="Do you really want to strike this user?">
-						{#snippet confirm()}
-							<form action="?/strike" method="post" use:enhance={updateCourse}>
-								<input type="hidden" name="userId" value={participant.id} />
-								<button type="submit" class="underline">strike</button>
-							</form>
-						{/snippet}
-						{#snippet button()}
-							<button type="submit" class="underline">strike</button>
-						{/snippet}
-					</ConfirmableForm>
+					<form action="?/strike" method="post" use:enhance={updateCourse}>
+						<input type="hidden" name="userId" value={participant.id} />
+						<ConfirmableForm message="Do you really want to strike this user?">
+							{#snippet children(onclick, type)}
+								<button {type} {onclick} class="underline">strike</button>
+							{/snippet}
+						</ConfirmableForm>
+					</form>
 					{#if participant.canceledAt}
 						{@const canceledToday = isToday(participant.canceledAt) && false}
 						{@const dateFormat = canceledToday ? 'HH:mm' : 'dd.MM. HH:mm'}
 						<span class:canceled={participant.canceledAt}>canceled at {format(participant.canceledAt, dateFormat)} </span>
 					{:else}
-						<ConfirmableForm message="Do you really want to cancel this user?">
-							{#snippet confirm()}
-								<form action="?/cancel" method="post" use:enhance={updateCourse}>
-									<input type="hidden" name="userId" value={participant.id} />
-									<button type="submit" class="underline">cancel</button>
-								</form>
-							{/snippet}
-							{#snippet button()}
-								<button type="submit" class="underline">cancel</button>
-							{/snippet}
-						</ConfirmableForm>
+						<form action="?/cancel" method="post" use:enhance={updateCourse}>
+							<input type="hidden" name="userId" value={participant.id} />
+							<ConfirmableForm message="Do you really want to cancel this user?">
+								{#snippet children(onclick, type)}
+									<button {type} {onclick} class="underline">cancel</button>
+								{/snippet}
+							</ConfirmableForm>
+						</form>
 					{/if}
 				</div>
 			{:else}

@@ -7,7 +7,7 @@
 
 	let { data, form = $bindable() } = $props();
 
-	const user = data.user;
+	const user = $derived(data.user);
 
 	/**
 	 *
@@ -47,42 +47,33 @@
 
 	<div>
 		{#if user.role === Role.ADMIN}
-			<ConfirmableForm message="Do you really want to demote the user to a normie?">
-				{#snippet confirm()}
-								<form action="?/demote" method="post" >
-						<button>Demote to User</button>
-					</form>
-							{/snippet}
-				{#snippet button()}
-								<button >Demote to User</button>
-							{/snippet}
-			</ConfirmableForm>
+			<form action="?/demote" method="post" use:enhance>
+				<ConfirmableForm message="Do you really want to demote the user to a normie?">
+					{#snippet children(fireSubmit, type)}
+						<button {type} onclick={fireSubmit}>Demote to User</button>
+					{/snippet}
+				</ConfirmableForm>
+			</form>
 		{:else if user.role === Role.USER}
-			<ConfirmableForm message="Do you really want to promote the user to an admin?">
-				{#snippet confirm()}
-										<form action="?/promote" method="post" >
-						<button>Promote to Admin</button>
-					</form>
-									{/snippet}
-				{#snippet button()}
-										<button >Promote to Admin</button>
-									{/snippet}
-			</ConfirmableForm>
+			<form action="?/promote" method="post" use:enhance>
+				<ConfirmableForm message="Do you really want to promote the user to an admin?">
+					{#snippet children(fireSubmit, type)}
+						<button {type} onclick={fireSubmit}>Promote to Admin</button>
+					{/snippet}
+				</ConfirmableForm>
+			</form>
 		{/if}
-		<form action="?/reset-pw" method="post">
-			<button>Send Password Reset Email</button>
+		<form action="?/reset-pw" method="post" use:enhance>
+			<button type="submit">Send Password Reset Email</button>
 		</form>
 		{#if user.role === Role.USER}
-			<ConfirmableForm message="Do you really want to delete the user?">
-				{#snippet confirm()}
-								<form action="?/delete" method="post" >
-						<button>Delete User</button>
-					</form>
-							{/snippet}
-				{#snippet button()}
-								<button >Delete User</button>
-							{/snippet}
-			</ConfirmableForm>
+			<form action="?/delete" method="post" use:enhance>
+				<ConfirmableForm message="Do you really want to delete the user?">
+					{#snippet children(fireSubmit, type)}
+						<button {type} onclick={fireSubmit}>Delete User</button>
+					{/snippet}
+				</ConfirmableForm>
+			</form>
 		{/if}
 	</div>
 	<br />
@@ -95,8 +86,8 @@
 	<div>
 		<p class="red">Number of Strikes: {user.strikes}</p>
 		{#if user.strikes > 0}
-			<form action="?/unstrike" method="post">
-				<button class="small">remove</button>
+			<form action="?/unstrike" method="post" use:enhance>
+				<button type="submit" class="small">remove</button>
 			</form>
 		{/if}
 	</div>
@@ -141,7 +132,7 @@
 				<p>Error: {form.error}!</p>
 			</div>
 		{/if}
-		<button>Send Email</button>
+		<button type="submit">Send Email</button>
 	</form>
 </section>
 
@@ -153,9 +144,9 @@
 <br />
 <div class="column">
 	<h2>Notes</h2>
-	<form class="flex" method="post" action="?/note">
+	<form class="flex" method="post" action="?/note" use:enhance>
 		<textarea name="notes" id="notes" cols="30" rows="10" value={user.notes}></textarea>
-		<button>Save</button>
+		<button type="submit">Save</button>
 	</form>
 </div>
 
@@ -177,37 +168,46 @@
 		align-items: center;
 	}
 
-	div.center {
-		justify-content: center;
-		margin: 1rem;
-		width: 80%;
-		height: 200px;
-	}
-
 	.column {
 		flex-direction: column;
 		align-items: flex-start;
 	}
 
-	svg {
-		width: 100%;
-		height: 100%;
+	button {
+		padding: 0.75rem 1.5rem;
+		background-color: #9cc1cf;
+		color: #000;
+		border: none;
+		border-radius: 0.5rem;
+		margin: 0.5rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 150ms ease-in-out;
 	}
 
-	button {
-		padding: 20px;
-		background: #9cc1cf;
-		margin: 10px;
-		color: black;
+	button:hover {
+		background-color: #b0d1dc;
+		transform: translateY(-1px);
+	}
+
+	button:focus {
+		outline: none;
+		box-shadow: 0 0 0 2px #9cc1cf;
+	}
+
+	button.small {
+		padding: 0.5rem 1rem;
+		background-color: #ecfbc7;
+		color: #000;
+		font-size: 0.875rem;
+	}
+
+	button.small:hover {
+		background-color: #f5e8a8;
 	}
 
 	.red {
 		color: #ecfbc7;
-	}
-
-	.small {
-		padding: 10px;
-		background: #ecfbc7;
 	}
 
 	.flex {
