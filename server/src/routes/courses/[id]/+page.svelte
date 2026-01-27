@@ -235,8 +235,9 @@
 	}
 
 	.badge.waitList {
-		background: #eb714f;
-		color: #131313;
+		background: black;
+		color: #eb714f;
+		font-weight: 300;
 	}
 
 	.status-badge {
@@ -332,10 +333,6 @@
 
 	.btn-secondary {
 		opacity: 0.7;
-	}
-
-	.btn-danger {
-		color: #830000;
 	}
 
 	#users {
