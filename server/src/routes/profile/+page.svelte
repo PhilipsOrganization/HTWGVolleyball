@@ -1,4 +1,4 @@
-<script >
+<script>
 	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
 	import { approximatelyFormatTime } from '$lib/helpers/date';
 	import { onMount } from 'svelte';
@@ -43,7 +43,7 @@
 			});
 
 			if (!request.ok) {
-				throw new Error(await request.text() || 'Subscription failed on server');
+				throw new Error((await request.text()) || 'Subscription failed on server');
 			}
 
 			const globalUser = await request.json();
@@ -109,16 +109,13 @@
 					<p class="status-msg success">Email verified and active</p>
 				{:else}
 					<p class="status-msg warning">Email not verified</p>
-					<ConfirmableForm message="Do you really want to resend the verification email?">
-						{#snippet confirm()}
-												<form action="?/reverify" method="post" >
-								<button class="action-btn outline" type="submit">Resend verification email</button>
-							</form>
-											{/snippet}
-						{#snippet button()}
-												<button  class="action-btn outline" type="button">Resend verification email</button>
-											{/snippet}
-					</ConfirmableForm>
+					<form action="?/reverify" method="post">
+						<ConfirmableForm message="Do you really want to resend the verification email?">
+							{#snippet children(onclick, type)}
+								<button {type} {onclick} class="action-btn outline">Resend verification email</button>
+							{/snippet}
+						</ConfirmableForm>
+					</form>
 				{/if}
 			</div>
 		</div>
@@ -128,26 +125,14 @@
 				<div class="card-icon">🔔</div>
 				<div class="card-content">
 					<h3>Push Notifications</h3>
-					<p class="description">
-						Receive instant updates about course openings and spot availability.
-					</p>
+					<p class="description">Receive instant updates about course openings and spot availability.</p>
 					<div class="toggle-area">
 						{#if data.globalUser.hasNotificationsEnabled}
-							<button 
-								class="action-btn enabled" 
-								onclick={disableNotification} 
-								disabled={loading}
-								type="button"
-							>
+							<button class="action-btn enabled" onclick={disableNotification} disabled={loading} type="button">
 								{loading ? 'Processing...' : 'Disable Notifications'}
 							</button>
 						{:else}
-							<button 
-								class="action-btn accent" 
-								onclick={enableNotification} 
-								disabled={loading}
-								type="button"
-							>
+							<button class="action-btn accent" onclick={enableNotification} disabled={loading} type="button">
 								{loading ? 'Processing...' : 'Enable Notifications'}
 							</button>
 						{/if}
@@ -186,7 +171,7 @@
 						</div>
 					{/if}
 				</div>
-				
+
 				<div class="course-list">
 					<h4>Recent Activity</h4>
 					{#each data.stats as course}
@@ -252,7 +237,9 @@
 		padding: 1.5rem;
 		display: flex;
 		gap: 1.25rem;
-		transition: transform 0.2s ease, border-color 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease;
 	}
 
 	.card:hover {
@@ -314,8 +301,12 @@
 		margin-bottom: 1rem;
 	}
 
-	.status-msg.success { color: #9cc1cf; }
-	.status-msg.warning { color: #eb714f; }
+	.status-msg.success {
+		color: #9cc1cf;
+	}
+	.status-msg.warning {
+		color: #eb714f;
+	}
 
 	.action-btn {
 		padding: 0.6rem 1.25rem;
@@ -340,7 +331,9 @@
 		color: #000;
 	}
 
-	.action-btn.accent:hover:not(:disabled) { background: #b0d1dc; }
+	.action-btn.accent:hover:not(:disabled) {
+		background: #b0d1dc;
+	}
 
 	.action-btn.outline {
 		background: transparent;
@@ -423,8 +416,13 @@
 		border-bottom: none;
 	}
 
-	.course-name { color: #888; }
-	.course-count { color: #9cc1cf; font-weight: 500; }
+	.course-name {
+		color: #888;
+	}
+	.course-count {
+		color: #9cc1cf;
+		font-weight: 500;
+	}
 
 	.empty {
 		font-size: 0.85rem;
@@ -434,10 +432,20 @@
 	}
 
 	@media (max-width: 600px) {
-		section { padding: 1.5rem 1rem 5rem; }
-		h1 { font-size: 2rem; }
-		.profile-header { margin-bottom: 1.5rem; }
-		.grid { grid-template-columns: 1fr; }
-		.card { padding: 1.25rem; }
+		section {
+			padding: 1.5rem 1rem 5rem;
+		}
+		h1 {
+			font-size: 2rem;
+		}
+		.profile-header {
+			margin-bottom: 1.5rem;
+		}
+		.grid {
+			grid-template-columns: 1fr;
+		}
+		.card {
+			padding: 1.25rem;
+		}
 	}
 </style>

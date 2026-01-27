@@ -1,4 +1,5 @@
 <script>
+	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/state';
 
 	let { children } = $props();
@@ -20,6 +21,15 @@
 		}
 		return url.pathname.startsWith(href);
 	}
+
+	onMount(() => {
+		document.documentElement.classList.add('admin-layout');
+		document.body.classList.add('admin-layout');
+		return () => {
+			document.documentElement.classList.remove('admin-layout');
+			document.body.classList.remove('admin-layout');
+		};
+	});
 </script>
 
 <div class="admin-container">
@@ -39,11 +49,14 @@
 </div>
 
 <style>
-	:global(html),
-	:global(body) {
+	:global(body.admin-layout) {
 		height: 100%;
 		overflow: hidden;
 		padding-bottom: 0 !important;
+	}
+
+	:global(html.admin-layout) {
+		overflow: hidden;
 	}
 
 	.admin-container {
