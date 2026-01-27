@@ -76,7 +76,7 @@
 		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
 		transition: all 150ms ease-in-out;
 		width: 100%;
-		max-width: 28rem;
+		max-width: min(28rem, 90vw);
 		backdrop-filter: blur(10px);
 		-webkit-backdrop-filter: blur(10px);
 	}
