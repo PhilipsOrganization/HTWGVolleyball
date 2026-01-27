@@ -188,7 +188,6 @@ const filtered = course.participants.filter(p=> !p.canceledAt);
 
 	section {
 		justify-content: center;
-		max-height: 400px;
 		padding-top: 2rem;
 	}
 
