@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build",
+		"build": "bunx --bun vite build",
 		"migrate": "drizzle-kit migrate",
 		"generate": "drizzle-kit generate",
 		"preview": "vite preview --host",

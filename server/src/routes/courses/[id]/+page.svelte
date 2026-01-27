@@ -73,17 +73,19 @@
 	<section>
 		<h2>
 			{course.name}
+		</h2>
+		<div class="status-badge">
 			{#if course.isEnrolled}
 				{#if course.isOnWaitlist}
-					<small class="isSignedUp waitList"> - on waitlist spot #{course.spot - course.maxParticipants + 1}</small>
+					<span class="badge waitList">on waitlist spot #{course.spot - course.maxParticipants + 1}</span>
 				{:else}
-					<small class="isSignedUp"> - registered</small>
+					<span class="badge isSignedUp">registered</span>
 				{/if}
 			{/if}
-		</h2>
-		<p class="bold">{course.time}</p>
-		<p>{intl.format(new Date(course.date))}</p>
-		<p>{course.location}</p>
+		</div>
+		<p class="time bold">{course.time}</p>
+		<p class="date">{intl.format(new Date(course.date))}</p>
+		<p class="location">{course.location}</p>
 
 		{#if admin}
 			{@const intlAdmin = new Intl.DateTimeFormat('de-DE', {
@@ -113,12 +115,12 @@
 		class:justSignedUp
 		style:--course-transition={`course-${course.id}`}
 	>
-		<a href={admin ? '/admin' : '/courses'}>back</a>
+		<a class="btn-secondary" href={admin ? '/admin' : '/courses'}>back</a>
 		{#if admin}
 			<form class="waitlist" action="?/delete-course" method="post" use:enhance>
 				<ConfirmableForm message="Do you really want to delete this course?">
 					{#snippet children(onclick, type)}
-						<button {type} {onclick}>delete</button>
+						<button class="btn-danger" {type} {onclick}>delete</button>
 					{/snippet}
 				</ConfirmableForm>
 			</form>
@@ -127,13 +129,13 @@
 			<form action={`?/drop${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
 				<ConfirmableForm message="Do you really want to drop this course?">
 					{#snippet children(onclick, type)}
-						<button {type} {onclick}> drop </button>
+						<button class="btn-action" {type} {onclick}> drop </button>
 					{/snippet}
 				</ConfirmableForm>
 			</form>
 		{:else}
 			<form action={`?/enlist${admin ? '&admin' : ''}`} method="post" use:enhance={updateCourse}>
-				<button type="submit" disabled={course.isPast}> enlist </button>
+				<button class="btn-action" type="submit" disabled={course.isPast}> enlist </button>
 			</form>
 		{/if}
 	</div>
@@ -149,31 +151,41 @@
 			{#each course.participants ?? [] as participant, index}
 				{@const idx = course.participants.filter((p) => !p.canceledAt).findIndex((p) => p.id === participant.id)}
 				{@const isOnWaitList = idx >= course.maxParticipants}
-				<div class="user" class:waitList={isOnWaitList}>
-					<b class="ellipsis">{participant.username}</b>
-					<a href="/admin/users/{participant.id}/stats">&#9432;</a>
-					<form action="?/strike" method="post" use:enhance={updateCourse}>
-						<input type="hidden" name="userId" value={participant.id} />
-						<ConfirmableForm message="Do you really want to strike this user?">
-							{#snippet children(onclick, type)}
-								<button {type} {onclick} class="underline">strike</button>
-							{/snippet}
-						</ConfirmableForm>
-					</form>
-					{#if participant.canceledAt}
-						{@const canceledToday = isToday(participant.canceledAt) && false}
-						{@const dateFormat = canceledToday ? 'HH:mm' : 'dd.MM. HH:mm'}
-						<span class:canceled={participant.canceledAt}>canceled at {format(participant.canceledAt, dateFormat)} </span>
-					{:else}
-						<form action="?/cancel" method="post" use:enhance={updateCourse}>
+				<div class="user-row" class:waitList={isOnWaitList} class:is-canceled={participant.canceledAt}>
+					<div class="user-info">
+						<div class="user-name">
+							<b class="ellipsis">{participant.username}</b>
+							{#if isOnWaitList && !participant.canceledAt}
+								<span class="waitlist-indicator">WL</span>
+							{/if}
+						</div>
+						{#if participant.canceledAt}
+							{@const canceledToday = isToday(participant.canceledAt) && false}
+							{@const dateFormat = canceledToday ? 'HH:mm' : 'dd.MM. HH:mm'}
+							<div class="canceled-at">canceled {format(participant.canceledAt, dateFormat)}</div>
+						{/if}
+					</div>
+					<div class="user-actions">
+						<a title="Stats" href="/admin/users/{participant.id}/stats">&#9432;</a>
+						<form action="?/strike" method="post" use:enhance={updateCourse}>
 							<input type="hidden" name="userId" value={participant.id} />
-							<ConfirmableForm message="Do you really want to cancel this user?">
+							<ConfirmableForm message="Do you really want to strike this user?">
 								{#snippet children(onclick, type)}
-									<button {type} {onclick} class="underline">cancel</button>
+									<button {type} {onclick} class="underline strike-btn">strike</button>
 								{/snippet}
 							</ConfirmableForm>
 						</form>
-					{/if}
+						{#if !participant.canceledAt}
+							<form action="?/cancel" method="post" use:enhance={updateCourse}>
+								<input type="hidden" name="userId" value={participant.id} />
+								<ConfirmableForm message="Do you really want to cancel this user?">
+									{#snippet children(onclick, type)}
+										<button {type} {onclick} class="underline cancel-btn">cancel</button>
+									{/snippet}
+								</ConfirmableForm>
+							</form>
+						{/if}
+					</div>
 				</div>
 			{:else}
 				<p>There are currently no participants. ☹</p>
@@ -205,8 +217,46 @@
 	}
 
 	.isSignedUp {
-		color: #9cc1cf;
+		color: #ecfbc7;
 		font-weight: 800;
+	}
+
+	.badge {
+		padding: 0.2rem 0.6rem;
+		border-radius: 4px;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05rem;
+	}
+
+	.badge.isSignedUp {
+		background: #ecfbc7;
+		color: #131313;
+	}
+
+	.badge.waitList {
+		background: #eb714f;
+		color: #131313;
+	}
+
+	.status-badge {
+		display: flex;
+		justify-content: center;
+		margin-top: -0.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.time {
+		font-size: 1.5rem;
+	}
+
+	.date {
+		opacity: 0.8;
+	}
+
+	.location {
+		font-style: italic;
+		opacity: 0.8;
 	}
 
 	.waitList {
@@ -265,6 +315,29 @@
 		background: #eb714f;
 	}
 
+	.btn-action,
+	.btn-secondary,
+	.btn-danger {
+		padding: 0.5rem 1rem;
+		text-transform: uppercase;
+		font-weight: 500;
+		transition: transform 0.1s ease;
+	}
+
+	.btn-action:active,
+	.btn-secondary:active,
+	.btn-danger:active {
+		transform: scale(0.95);
+	}
+
+	.btn-secondary {
+		opacity: 0.7;
+	}
+
+	.btn-danger {
+		color: #830000;
+	}
+
 	#users {
 		display: flex;
 		flex-direction: column;
@@ -272,16 +345,61 @@
 		width: min(90%, 9000px);
 	}
 
-	.user {
-		display: grid;
-		grid-template-columns: 2fr repeat(2, 1fr) 2fr;
-		justify-items: center;
-		align-items: center;
-		flex-direction: row;
+	.user-row {
+		display: flex;
+		align-items: flex-start;
 		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 0.5rem;
 		gap: 1rem;
+		padding: 0.75rem 1rem;
+		margin-bottom: 0.5rem;
+		background: #1a1a1a;
+		border-radius: 4px;
+		transition: background 0.2s ease;
+	}
+
+	.user-row:hover {
+		background: #222;
+	}
+
+	.user-row.waitList {
+		border-left: 3px solid #eb714f;
+	}
+
+	.user-row.is-canceled {
+		opacity: 0.6;
+		background: #1a1a1a;
+	}
+
+	.user-info {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		flex: 1;
+		min-width: 0;
+	}
+
+	.user-name {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.waitlist-indicator {
+		padding: 0.1rem 0.4rem;
+		font-size: 0.7rem;
+		background: #eb714f;
+		color: #131313;
+		border-radius: 3px;
+		text-transform: uppercase;
+		font-weight: 700;
+	}
+
+	.user-actions {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		justify-content: flex-end;
+		flex-shrink: 0;
 	}
 
 	.header {
@@ -303,8 +421,18 @@
 		text-decoration: underline;
 	}
 
-	.canceled {
+	.canceled-at {
+		color: #ff592b;
+		font-size: 0.85rem;
+		white-space: nowrap;
+		font-weight: 400;
+	}
+
+	.strike-btn {
 		color: #e65932;
-		justify-self: end;
+	}
+
+	.cancel-btn {
+		color: #eb714f;
 	}
 </style>
