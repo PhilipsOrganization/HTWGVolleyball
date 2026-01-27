@@ -5,6 +5,8 @@
 	import Toast from '$lib/components/toast.svelte';
 	import { toasts } from '$lib/helpers/toast';
 
+	let { children } = $props();
+
 	/**
 	 * @param {() => Promise<void>} callback
 	 */
@@ -33,7 +35,7 @@
 </div>
 
 <InfoModal />
-<slot />
+{@render children?.()}
 
 <style>
 	:global(body) {

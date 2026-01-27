@@ -1,15 +1,14 @@
 <script>
-	import { Button, Container, Head, Hr, Html, Section, Text } from 'svelte-email';
+	import { Button, Container, Head, Hr, Html, Section, Text } from '../components/index.js';
 
 	/**
-	 * @type {import("$lib/db/schema").Account}
+	 * @typedef {Object} Props
+	 * @property {import("$lib/db/schema").Account} user
+	 * @property {string} token
 	 */
-	export let user;
 
-	/**
-	 * @type {string}
-	 */
-	export let token;
+	/** @type {Props} */
+	let { user, token } = $props();
 
 	const fontFamily = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';
 

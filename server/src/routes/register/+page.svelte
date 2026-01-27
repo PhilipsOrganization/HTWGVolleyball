@@ -1,7 +1,7 @@
-<script lang="ts">
+<script >
 	import { enhance } from '$app/forms';
 
-	export let form;
+	let { form } = $props();
 </script>
 
 <section>

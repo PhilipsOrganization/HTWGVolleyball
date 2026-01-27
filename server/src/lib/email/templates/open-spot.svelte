@@ -1,16 +1,18 @@
 <script>
 	import { format } from 'date-fns';
-	import { Container, Head, Hr, Html, Section, Text, Preview, Link, Column } from 'svelte-email';
+	import { Container, Head, Hr, Html, Section, Text, Preview, Link, Column } from '../components/index.js';
 
-	/**
-	 * @type {import("$lib/db/schema").Account}
-	 */
-	export let user;
+	
 
+	
 	/**
-	 * @type {import("$lib/db/schema").Course}
+	 * @typedef {Object} Props
+	 * @property {import("$lib/db/schema").Account} user
+	 * @property {import("$lib/db/schema").Course} course
 	 */
-	export let course;
+
+	/** @type {Props} */
+	let { user, course } = $props();
 
 	const date = format(new Date(course.date), 'EEEE, MMMM do, yyyy');
 	const fontFamily = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';

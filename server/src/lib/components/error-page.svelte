@@ -1,22 +1,17 @@
-<script lang="ts">
-	import { dev } from '$app/environment';
-	import { page } from '$app/stores';
+<script>
+	import { page } from '$app/state';
 
-	export let title = 'Error';
-
-	const error = $page.error;
-	const stack = dev && error ? error.stack : '';
+	let { title = 'Error', children } = $props();
 </script>
 
 <section>
 	<h1>{title}</h1>
-	{#if error}
-		<p>Error: {error.message}</p>
-		{#if dev}
-			<p>{stack}</p>
-		{/if}
+	{#if page.error}
+		<p>Error: {page.error.message}</p>
 	{/if}
-	<slot />
+	{#if children}
+		{@render children()}
+	{/if}
 </section>
 
 <style>
