@@ -29,7 +29,7 @@
 			<span>{course.signupCount}/{course.maxParticipants}</span>
 		{/if}
 
-		<div class="underline right">
+		<div class="right">
 			<p>
 				{#if admin || course.isPast}
 					details
@@ -50,6 +50,7 @@
 	div {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
+		align-items: center;
 
 		padding: 1rem 2rem;
 		border-bottom: 1px solid #5d5d5d;
@@ -71,16 +72,16 @@
 	div.right {
 		display: flex;
 		justify-content: flex-end;
+		border: 0;
+		p {
+			text-decoration: underline;
+		}
 	}
 
 	p {
 		all: unset;
 		min-width: 8ch;
 		text-align: center;
-	}
-
-	.underline {
-		text-decoration: underline;
 	}
 
 	.enlisted {
