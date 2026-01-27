@@ -1,9 +1,15 @@
-<script lang="ts">
+<script>
 	import { styleToString } from '../utils';
 
-	export let style: Record<string, string | number> = {};
-	let className: string | undefined = undefined;
-	export { className as class };
+	/**
+	 * @type {{
+	 *   style?: Record<string, string | number>;
+	 *   class?: string;
+	 *   children?: import('svelte').Snippet;
+	 *   [key: string]: any;
+	 * }}
+	 */
+	let { style = {}, class: className, children, ...restProps } = $props();
 
 	const styleDefaultTable = {
 		width: '100%',
@@ -24,12 +30,12 @@
 	cellPadding={0}
 	cellSpacing={0}
 	role="presentation"
-	{...$$restProps}
+	{...restProps}
 	class={className}
 >
 	<tbody>
 		<tr style={styleToString(styleDefaultTr)}>
-			<slot />
+			{@render children?.()}
 		</tr>
 	</tbody>
 </table>

@@ -1,12 +1,14 @@
-<script lang="ts">
-	import type { HTMLAttributes } from 'svelte/elements';
-	interface $$Props extends Omit<HTMLAttributes<HTMLHtmlElement>, 'style'> {
-		lang?: string;
-	}
-
-	export let lang = 'en';
+<script>
+	/**
+	 * @type {{
+	 *   lang?: string;
+	 *   children?: import('svelte').Snippet;
+	 *   [key: string]: any;
+	 * }}
+	 */
+	let { lang = 'en', children, ...restProps } = $props();
 </script>
 
-<html {...$$restProps} id="__svelte-email" {lang}>
-	<slot />
+<html {...restProps} id="__svelte-email" {lang}>
+	{@render children?.()}
 </html>
