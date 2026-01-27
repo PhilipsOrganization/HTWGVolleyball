@@ -1,7 +1,7 @@
-<script lang="ts">
+<script >
 	import { enhance } from '$app/forms';
 
-	export let form;
+	let { form } = $props();
 </script>
 
 <section>
@@ -38,7 +38,7 @@
 		<button id="login-btn">login</button>
 	</form>
 
-	<div id="line" />
+	<div id="line"></div>
 
 	<div id="more">
 		<form action="?/authenticate" method="post">

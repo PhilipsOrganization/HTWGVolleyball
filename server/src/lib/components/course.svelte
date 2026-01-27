@@ -1,17 +1,14 @@
 <script>
 	import { fade } from 'svelte/transition';
 
-	/** @type {import('$lib/db/entities').CourseDTO} */
-	export let course;
-	export let isFirst = false;
-	export let admin = false;
+	let { course, isFirst = false, admin = false } = $props();
 
-	const spot = course.spot + 1;
-	const waitlistSpot = spot - course.maxParticipants;
-	const href = `courses/${course.id}${admin ? '?admin' : ''}`;
+	const spot = $derived(course.spot + 1);
+	const waitlistSpot = $derived(spot - course.maxParticipants);
+	const href = $derived(`courses/${course.id}${admin ? '?admin' : ''}`);
 </script>
 
-<a {href} in:fade>
+<a {href} in:fade class="course-link">
 	<div
 		aria-roledescription="course"
 		class:enlisted={course.isEnrolled}
@@ -32,7 +29,7 @@
 			<span>{course.signupCount}/{course.maxParticipants}</span>
 		{/if}
 
-		<a class="underline right" {href}>
+		<div class="underline right">
 			<p>
 				{#if admin || course.isPast}
 					details
@@ -40,11 +37,16 @@
 					{course.isEnrolled ? 'drop ' : 'enlist'}
 				{/if}
 			</p>
-		</a>
+		</div>
 	</div>
 </a>
 
 <style>
+	.course-link {
+		text-decoration: none;
+		color: inherit;
+	}
+
 	div {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
@@ -66,7 +68,7 @@
 		text-align: center;
 	}
 
-	a.right {
+	div.right {
 		display: flex;
 		justify-content: flex-end;
 	}

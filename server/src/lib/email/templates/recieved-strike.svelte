@@ -1,20 +1,20 @@
 <script>
-	import { Column, Container, Head, Html, Link, Preview, Section, Text } from 'svelte-email';
+	import { Column, Container, Head, Html, Link, Preview, Section, Text } from '../components/index.js';
 
+	
+
+	
+
+    
 	/**
-	 * @type {import("$lib/db/schema").Account}
+	 * @typedef {Object} Props
+	 * @property {import("$lib/db/schema").Account} user
+	 * @property {import("$lib/db/schema").Course} course
+	 * @property {import("$lib/db/schema").Account} admin
 	 */
-	export let user;
 
-	/**
-	 * @type {import("$lib/db/schema").Course}
-	 */
-	export let course;
-
-    /**
-     * @type {import("$lib/db/schema").Account}
-     */
-    export let admin;
+	/** @type {Props} */
+	let { user, course, admin } = $props();
 
 	const fontFamily = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';
 	const main = { backgroundColor: '#fff' };

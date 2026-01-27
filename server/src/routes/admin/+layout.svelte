@@ -1,5 +1,7 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
+
+	let { children } = $props();
 
 	const navItems = [
 		{ href: '/admin', label: 'Dashboard', icon: '◉' },
@@ -24,7 +26,7 @@
 	<aside class="admin-nav">
 		<nav>
 			{#each navItems as item}
-				<a href={item.href} class:active={isActive(item.href, $page)}>
+				<a href={item.href} class:active={isActive(item.href, page)}>
 					<span class="icon">{item.icon}</span>
 					<span class="label">{item.label}</span>
 				</a>
@@ -32,7 +34,7 @@
 		</nav>
 	</aside>
 	<div class="admin-content">
-		<slot />
+		{@render children?.()}
 	</div>
 </div>
 

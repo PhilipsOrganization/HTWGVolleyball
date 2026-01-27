@@ -1,9 +1,11 @@
-<script lang="ts">
+<script >
 	import ErrorPage from '$lib/components/error-page.svelte';
 </script>
 
 <ErrorPage title="Registration Failed">
-	<a href="/register">Try again</a>
+	{#snippet children()}
+		<a href="/register">Try again</a>
+	{/snippet}
 </ErrorPage>
 
 <style>

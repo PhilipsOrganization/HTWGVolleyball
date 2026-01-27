@@ -4,7 +4,7 @@
 	import { addToast } from '$lib/helpers/toast';
 	import { onMount } from 'svelte';
 
-	export let data;
+	let { data } = $props();
 
 	onMount(() => {
 		if (!data.globalUser?.emailVerified) {
@@ -19,7 +19,7 @@
 			<div id="block">
 				<h2>{humanReadableDate(block.date)}</h2>
 				{#each block.courses as course, i}
-					<Course {course} isFirst={i === 0} />
+					<Course {course} isFirst={i === 0} ></Course>	
 				{/each}
 			</div>
 		{:else}
