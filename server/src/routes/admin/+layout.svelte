@@ -122,6 +122,7 @@
 			border-bottom: 1px solid #2a2a2a;
 			padding: 0.75rem 0;
 			overflow-y: auto;
+			flex-shrink: 0;
 		}
 
 		.admin-nav nav {
@@ -142,7 +143,8 @@
 
 		.admin-content {
 			padding: 1rem;
-			height: auto;
+			flex: 1;
+			min-height: 0;
 		}
 	}
 </style>
