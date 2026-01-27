@@ -1,9 +1,14 @@
-<script lang="ts">
+<script>
 	import { styleToString } from '../utils';
 
-	export let style: Record<string, string | number> = {};
-	let className: string | undefined = undefined;
-	export { className as class };
+	/**
+	 * @type {{
+	 *   style?: Record<string, string | number>;
+	 *   class?: string;
+	 *   [key: string]: any;
+	 * }}
+	 */
+	let { style = {}, class: className, ...restProps } = $props();
 
 	const styleDefault = {
 		width: '100%',
@@ -13,4 +18,4 @@
 	};
 </script>
 
-<hr style={styleToString(styleDefault)} {...$$restProps} class={className} />
+<hr style={styleToString(styleDefault)} {...restProps} class={className} />

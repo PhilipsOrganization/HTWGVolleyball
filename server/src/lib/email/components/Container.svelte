@@ -1,9 +1,15 @@
-<script lang="ts">
+<script>
 	import { styleToString } from '../utils';
 
-	export let style: Record<string, string | number> = {};
-	let className: string | undefined = undefined;
-	export { className as class };
+	/**
+	 * @type {{
+	 *   style?: Record<string, string | number>;
+	 *   class?: string;
+	 *   children?: import('svelte').Snippet;
+	 *   [key: string]: any;
+	 * }}
+	 */
+	let { style = {}, class: className, children, ...restProps } = $props();
 
 	const styles = { maxWidth: '37.5em', ...style };
 	const inlineStyle = styleToString(styles);
@@ -14,8 +20,8 @@
           <table role="presentation" width="100%" align="center" style="${inlineStyle}" class="${className}"><tr><td></td><td style="width:37.5em;background:#ffffff">
         <![endif]-->`}
 </div>
-<div {...$$restProps} style={inlineStyle} class={className}>
-	<slot />
+<div {...restProps} style={inlineStyle} class={className}>
+	{@render children?.()}
 </div>
 <div>
 	{@html `<!--[if mso | IE]>

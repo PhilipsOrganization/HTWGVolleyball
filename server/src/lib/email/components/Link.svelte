@@ -1,11 +1,17 @@
-<script lang="ts">
+<script>
 	import { styleToString } from '../utils';
 
-	export let style: Record<string, string | number> = {};
-	let className: string | undefined = undefined;
-	export { className as class };
-	export let target = '_blank';
-	export let href = '';
+	/**
+	 * @type {{
+	 *   style?: Record<string, string | number>;
+	 *   class?: string;
+	 *   target?: string;
+	 *   href?: string;
+	 *   children?: import('svelte').Snippet;
+	 *   [key: string]: any;
+	 * }}
+	 */
+	let { style = {}, class: className, target = '_blank', href = '', children, ...restProps } = $props();
 
 	const styleDefault = {
 		color: '#067df7',
@@ -14,6 +20,6 @@
 	};
 </script>
 
-<a {...$$restProps} {href} {target} style={styleToString(styleDefault)} class={className}>
-	<slot />
+<a {...restProps} {href} {target} style={styleToString(styleDefault)} class={className}>
+	{@render children?.()}
 </a>

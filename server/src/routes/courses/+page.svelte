@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	import Course from '$lib/components/course.svelte';
 	import { humanReadableDate } from '$lib/helpers/date';
 	import { addToast } from '$lib/helpers/toast';

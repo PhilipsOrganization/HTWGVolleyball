@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Role } from '$lib/db/role';
 
 	let { data } = $props();
@@ -13,7 +13,7 @@
 	 * @param {string} value
 	 */
 	function updateFilter(key, value) {
-		const url = new URL($page.url);
+		const url = new URL(page.url);
 		if (value) {
 			url.searchParams.set(key, value);
 		} else {
@@ -38,7 +38,7 @@
 	 * @param {number} newPage
 	 */
 	function goToPage(newPage) {
-		const url = new URL($page.url);
+		const url = new URL(page.url);
 		if (newPage > 1) {
 			url.searchParams.set('page', String(newPage));
 		} else {

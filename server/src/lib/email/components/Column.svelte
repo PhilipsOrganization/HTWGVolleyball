@@ -1,9 +1,15 @@
-<script lang="ts">
+<script>
 	import { styleToString } from '../utils';
 
-	export let style: Record<string, string | number> = {};
-	let className: string | undefined = undefined;
-	export { className as class };
+	/**
+	 * @type {{
+	 *   style?: Record<string, string | number>;
+	 *   class?: string;
+	 *   children?: import('svelte').Snippet;
+	 *   [key: string]: any;
+	 * }}
+	 */
+	let { style = {}, class: className, children, ...restProps } = $props();
 
 	const styleDefault = {
 		display: 'inline-flex',
@@ -13,6 +19,6 @@
 	};
 </script>
 
-<td style={styleToString(styleDefault)} role="presentation" {...$$restProps} class={className}>
-	<slot />
+<td style={styleToString(styleDefault)} role="presentation" {...restProps} class={className}>
+	{@render children?.()}
 </td>

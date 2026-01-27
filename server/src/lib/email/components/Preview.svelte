@@ -1,9 +1,15 @@
-<script lang="ts">
+<script>
 	import { styleToString } from '../utils';
 
-	export let preview = '';
+	/**
+	 * @type {{
+	 *   preview?: string;
+	 *   [key: string]: any;
+	 * }}
+	 */
+	let { preview = '', ...restProps } = $props();
 
-	const renderWhiteSpace = (text: string) => {
+	const renderWhiteSpace = (/** @type {string} */ text) => {
 		const whiteSpaceCodes = '\xa0\u200C\u200B\u200D\u200E\u200F\uFEFF';
 		return whiteSpaceCodes.repeat(150 - text.length);
 	};
@@ -19,7 +25,7 @@
 		maxHeight: 0,
 		maxWidth: 0
 	})}
-	{...$$restProps}
+	{...restProps}
 >
 	{preview}
 	<div>

@@ -4,7 +4,9 @@
 </script>
 
 <ErrorPage title={page.error?.message ?? 'An Error Occurred :('}>
-	<a href="/">Go back</a>
+	{#snippet children()}
+		<a href="/">Go back</a>
+	{/snippet}
 </ErrorPage>
 
 <style>

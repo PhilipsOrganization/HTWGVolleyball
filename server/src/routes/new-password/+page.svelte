@@ -1,11 +1,11 @@
-<script lang="ts">
+<script >
 	import { enhance } from '$app/forms';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	let { form } = $props();
 
-	let token = $derived($page.url.searchParams.get('token'));
-	let userId = $derived($page.url.searchParams.get('user'));
+	let token = $derived(page.url.searchParams.get('token'));
+	let userId = $derived(page.url.searchParams.get('user'));
 </script>
 
 <div>

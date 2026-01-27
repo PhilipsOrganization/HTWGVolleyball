@@ -1,9 +1,15 @@
-<script lang="ts">
+<script>
 	import { styleToString } from '../utils';
 
-	export let style: Record<string, string | number> = {};
-	let className: string | undefined = undefined;
-	export { className as class };
+	/**
+	 * @type {{
+	 *   style?: Record<string, string | number>;
+	 *   class?: string;
+	 *   children?: import('svelte').Snippet;
+	 *   [key: string]: any;
+	 * }}
+	 */
+	let { style = {}, class: className, children, ...restProps } = $props();
 
 	const styleDefault = {
 		fontSize: '14px',
@@ -13,6 +19,6 @@
 	};
 </script>
 
-<p style={styleToString(styleDefault)} {...$$restProps} class={className}>
-	<slot />
+<p style={styleToString(styleDefault)} {...restProps} class={className}>
+	{@render children?.()}
 </p>

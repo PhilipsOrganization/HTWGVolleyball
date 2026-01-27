@@ -1,9 +1,14 @@
-<script lang="ts">
-	import type { HTMLAttributes } from 'svelte/elements';
-	interface $$Props extends HTMLAttributes<HTMLHeadElement> {}
+<script>
+	/**
+	 * @type {{
+	 *   children?: import('svelte').Snippet;
+	 *   [key: string]: any;
+	 * }}
+	 */
+	let { children, ...restProps } = $props();
 </script>
 
-<head {...$$restProps}>
+<head {...restProps}>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	<slot />
+	{@render children?.()}
 </head>

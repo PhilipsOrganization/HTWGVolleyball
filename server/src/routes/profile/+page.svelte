@@ -1,4 +1,4 @@
-<script lang="ts">
+<script >
 	import ConfirmableForm from '$lib/components/confirmable-form.svelte';
 	import { approximatelyFormatTime } from '$lib/helpers/date';
 	import { onMount } from 'svelte';
