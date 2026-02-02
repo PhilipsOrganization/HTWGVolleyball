@@ -65,7 +65,7 @@
 </button>
 
 <dialog bind:this={dialogEl} onclick={closeDialog}>
-	<div class="dialog-content" in:scale={{ duration: 200, start: 0.95 }}>
+	<div class="dialog-content" in:scale={{ duration: 200, start: 0.95 }} onclick={(e) => e.stopPropagation()}>
 		<header>
 			<h1>New Course</h1>
 			<button class="close-btn" onclick={closeDialog} aria-label="Close dialog">×</button>
@@ -139,7 +139,7 @@
 					<label class="switch-label">
 						<input type="checkbox" name="allowDoubleBookings" />
 						<span class="switch"></span>
-						<span class="label-text">Allow users to book multiple courses</span>
+						<span class="label-text">Allow users that have booked other courses on the same day</span>
 					</label>
 				</div>
 			</div>
@@ -267,6 +267,7 @@
 		font-size: 0.95rem;
 		font-family: inherit;
 		transition: border-color 0.15s ease;
+		color-scheme: dark;
 	}
 	input[type='checkbox'] {
 		width: auto;
