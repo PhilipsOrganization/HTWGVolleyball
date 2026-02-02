@@ -8,7 +8,8 @@
 		{ href: '/admin', label: 'Dashboard', icon: '◉' },
 		{ href: '/admin/users', label: 'Users', icon: '◎' },
 		{ href: '/admin/groups', label: 'Groups', icon: '◈' },
-		{ href: '/admin/templates', label: 'Templates', icon: '◇' }
+		{ href: '/admin/templates', label: 'Templates', icon: '◇' },
+		{ href: '/admin/analytics', label: 'Analytics', icon: '◆' }
 	];
 
 	/**
