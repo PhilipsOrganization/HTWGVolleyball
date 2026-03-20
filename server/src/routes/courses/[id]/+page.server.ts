@@ -162,6 +162,7 @@ export const actions = {
 						// find all courses that are on the same day
 						gte(courses.date, dateWithoutTime),
 						lte(courses.date, nextDayWithoutTime),
+						isNull(courses.deletedAt),
 						isNull(courseSpots.deletedAt)
 					)
 				)
