@@ -26,6 +26,22 @@
 				return 'Unknown';
 		}
 	}
+
+	/**
+	 * @param {number} templateId
+	 */
+	function getUpdateErrors(templateId) {
+		if (!form || typeof form !== 'object') {
+			return undefined;
+		}
+
+		const payload = /** @type {Record<string, unknown>} */ (form);
+		if (payload.templateId !== templateId) {
+			return undefined;
+		}
+
+		return payload.errors ? JSON.stringify(payload.errors) : undefined;
+	}
 </script>
 
 <section>
@@ -192,6 +208,123 @@
 					{/if}
 
 					<div class="card-actions">
+						<details class="edit-template">
+							<summary>Edit Template</summary>
+							<form action="?/update" method="post" use:enhance class="edit-form">
+								<input type="hidden" name="templateId" value={template.id} />
+								<div class="form-grid">
+									<div class="field">
+										<label for={`name-${template.id}`}>Name</label>
+										<input type="text" name="name" id={`name-${template.id}`} value={template.name} required />
+									</div>
+
+									<div class="field">
+										<label for={`location-${template.id}`}>Location</label>
+										<input
+											type="text"
+											name="location"
+											id={`location-${template.id}`}
+											value={template.location}
+											required
+										/>
+									</div>
+
+									<div class="field">
+										<label for={`day-${template.id}`}>Day</label>
+										<select name="day" id={`day-${template.id}`} required>
+											<option value="1" selected={template.day === 1}>Monday</option>
+											<option value="2" selected={template.day === 2}>Tuesday</option>
+											<option value="3" selected={template.day === 3}>Wednesday</option>
+											<option value="4" selected={template.day === 4}>Thursday</option>
+											<option value="5" selected={template.day === 5}>Friday</option>
+											<option value="6" selected={template.day === 6}>Saturday</option>
+											<option value="0" selected={template.day === 0}>Sunday</option>
+										</select>
+									</div>
+
+									<div class="field">
+										<label for={`time-${template.id}`}>Time</label>
+										<input type="time" name="time" id={`time-${template.id}`} value={template.time} required />
+									</div>
+
+									<div class="field">
+										<label for={`maxParticipants-${template.id}`}>Max Participants</label>
+										<input
+											type="number"
+											name="maxParticipants"
+											id={`maxParticipants-${template.id}`}
+											value={template.maxParticipants}
+											required
+										/>
+									</div>
+
+									<div class="field">
+										<label for={`publishDay-${template.id}`}>Publish Day</label>
+										<select name="publishDay" id={`publishDay-${template.id}`} required>
+											<option value="1" selected={template.publishDay === 1}>Monday</option>
+											<option value="2" selected={template.publishDay === 2}>Tuesday</option>
+											<option value="3" selected={template.publishDay === 3}>Wednesday</option>
+											<option value="4" selected={template.publishDay === 4}>Thursday</option>
+											<option value="5" selected={template.publishDay === 5}>Friday</option>
+											<option value="6" selected={template.publishDay === 6}>Saturday</option>
+											<option value="0" selected={template.publishDay === 0}>Sunday</option>
+										</select>
+									</div>
+
+									<div class="field">
+										<label for={`publishHour-${template.id}`}>Publish Hour</label>
+										<input
+											type="number"
+											name="publishHour"
+											id={`publishHour-${template.id}`}
+											min="0"
+											max="23"
+											value={template.publishHour}
+											required
+										/>
+									</div>
+
+									<div class="field">
+										<label for={`maxStrikes-${template.id}`}>Max Strikes</label>
+										<input
+											type="number"
+											name="maxStrikes"
+											id={`maxStrikes-${template.id}`}
+											value={template.maxStrikes}
+											required
+										/>
+									</div>
+
+									<div class="field">
+										<label for={`group-${template.id}`}>Visible To</label>
+										<select name="groupId" id={`group-${template.id}`}>
+											<option value="" selected={!template.groupId}>All Users</option>
+											{#each data.groups as group}
+												<option value={group.id} selected={template.groupId === group.id}>{group.name}</option>
+											{/each}
+										</select>
+									</div>
+								</div>
+
+								<div class="checkbox-row">
+									<label class="checkbox-label">
+										<input type="checkbox" name="allowDoubleBookings" checked={template.allowDoubleBookings} />
+										<span>Allow Double Bookings</span>
+									</label>
+									<label class="checkbox-label">
+										<input type="checkbox" name="autoCreate" checked={template.autoCreate} />
+										<span>Auto Generate Weekly</span>
+									</label>
+								</div>
+
+								<button type="submit">Save Changes</button>
+
+								{#if getUpdateErrors(template.id)}
+									<p class="error">{getUpdateErrors(template.id)}</p>
+								{/if}
+							</form>
+						</details>
+
 						<form action="?/delete" method="post" use:enhance>
 							<input type="hidden" name="templateId" value={template.id} />
 							<button class="delete-btn">Delete</button>
@@ -241,18 +374,18 @@
 		padding: 1rem;
 	}
 
-	form field {
+	.field {
 		display: flex;
 		flex-direction: column;
 		margin-bottom: 1rem;
 	}
 
-	form field label {
+	.field label {
 		margin-bottom: 0.5rem;
 	}
 
-	form field input,
-	form field select {
+	.field input,
+	.field select {
 		padding: 0.5rem;
 		border: 1px solid #ccc;
 		border-radius: 0.25rem;
@@ -267,7 +400,7 @@
 		font-size: 16px;
 	}
 
-	form field input:focus {
+	.field input:focus {
 		outline: none;
 		border-color: #000;
 	}
@@ -277,18 +410,6 @@
 		color: #000;
 		padding: 1rem 2rem;
 		text-align: center;
-	}
-
-	.center {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	select.pad {
-		padding: 0.5rem;
-		display: inline-block;
-		margin: 0.4rem 0;
 	}
 
 	.templates-grid {
@@ -327,6 +448,26 @@
 		border: 1px solid #eb714f40 !important;
 		width: 100%;
 		border-radius: 6px;
+	}
+
+	.edit-template {
+		width: 100%;
+		border: 1px solid #2a2a2a;
+		border-radius: 8px;
+		padding: 0.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.edit-template summary {
+		text-transform: none;
+		text-align: left;
+		letter-spacing: normal;
+		padding: 0.25rem 0.5rem;
+		font-weight: 500;
+	}
+
+	.edit-form {
+		padding: 0.5rem;
 	}
 
 	.delete-btn:hover {

@@ -82,6 +82,60 @@ export const actions: Actions = {
 
 		await locals.db.insert(courseTemplateTable).values({ ...template, trainer: template.autoCreate ? locals.user.id : null });
 	},
+	update: async ({ locals, request }) => {
+		if (!locals.user || locals.user.role === Role.USER) {
+			redirect(303, '/login');
+		}
+
+		const form = await request.formData();
+		const templateId = parseInt(form.get('templateId') as string, 10);
+
+		if (Number.isNaN(templateId)) {
+			return fail(400, { templateId: 'Template not found' });
+		}
+
+		const dto = templateValidation.safeParse(Object.fromEntries(form.entries()));
+
+		if (!dto.success) {
+			const errors: Record<string, string> = {};
+
+			for (const issue of dto.error.issues) {
+				errors[issue.path.join('.')] = issue.message;
+			}
+
+			return fail(400, { templateId, errors });
+		}
+
+		const [existingTemplate] = await locals.db
+			.select()
+			.from(courseTemplateTable)
+			.where(eq(courseTemplateTable.id, templateId))
+			.limit(1);
+
+		if (!existingTemplate) {
+			return fail(400, { templateId: 'Template not found' });
+		}
+
+		const template = dto.data;
+
+		if (template.groupId) {
+			const [g] = await locals.db.select().from(groups).where(eq(groups.id, template.groupId)).limit(1);
+
+			if (!g) {
+				return fail(400, { templateId, groupId: 'Group not found' });
+			}
+		} else {
+			template.groupId = undefined;
+		}
+
+		await locals.db
+			.update(courseTemplateTable)
+			.set({
+				...template,
+				trainer: template.autoCreate ? existingTemplate.trainer : null
+			})
+			.where(eq(courseTemplateTable.id, templateId));
+	},
 	assign: async ({ locals, request }) => {
 		if (!locals.user || locals.user.role === Role.USER) {
 			redirect(303, '/login');
